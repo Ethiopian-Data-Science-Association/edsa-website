@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
 import AsideMenuItem from '@/components/AsideMenuItem.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
+import logo from "../../public/favicon.png";
 
 defineProps({
   menu: {
@@ -35,11 +36,16 @@ const asideLgCloseClick = (event) => {
     id="aside"
     class="lg:py-2 lg:pl-2 w-60 fixed flex z-40 top-0 h-screen transition-position overflow-hidden"
   >
-    <div class="aside lg:rounded-2xl flex-1 flex flex-col overflow-hidden dark:bg-slate-900">
-      <div class="aside-brand flex flex-row h-14 items-center justify-between dark:bg-slate-900">
+    <div class="aside lg:rounded-2xl flex-1 flex flex-col overflow-hidden dark:bg-slate-800">
+      <div class="aside-brand flex flex-col h-14 logo-align my-24 items-center justify-center dark:bg-slate-800">
         <div class="text-center flex-1 lg:text-left lg:pl-6 xl:text-center xl:pl-0">
-          <b class="font-black">One</b>
+          <b class="font-black text-xl">EDSA</b>
         </div>
+        <img
+          :src="logo"
+          alt="EDSA Logo"
+          class="rounded-full h-16 w-16 mt-6 bg-gray-100 dark:bg-slate-800"
+        />
         <button class="hidden lg:inline-block xl:hidden p-3" @click.prevent="asideLgCloseClick">
           <BaseIcon :path="mdiClose" />
         </button>
@@ -56,3 +62,9 @@ const asideLgCloseClick = (event) => {
     </div>
   </aside>
 </template>
+
+<style scoped>
+.logo-align {
+  margin-left: -30px !important;
+}
+</style>
