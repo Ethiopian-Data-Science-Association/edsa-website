@@ -14,7 +14,6 @@ import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
 
 const chartData = ref(null)
 
@@ -81,30 +80,32 @@ const mainStore = useMainStore()
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
         <CardBoxWidget
-          trend="12%"
-          trend-type="up"
-          color="text-emerald-500"
-          :icon="mdiAccountMultiple"
-          :number="512"
-          label="Clients"
+          title="Chartered Data Scientist Exam"
+          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
+          imageUrl="/public/favicon.png"
+          linkText="Learn more"
+          linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium" 
         />
         <CardBoxWidget
-          trend="12%"
-          trend-type="down"
-          color="text-blue-500"
-          :icon="mdiCartOutline"
-          :number="7770"
-          prefix="$"
-          label="Sales"
+          title="Chartered Data Scientist Exam"
+          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
+          imageUrl="/public/favicon.png"
+          linkText="Learn more"
+          linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium" 
         />
+
         <CardBoxWidget
-          trend="Overflow"
-          trend-type="alert"
-          color="text-red-500"
-          :icon="mdiChartTimelineVariant"
-          :number="256"
-          suffix="%"
-          label="Performance"
+          title="Chartered Data Scientist Exam"
+          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
+          imageUrl="/public/favicon.png"
+          linkText="Learn more"
+          linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium"
         />
       </div>
 

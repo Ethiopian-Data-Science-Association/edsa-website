@@ -1,64 +1,95 @@
 <script setup>
-import { mdiCog } from '@mdi/js'
 import CardBox from '@/components/CardBox.vue'
-import NumberDynamic from '@/components/NumberDynamic.vue'
-import BaseIcon from '@/components/BaseIcon.vue'
-import BaseLevel from '@/components/BaseLevel.vue'
-import PillTagTrend from '@/components/PillTagTrend.vue'
 import BaseButton from '@/components/BaseButton.vue'
+import BaseIcon from '@/components/BaseIcon.vue'
+import { mdiArrowRight } from '@mdi/js'
 
 defineProps({
-  number: {
-    type: Number,
-    default: 0
+  title: {
+    type: String,
+    required: true
   },
-  icon: {
+  description: {
+    type: String,
+    required: true
+  },
+  imageUrl: {
+    type: String,
+    required: true
+  },
+  linkText: {
+    type: String,
+    default: 'Learn more'
+  },
+  linkUrl: {
+    type: String,
+    required: false
+  },
+  linkColor: {
+    type: String,
+    default: 'text-blue-600 dark:text-blue-400'
+  },
+  linkFontWeight: {
+    type: String,
+    default: 'font-bold'
+  },
+  buttonText: {
     type: String,
     default: null
   },
-  prefix: {
+  buttonUrl: {
     type: String,
-    default: null
+    required: false
   },
-  suffix: {
+  buttonColor: {
     type: String,
-    default: null
+    default: 'text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white'
   },
-  label: {
+  buttonFontWeight: {
     type: String,
-    default: null
-  },
-  color: {
-    type: String,
-    default: null
-  },
-  trend: {
-    type: String,
-    default: null
-  },
-  trendType: {
-    type: String,
-    default: null
+    default: 'font-bold'
   }
 })
 </script>
 
 <template>
-  <CardBox>
-    <BaseLevel v-if="trend" class="mb-3" mobile>
-      <PillTagTrend :trend="trend" :trend-type="trendType" small />
-      <BaseButton :icon="mdiCog" icon-w="w-4" icon-h="h-4" color="lightDark" small />
-    </BaseLevel>
-    <BaseLevel mobile>
-      <div>
-        <h3 class="text-lg leading-tight text-gray-500 dark:text-slate-400">
-          {{ label }}
+  <CardBox  :no-padding="true">
+    <div class="flex flex-col">
+      <!-- Image -->
+      <img :src="imageUrl" alt="Card Image" class="rounded-t-lg w-full h-48 object-cover" />
+
+      <!-- Content -->
+      <div class="p-4">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
+          {{ title }}
         </h3>
-        <h1 class="text-3xl leading-tight font-semibold">
-          <NumberDynamic :value="number" :prefix="prefix" :suffix="suffix" />
-        </h1>
+        <p class="mt-2 text-gray-600 dark:text-slate-400">
+          {{ description }}
+        </p>
+
+        <!-- Conditional Rendering of Link or Button -->
+        <div class="mt-4">
+          <a v-if="linkUrl" :href="linkUrl" :class="`${linkColor} ${linkFontWeight} flex items-center`">
+            {{ linkText }}
+            <BaseIcon :path="mdiArrowRight" class="ml-2 w-5 h-5" />
+          </a>
+          <a v-if="buttonUrl" :href="buttonUrl" :class="`${buttonColor} ${buttonFontWeight} block text-center px-4 py-2 mt-2 border-2 rounded-full transition`">
+            {{ buttonText }}
+          </a>
+        </div>
       </div>
-      <BaseIcon v-if="icon" :path="icon" size="48" w="" h="h-16" :class="color" />
-    </BaseLevel>
+    </div>
   </CardBox>
 </template>
+
+<style scoped>
+/* Ensure the CardBox has a border and rounded corners */
+.CardBox {
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb; /* Tailwind's gray-200 color */
+}
+
+.dark .CardBox {
+  border-color: #374151; /* Tailwind's gray-700 color for dark mode */
+}
+</style>
