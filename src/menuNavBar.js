@@ -25,7 +25,7 @@ export default [
       },
       {
         icon: mdiEmail,
-        label: 'Messages'
+        label: 'Announcements'
       },
       {
         isDivider: true
