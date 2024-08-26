@@ -5,21 +5,13 @@ import {
   mdiAccountMultiple,
   mdiCartOutline,
   mdiChartTimelineVariant,
-  mdiMonitorCellphone,
   mdiReload,
   mdiGithub,
   mdiChartPie
 } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
-import LineChart from '@/components/Charts/LineChart.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
-import CardBox from '@/components/CardBox.vue'
-import TableSampleClients from '@/components/TableSampleClients.vue'
-import NotificationBar from '@/components/NotificationBar.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import CardBoxTransaction from '@/components/CardBoxTransaction.vue'
-import CardBoxClient from '@/components/CardBoxClient.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import SectionBannerStarOnGitHub from '@/components/SectionBannerStarOnGitHub.vue'
@@ -35,15 +27,46 @@ onMounted(() => {
 })
 
 const mainStore = useMainStore()
-
-const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
-
-const transactionBarItems = computed(() => mainStore.history)
 </script>
 
 <template>
   <LayoutAuthenticated>
-    <SectionMain>
+    <!-- Video Introduction Section -->
+    <div class="relative bg-slate-900 text-white p-6 mb-6">
+      <!-- Video Element with Increased Height -->
+      <div class="absolute inset-0 z-0">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover" style="height: 600px;">
+          <source src="/data-sources/Intro-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- Text Overlay -->
+      <div class="relative z-10 text-left">
+        <h2 class="text-4xl font-extrabold mb-4">EDSA AI Academy</h2>
+        <h2 class="text-3xl font-semibold mb-4">Enhance Your AI Skills with our Hands-on training</h2>
+ 
+        <h2 class="text-xl font-normal mb-4 lg:pt-64">
+          Stand out from the crowd by mastering AI today—your future success depends on staying ahead in the game.
+        </h2>
+        <h2 class="text-xl font-bold text-green-500 mb-6">
+          Start transforming your skills with our Generative AI courses—enroll now and future-proof your career!
+        </h2>
+
+        <!-- Responsive Buttons -->
+        <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+          <a href="/membership" class="px-6 py-3 border-2 border-green-500 text-green-500 font-bold rounded-full hover:bg-green-500 hover:text-white transition text-center">
+            BECOME A MEMBER
+          </a>
+          <a href="/courses" class="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition text-center">
+            START LEARNING AI
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ensure SectionMain Starts Below the Video Section -->
+    <SectionMain class="mt-[150px] xs:mt-80 sm:mt-80 md:mt-80 lg:mt-40">
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
         <BaseButton
           href="https://github.com/Ethiopian-Data-Science-Association/edsa-website"
@@ -85,52 +108,6 @@ const transactionBarItems = computed(() => mainStore.history)
         />
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="flex flex-col justify-between">
-          <CardBoxTransaction
-            v-for="(transaction, index) in transactionBarItems"
-            :key="index"
-            :amount="transaction.amount"
-            :date="transaction.date"
-            :business="transaction.business"
-            :type="transaction.type"
-            :name="transaction.name"
-            :account="transaction.account"
-          />
-        </div>
-        <div class="flex flex-col justify-between">
-          <CardBoxClient
-            v-for="client in clientBarItems"
-            :key="client.id"
-            :name="client.name"
-            :login="client.login"
-            :date="client.created"
-            :progress="client.progress"
-          />
-        </div>
-      </div>
-
-      <SectionBannerStarOnGitHub class="mt-6 mb-6" />
-
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
-      </SectionTitleLineWithButton>
-
-      <CardBox class="mb-6">
-        <div v-if="chartData">
-          <line-chart :data="chartData" class="h-96" />
-        </div>
-      </CardBox>
-
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Clients" />
-
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
-
-      <CardBox has-table>
-        <TableSampleClients />
-      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>
