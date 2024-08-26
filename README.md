@@ -37,7 +37,15 @@
 
 #### Install
 
-`cd` to project's dir and run `npm install`
+Change directory
+```
+cd <PROJECT_NAME>
+```
+
+run
+```
+npm install
+```
 
 ### Vite builds
 
