@@ -34,7 +34,7 @@
             <BaseDivider />
 
             <FormField label="Question" help="Your question. Max 400 characters">
-                <FormControl type="textarea" placeholder="Explain how we can help you" :maxlength="400" />
+                <FormControl type="textarea" placeholder="Explain how we can help you" maxlength="400" />
             </FormField>
             <BaseButtons>
                 <BaseButton type="submit" color="info" label="Submit" />
