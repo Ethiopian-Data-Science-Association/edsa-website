@@ -1,6 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 // import Style from '@/views/StyleView.vue'
 import Home from '@/views/HomeView.vue'
+import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
+import TermsAndConditions from '@/views/TermsAndConditions.vue'
 
 const routes = [
   {
@@ -20,6 +22,22 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: Home
+  },
+  {
+    meta: {
+      title: 'PrivacyPolicy'
+    },
+    path: '/privacy-policy',
+    name: 'privacy-policy',
+    component: PrivacyPolicy
+  },
+  {
+    meta: {
+      title: 'TermsAndConditions'
+    },
+    path: '/terms-and-conditions',
+    name: 'terms-and-conditions',
+    component: TermsAndConditions
   },
   {
     meta: {
