@@ -1,9 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
+import { mdiLinkedin} from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
-import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
@@ -85,14 +84,12 @@ const checked = (isChecked, client) => {
         <th>Name</th>
         <th>Company</th>
         <th>City</th>
-        <th>Progress</th>
-        <th>Created</th>
+        <th>Joined</th>
         <th />
       </tr>
     </thead>
     <tbody>
       <tr v-for="client in itemsPaginated" :key="client.id">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, client)" />
         <td class="border-b-0 lg:w-6 before:hidden">
           <UserAvatar :username="client.name" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
         </td>
@@ -105,25 +102,14 @@ const checked = (isChecked, client) => {
         <td data-label="City">
           {{ client.city }}
         </td>
-        <td data-label="Progress" class="lg:w-32">
-          <progress class="flex w-2/5 self-center lg:w-full" max="100" :value="client.progress">
-            {{ client.progress }}
-          </progress>
-        </td>
-        <td data-label="Created" class="lg:w-1 whitespace-nowrap">
+        <td data-label="Joined" class="lg:w-1 whitespace-nowrap">
           <small class="text-gray-500 dark:text-slate-400" :title="client.created">{{
             client.created
           }}</small>
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-            <BaseButton
-              color="danger"
-              :icon="mdiTrashCan"
-              small
-              @click="isModalDangerActive = true"
-            />
+            <BaseButton color="info" :icon="mdiLinkedin" small @click="isModalActive = true" />
           </BaseButtons>
         </td>
       </tr>
