@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Memberships from '@/views/Memberships.vue'
+import CertificationDetail from '@/views/CertificationDetail.vue'
 import Home from '@/views/HomeView.vue'
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
 import TermsAndConditions from '@/views/TermsAndConditions.vue'
@@ -24,6 +25,11 @@ const routes = [
     component: Memberships
   },
   {
+    path: '/certifications/:title',
+    name: 'CertificationDetail',
+    component: CertificationDetail,
+  },
+  {
     meta: {
       title: 'PrivacyPolicy'
     },
@@ -41,12 +47,20 @@ const routes = [
   },
   {
     meta: {
-      title: 'Tables'
+      title: 'Certifications'
     },
-    path: '/tables',
-    name: 'tables',
-    component: () => import('@/views/TablesView.vue')
+    path: '/certifications',
+    name: 'certifications',
+    component: () => import('@/views/CertificationsPage.vue')
   },
+  // {
+  //   meta: {
+  //     title: 'CertificationDetail'
+  //   },
+  //   path: '/certifications/:id',
+  //   name: 'certification-detail',
+  //   component: () => import('@/views/CertificationDetail.vue')
+  // },
   {
     meta: {
       title: 'Forms'
@@ -60,7 +74,7 @@ const routes = [
       title: 'RegularMembershipForm'
     },
     path: '/regular-membership-form',
-    name: 'RegularMembershipForm',
+    name: 'regular-membership-form',
     component: () => import('@/views/RegularMembershipForm.vue')
   },
   {
@@ -68,7 +82,7 @@ const routes = [
       title: 'InstitutionMembershipForm'
     },
     path: '/institution-membership-form',
-    name: 'InstitutionMembershipForm',
+    name: 'institution-membership-form',
     component: () => import('@/views/InstitutionMembershipForm.vue')
   },
   {

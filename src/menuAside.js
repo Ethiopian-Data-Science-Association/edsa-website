@@ -4,7 +4,7 @@ import {
   mdiLock,
   mdiAlertCircle,
   mdiSquareEditOutline,
-  mdiTable,
+  mdiCertificateOutline ,
   mdiViewList,
   mdiTelevisionGuide,
   mdiResponsive,
@@ -23,9 +23,9 @@ export default [
     icon: mdiAccountMultiplePlus 
   },
   {
-    to: '/tables',
-    label: 'Tables',
-    icon: mdiTable
+    to: '/certifications',
+    label: 'Certifications',
+    icon: mdiCertificateOutline 
   },
   {
     to: '/forms',
