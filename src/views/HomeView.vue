@@ -15,6 +15,7 @@ import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import ObjectivesSection from '@/components/ObjectivesSection.vue'
+import BlogSection from '@/components/BlogSection.vue'
 
 const chartData = ref(null)
 
@@ -92,6 +93,9 @@ const mainStore = useMainStore()
 
       <!-- Objectives Section here -->
       <ObjectivesSection />
+
+      <!-- Blog Section -->
+      <BlogSection />
 
     </SectionMain>
   </LayoutAuthenticated>

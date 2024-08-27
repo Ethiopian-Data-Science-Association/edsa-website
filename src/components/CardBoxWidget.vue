@@ -53,22 +53,22 @@ defineProps({
 </script>
 
 <template>
-  <CardBox  :no-padding="true">
-    <div class="flex flex-col">
+  <CardBox :no-padding="true">
+    <div class="flex flex-col h-full">
       <!-- Image -->
       <img :src="imageUrl" alt="Card Image" class="rounded-t-3xl w-full h-48 object-cover" />
 
       <!-- Content -->
-      <div class="p-4">
+      <div class="p-4 flex flex-col flex-grow">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
           {{ title }}
         </h3>
-        <p class="mt-2 text-gray-600 dark:text-slate-400">
+        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow">
           {{ description }}
         </p>
 
         <!-- Conditional Rendering of Link or Button -->
-        <div class="mt-4">
+        <div class="mt-auto">
           <a v-if="linkUrl" :href="linkUrl" :class="`${linkColor} ${linkFontWeight} flex items-center`">
             {{ linkText }}
             <BaseIcon :path="mdiArrowRight" class="ml-2 w-5 h-5" />
