@@ -14,6 +14,7 @@ import SectionMain from '@/components/SectionMain.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import ObjectivesSection from '@/components/ObjectivesSection.vue'
 
 const chartData = ref(null)
 
@@ -44,7 +45,7 @@ const mainStore = useMainStore()
       <div class="relative z-10 text-left">
         <h2 class="text-4xl font-extrabold mb-4">EDSA AI Academy</h2>
         <h2 class="text-3xl font-semibold mb-4">Enhance Your AI Skills with our Hands-on training</h2>
- 
+
         <h2 class="text-xl font-normal mb-4 lg:pt-64">
           Stand out from the crowd by mastering AI today—your future success depends on staying ahead in the game.
         </h2>
@@ -54,10 +55,12 @@ const mainStore = useMainStore()
 
         <!-- Responsive Buttons -->
         <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-          <a href="/membership" class="px-6 py-3 border-2 border-green-500 text-green-500 font-bold rounded-full hover:bg-green-500 hover:text-white transition text-center">
+          <a href="/membership"
+            class="px-6 py-3 border-2 border-green-500 text-green-500 font-bold rounded-full hover:bg-green-500 hover:text-white transition text-center">
             BECOME A MEMBER
           </a>
-          <a href="/courses" class="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition text-center">
+          <a href="/courses"
+            class="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition text-center">
             START LEARNING AI
           </a>
         </div>
@@ -67,47 +70,28 @@ const mainStore = useMainStore()
     <!-- Ensure SectionMain Starts Below the Video Section -->
     <SectionMain class="mt-[150px] xs:mt-80 sm:mt-80 md:mt-80 lg:mt-40">
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
-        <BaseButton
-          href="https://github.com/Ethiopian-Data-Science-Association/edsa-website"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
+        <BaseButton href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank"
+          :icon="mdiGithub" label="Star on GitHub" color="contrast" rounded-full small />
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-        <CardBoxWidget
-          title="Chartered Data Scientist Exam"
+        <CardBoxWidget title="Chartered Data Scientist Exam"
           description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png"
-          linkText="Learn more"
-          linkUrl="/chartered-data-scientist"
-          linkColor="text-purple-600 dark:text-purple-400"
-          linkFontWeight="font-medium" 
-        />
-        <CardBoxWidget
-          title="Chartered Data Scientist Exam"
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
+        <CardBoxWidget title="Chartered Data Scientist Exam"
           description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png"
-          linkText="Learn more"
-          linkUrl="/chartered-data-scientist"
-          linkColor="text-purple-600 dark:text-purple-400"
-          linkFontWeight="font-medium" 
-        />
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
 
-        <CardBoxWidget
-          title="Chartered Data Scientist Exam"
+        <CardBoxWidget title="Chartered Data Scientist Exam"
           description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png"
-          linkText="Learn more"
-          linkUrl="/chartered-data-scientist"
-          linkColor="text-purple-600 dark:text-purple-400"
-          linkFontWeight="font-medium"
-        />
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
       </div>
+
+      <!-- Objectives Section here -->
+      <ObjectivesSection />
 
     </SectionMain>
   </LayoutAuthenticated>
