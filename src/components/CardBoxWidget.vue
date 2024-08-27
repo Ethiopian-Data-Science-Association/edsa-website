@@ -56,7 +56,7 @@ defineProps({
   <CardBox  :no-padding="true">
     <div class="flex flex-col">
       <!-- Image -->
-      <img :src="imageUrl" alt="Card Image" class="rounded-t-lg w-full h-48 object-cover" />
+      <img :src="imageUrl" alt="Card Image" class="rounded-t-3xl w-full h-48 object-cover" />
 
       <!-- Content -->
       <div class="p-4">
