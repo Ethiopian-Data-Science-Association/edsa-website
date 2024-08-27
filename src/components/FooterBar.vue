@@ -10,7 +10,7 @@ const year = new Date().getFullYear()
   <footer class="py-2 px-6 text-center justify-center" :class="containerMaxW">
     <BaseLevel>
       <div class="text-center md:text-center">
-        <b>&copy;{{ year }}, <a href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank">All rights reserved Ethiopian Data Science Association</a>.</b>
+        <b>&copy;{{ year }} <a href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank">All rights reserved Ethiopian Data Science Association</a>.</b>
         <slot />
       </div>
       <!-- <div class="md:py-2">

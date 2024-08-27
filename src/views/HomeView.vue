@@ -16,6 +16,7 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import ObjectivesSection from '@/components/ObjectivesSection.vue'
 import BlogSection from '@/components/BlogSection.vue'
+import ContactUs from '@/components/ContactUs.vue'
 
 const chartData = ref(null)
 
@@ -97,6 +98,8 @@ const mainStore = useMainStore()
       <!-- Blog Section -->
       <BlogSection />
 
+      <!-- Contact Us section -->
+       <ContactUs/>
     </SectionMain>
   </LayoutAuthenticated>
 </template>
