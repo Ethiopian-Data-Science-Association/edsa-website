@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-// import Style from '@/views/StyleView.vue'
+import Memberships from '@/views/Memberships.vue'
 import Home from '@/views/HomeView.vue'
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
 import TermsAndConditions from '@/views/TermsAndConditions.vue'
@@ -17,11 +17,11 @@ const routes = [
     // Document title tag
     // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
     meta: {
-      title: 'Dashboard'
+      title: 'Memberships'
     },
-    path: '/dashboard',
-    name: 'dashboard',
-    component: Home
+    path: '/memberships',
+    name: 'memberships',
+    component: Memberships
   },
   {
     meta: {
@@ -54,6 +54,30 @@ const routes = [
     path: '/forms',
     name: 'forms',
     component: () => import('@/views/FormsView.vue')
+  },
+  {
+    meta: {
+      title: 'RegularMembershipForm'
+    },
+    path: '/regular-membership-form',
+    name: 'RegularMembershipForm',
+    component: () => import('@/views/RegularMembershipForm.vue')
+  },
+  {
+    meta: {  
+      title: 'InstitutionMembershipForm'
+    },
+    path: '/institution-membership-form',
+    name: 'InstitutionMembershipForm',
+    component: () => import('@/views/InstitutionMembershipForm.vue')
+  },
+  {
+    meta: {
+      title: 'About'
+    },
+    path: '/about',
+    name: 'about',
+    component: () => import('@/views/About.vue')
   },
   {
     meta: {

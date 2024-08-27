@@ -1,8 +1,5 @@
 import {
-  mdiMenu,
-  mdiClockOutline,
-  mdiCloud,
-  mdiCrop,
+  mdiDomain, 
   mdiAccount,
   mdiCogOutline,
   mdiEmail,
@@ -11,6 +8,11 @@ import {
 } from '@mdi/js'
 
 export default [ 
+  {
+    icon: mdiDomain ,
+    label: 'About the Association',
+    to: '/about'
+  },
   {
     isCurrentUser: true,
     menu: [

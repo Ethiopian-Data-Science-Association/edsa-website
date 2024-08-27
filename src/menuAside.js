@@ -8,7 +8,7 @@ import {
   mdiViewList,
   mdiTelevisionGuide,
   mdiResponsive,
-  mdiPalette,
+  mdiAccountMultiplePlus ,
 } from '@mdi/js'
 
 export default [
@@ -16,6 +16,11 @@ export default [
     to: '/',
     icon: mdiMonitor,
     label: 'Home'
+  },
+  {
+    to: '/memberships',
+    label: 'Memberships',
+    icon: mdiAccountMultiplePlus 
   },
   {
     to: '/tables',
@@ -36,11 +41,6 @@ export default [
     to: '/responsive',
     label: 'Responsive',
     icon: mdiResponsive
-  },
-  {
-    to: '/',
-    label: 'Styles',
-    icon: mdiPalette
   },
   {
     to: '/profile',
