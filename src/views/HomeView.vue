@@ -1,13 +1,8 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { ref, onMounted } from 'vue'
 import {
-  mdiAccountMultiple,
-  mdiCartOutline,
   mdiChartTimelineVariant,
-  mdiReload,
   mdiGithub,
-  mdiChartPie
 } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -28,7 +23,6 @@ onMounted(() => {
   fillChartData()
 })
 
-const mainStore = useMainStore()
 </script>
 
 <template>
