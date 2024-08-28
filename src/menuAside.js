@@ -2,10 +2,8 @@ import {
   mdiAccountCircle,
   mdiMonitor,
   mdiLock,
-  mdiAlertCircle,
   mdiSquareEditOutline,
   mdiCertificateOutline ,
-  mdiViewList,
   mdiTelevisionGuide,
   mdiResponsive,
   mdiAccountMultiplePlus ,
@@ -29,17 +27,17 @@ export default [
   },
   {
     to: '/forms',
-    label: 'Forms',
+    label: 'Library',
     icon: mdiSquareEditOutline
   },
   {
     to: '/ui',
-    label: 'UI',
+    label: 'Blogs',
     icon: mdiTelevisionGuide
   },
   {
     to: '/responsive',
-    label: 'Responsive',
+    label: 'Jobs',
     icon: mdiResponsive
   },
   {
@@ -51,22 +49,5 @@ export default [
     to: '/login',
     label: 'Login',
     icon: mdiLock
-  },
-  {
-    to: '/error',
-    label: 'Error',
-    icon: mdiAlertCircle
-  },
-  {
-    label: 'Dropdown',
-    icon: mdiViewList,
-    menu: [
-      {
-        label: 'Item One'
-      },
-      {
-        label: 'Item Two'
-      }
-    ]
-  } 
+  }, 
 ]
