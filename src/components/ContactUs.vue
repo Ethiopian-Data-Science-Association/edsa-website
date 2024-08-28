@@ -1,7 +1,7 @@
 <template>
     <SectionMain>
         <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Contact Us" main>
-            <div class="grid grid-cols-6 gap-4">
+            <div class="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-4">
                 <BaseButton href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank"
                     :icon="mdiGithub" color="contrast" rounded-full small />
                 <BaseButton href="https://twitter.com/your-profile" target="_blank" :icon="mdiTwitter" color="contrast"
