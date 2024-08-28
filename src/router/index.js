@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import Memberships from '@/views/Memberships.vue'
 import CertificationDetail from '@/views/CertificationDetail.vue'
 import Home from '@/views/HomeView.vue'
+import FAQ from '@/views/FAQ.vue'
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
 import TermsAndConditions from '@/views/TermsAndConditions.vue'
 
@@ -28,6 +29,14 @@ const routes = [
     path: '/certifications/:title',
     name: 'CertificationDetail',
     component: CertificationDetail,
+  },
+  {
+    meta: {
+      title: 'FAQ'
+    },
+    path: '/faq',
+    name: 'faq',
+    component: FAQ
   },
   {
     meta: {
