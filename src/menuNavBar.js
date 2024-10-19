@@ -22,10 +22,6 @@ export default [
         to: '/profile'
       },
       {
-        icon: mdiCogOutline,
-        label: 'Settings'
-      },
-      {
         icon: mdiEmail,
         label: 'Announcements'
       },
