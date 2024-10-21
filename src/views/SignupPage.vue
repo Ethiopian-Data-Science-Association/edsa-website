@@ -1,6 +1,108 @@
+<template>
+  <LayoutGuest>
+    <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
+      <CardBox :class="cardClass" is-form @submit.prevent="submit">
+        <div
+          v-if="generalError"
+          class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded"
+        >
+          {{ generalError }}
+        </div>
+        <FormField label="Fullname" help="Please enter your fullname">
+          <div class="flex flex-col gap-y-1.5">
+            <FormControl
+              v-model="name"
+              :icon="mdiAccount"
+              name="name"
+              :disabled="isSubmitting || isLoading"
+            />
+            <p v-if="nameError" class="mt-1 text-sm text-rose-500">{{ nameError }}</p>
+          </div>
+        </FormField>
+        <FormField label="Email" help="Please enter your email">
+          <div class="flex flex-col gap-y-1.5">
+            <FormControl
+              v-model="email"
+              :icon="mdiEmail"
+              name="email"
+              :disabled="isSubmitting || isLoading"
+            />
+            <p v-if="emailError" class="text-sm text-rose-500">{{ emailError }}</p>
+          </div>
+        </FormField>
+
+        <FormField label="Password" help="Please enter your password">
+          <div class="flex flex-col gap-y-1.5">
+            <FormControl
+              v-model="password"
+              :icon="mdiAsterisk"
+              type="password"
+              name="password"
+              :disabled="isSubmitting || isLoading"
+            />
+            <p v-if="passwordError" class="mt-1 text-sm text-rose-500">{{ passwordError }}</p>
+          </div>
+        </FormField>
+        <FormField label="Confirm Password" help="Please confirm your password">
+          <div class="flex flex-col gap-y-1.5">
+            <FormControl
+              v-model="confirmPassword"
+              :icon="mdiAsterisk"
+              type="password"
+              name="confirmPassword"
+            />
+            <p v-if="confirmPasswordError" class="mt-1 text-sm text-rose-500">
+              {{ confirmPasswordError }}
+            </p>
+          </div>
+        </FormField>
+
+        <template #footer>
+          <div class="flex flex-col gap-y-3">
+            <BaseButtons class="flex flex-row">
+              <BaseButton
+                type="submit"
+                color="info"
+                label="Signup"
+                :disabled="isSubmitting || isLoading"
+              />
+              <BaseButton
+                to="/dashboard"
+                color="info"
+                outline
+                label="Back"
+                :disabled="isSubmitting || isLoading"
+              />
+            </BaseButtons>
+
+            <div class="flex gap-x-2 justify-center items-center">
+              <hr class="border-gray-700 w-full" />
+              or
+              <hr class="border-gray-700 w-full" />
+            </div>
+            <BaseButton
+              :icon="mdiGoogle"
+              color="info"
+              outline
+              label="Signup with Google"
+              :disabled="isSubmitting || isLoading"
+              @click="signUpWithGoogle"
+            />
+          </div>
+        </template>
+      </CardBox>
+    </SectionFullScreen>
+  </LayoutGuest>
+</template>
+
+<script>
+import { GoogleAuthProvider } from 'firebase/auth'
+
+export const googleAuthProvider = new GoogleAuthProvider()
+</script>
 <script setup>
-import { mdiAccount, mdiAsterisk, mdiEmail } from '@mdi/js'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { mdiAccount, mdiAsterisk, mdiEmail, mdiGoogle } from '@mdi/js'
+import { createUserWithEmailAndPassword, updateProfile, signInWithPopup } from 'firebase/auth'
 import { useFirebaseAuth } from 'vuefire'
 import { useRouter } from 'vue-router'
 import { useForm, useField } from 'vee-validate'
@@ -27,9 +129,9 @@ const signupSchema = yup.object({
 
 const auth = useFirebaseAuth()
 const isLoading = ref(false)
-const errorMessage = ref('')
+const generalError = ref('')
 
-const { handleSubmit, isSubmitting  } = useForm({
+const { handleSubmit, isSubmitting } = useForm({
   validationSchema: toTypedSchema(signupSchema)
 })
 
@@ -45,90 +147,24 @@ const submit = handleSubmit(async (values) => {
     isLoading.value = true
     const { user } = await createUserWithEmailAndPassword(auth, values.email, values.password)
     await updateProfile(user, { displayName: values.name })
-    router.replace('/dashboard')
+    router.replace('/')
   } catch (error) {
     console.log(error)
-    errorMessage.value(error.message)
+    generalError.value = error.message
   } finally {
     isLoading.value = false
   }
 })
+
+const signUpWithGoogle = async () => {
+  isLoading.value = true
+  try {
+    await signInWithPopup(auth, googleAuthProvider)
+    router.replace('/')
+  } catch (error) {
+    generalError.value = error.message
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
-
-<template>
-  <LayoutGuest>
-    <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
-      <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <div v-if="generalError" class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded">
-          {{ errorMessage }} 
-        </div>
-        <FormField label="Fullname" help="Please enter your fullname">
-          <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="name"
-              :icon="mdiAccount"
-              name="name"
-              :disabled="isSubmitting"
-            />
-            <p v-if="nameError" class="mt-1 text-sm text-rose-500">{{ nameError }}</p>
-          </div>
-        </FormField>
-        <FormField label="Email" help="Please enter your email">
-          <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="email"
-              :icon="mdiEmail"
-              name="email"
-              :disabled="isSubmitting"
-            />
-            <p v-if="emailError" class="text-sm text-rose-500">{{ emailError }}</p>
-          </div>
-        </FormField>
-
-        <FormField label="Password" help="Please enter your password">
-          <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="password"
-              :icon="mdiAsterisk"
-              type="password"
-              name="password"
-              :disabled="isSubmitting"
-            />
-            <p v-if="passwordError" class="mt-1 text-sm text-rose-500">{{ passwordError }}</p>
-          </div>
-        </FormField>
-        <FormField label="Confirm Password" help="Please confirm your password">
-          <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="confirmPassword"
-              :icon="mdiAsterisk"
-              type="password"
-              name="confirmPassword"
-            />
-            <p v-if="confirmPasswordError" class="mt-1 text-sm text-rose-500">
-              {{ confirmPasswordError }}
-            </p>
-          </div>
-        </FormField>
-
-        <template #footer>
-          <BaseButtons>
-            <BaseButton
-              type="submit"
-              color="info"
-              :label="isLoading ? 'Loading...' : 'Signup'"
-              :disabled="isSubmitting"
-            />
-            <BaseButton
-              to="/dashboard"
-              color="info"
-              outline
-              label="Back"
-              :disabled="isSubmitting"
-            />
-          </BaseButtons>
-        </template>
-      </CardBox>
-    </SectionFullScreen>
-  </LayoutGuest>
-</template>
