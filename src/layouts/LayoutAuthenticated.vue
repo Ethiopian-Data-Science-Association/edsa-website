@@ -2,6 +2,8 @@
 import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { signOut } from 'firebase/auth'
+import { useFirebaseAuth } from 'vuefire'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
 import { useDarkModeStore } from '@/stores/darkMode.js'
@@ -17,6 +19,7 @@ const layoutAsidePadding = 'xl:pl-60'
 const darkModeStore = useDarkModeStore()
 
 const router = useRouter()
+const auth = useFirebaseAuth()
 
 const isAsideMobileExpanded = ref(false)
 const isAsideLgActive = ref(false)
@@ -32,7 +35,13 @@ const menuClick = (event, item) => {
   }
 
   if (item.isLogout) {
-    //
+    signOut(auth)
+      .then(() => {
+        router.push('/login')
+      })
+      .catch((error) => {
+        console.log(error.message)
+      })
   }
 }
 </script>
@@ -70,7 +79,7 @@ const menuClick = (event, item) => {
         @aside-lg-close-click="isAsideLgActive = false"
       />
       <slot />
-      <FooterBar/>
+      <FooterBar />
     </div>
   </div>
 </template>
