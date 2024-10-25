@@ -144,6 +144,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Forgot password'
+    },
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/views/ForgotPassword.vue')
+  },
+  {
+    meta: {
       title: 'Error'
     },
     path: '/error',
