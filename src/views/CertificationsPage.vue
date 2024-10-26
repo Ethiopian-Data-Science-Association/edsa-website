@@ -4,23 +4,23 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBoxWidget from '@/components/CardBoxWidget.vue';
 
+// Mock Implementation 
 const certifications = ref([
   { 
-    id: 1,
+    id: "1", // Use unique id
     title: "Certification 1",
     description: "Brief description for certification 1.",
-    image: "/public/favicon.png",
-    link: "/certifications/certification-1"
+    image: `${import.meta.env.BASE_URL}favicon.png`,
+    link: "/edsa-website/certifications/1"
   },
   {
-    id:2,
+    id: "2",
     title: "Certification 2",
     description: "Brief description for certification 2.",
-    image: "/public/favicon.png",
-    link: "/certifications/certification-2"
+    image: `${import.meta.env.BASE_URL}favicon.png`,
+    link: "/edsa-website/certifications/2"
   },
-  // Add more certifications as needed
-]);
+]); 
 </script>
 
 <template>

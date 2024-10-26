@@ -1,12 +1,29 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const certificationTitle = route.params.title || 'Certification Title';
-const certificationDescription = "Full detailed description of the certification. This will include objectives, requirements, content covered, and any other relevant details.";
+const certificationId = route.params.id;
+const certificationTitle = ref('');
+const certificationDescription = ref('');
+
+// Simulating data fetch (replace with Firebase logic)
+const fetchCertificationData = async (id) => {
+  // Placeholder data fetch - replace with Firebase API call
+  const data = {
+    title: `Certification ${id}`,
+    description: `Detailed description of certification ${id}.`,
+  };
+  certificationTitle.value = data.title;
+  certificationDescription.value = data.description;
+};
+
+onMounted(() => {
+  fetchCertificationData(certificationId);
+});
 </script>
 
 <template>
