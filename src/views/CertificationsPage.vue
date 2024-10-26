@@ -10,14 +10,14 @@ const certifications = ref([
     id: "1", // Use unique id
     title: "Certification 1",
     description: "Brief description for certification 1.",
-    image: `${import.meta.env.BASE_URL}favicon.png`,
+    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
     link: "/edsa-website/certifications/1"
   },
   {
     id: "2",
     title: "Certification 2",
     description: "Brief description for certification 2.",
-    image: `${import.meta.env.BASE_URL}favicon.png`,
+    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
     link: "/edsa-website/certifications/2"
   },
 ]); 
