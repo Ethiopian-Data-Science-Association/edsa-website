@@ -71,7 +71,7 @@ const submit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
     await sendPasswordResetEmail(auth, values.email, {
-      url: import.meta.env.BASE_URL
+      url: import.meta.env.VITE_BASE_URL
     })
     router.replace('/')
   } catch (error) {
