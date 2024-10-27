@@ -35,7 +35,7 @@ export const useMainStore = defineStore('main', () => {
         clients.value = result?.data?.data
       })
       .catch((error) => {
-        alert(error.message)
+        console.error(error.message) // these are mock data for temporary use
       })
   }
 
@@ -46,7 +46,7 @@ export const useMainStore = defineStore('main', () => {
         history.value = result?.data?.data
       })
       .catch((error) => {
-        alert(error.message)
+        console.error(error.message) // these are mock data for temporary use
       })
   }
 
