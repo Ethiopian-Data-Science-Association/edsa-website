@@ -1,4 +1,3 @@
-// store/index.js
 import { createStore } from 'vuex'
 import * as modules from './modules'
 import localforage from 'localforage'
@@ -7,12 +6,26 @@ export const store = createStore({
   modules, // all modules in store
   mutations: {
     // Configure Localforage on App Loading . Added localstorage as a fallback option
-    setLocalforageConfig: () => {
-      localforage.config({
-        driver: [localforage.INDEXEDDB, localforage.LOCALSTORAGE],
-        name: 'EDSA'
-      })
-      localforage.setDriver([localforage.INDEXEDDB, localforage.LOCALSTORAGE])
+   setLocalforageConfig: async () => {
+      let driver = ''; 
+      localforage.ready().then(function() {
+        // This code runs once localforage fully initialized the selected driver.
+        driver = localforage.config()?.name; // LocalStorage found
+    }).catch(function (error) {
+        console.error(error); // No available storage method found.
+    });
+
+      // Check if the driver is INDEXEDDB or LOCALSTORAGE is attched
+      if (driver) {
+        console.info('Driver is available and being used.')
+      } else {
+        localforage.config({
+          driver: [localforage.INDEXEDDB, localforage.LOCALSTORAGE],
+          name: 'EDSA'
+        })
+        localforage.setDriver([localforage.INDEXEDDB, localforage.LOCALSTORAGE]) 
+        localforage.setItem('driver', 1).catch((error) => console.error(error))
+      }
     },
     // persist Auth Stored Data
     persistAuth: (state) => {
@@ -20,7 +33,19 @@ export const store = createStore({
     },
     // persist User data if change happens like new project creation
     persistUser: (state) => {
-      localforage.setItem('user', state.user).catch((error) => console.error(error))
+      const serializedUser = {
+        email: state.user.userData.email,
+        fullName: state.user.userData.fullName,
+        phoneNumber: state.user.userData.phoneNumber || '', // Default to empty string if undefined
+        uid: state.user.userData.uid,
+        bio: state.user.userData.bio || '', // Default to empty string if undefined
+        city: state.user.userData.city || '', // Default to empty string if undefined
+        country: state.user.userData.country || '', // Default to empty string if undefined
+        profilePicture: state.user.userData.profilePicture || '', // Default to empty string if undefined
+        role: state.user.userData.role || 'REGULAR' // Default value if needed
+      }
+
+      localforage.setItem('user', serializedUser).catch((error) => console.error(error))
     },
     // Un-Persist all data in IndexDb meaning remove all data in store on logout
     unpersistAll: () => {
