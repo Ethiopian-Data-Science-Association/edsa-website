@@ -40,7 +40,7 @@ const menuClick = (event, item) => {
         router.push('/login')
       })
       .catch((error) => {
-        console.log(error.message)
+        console.error(error.message)
       })
   }
 }
