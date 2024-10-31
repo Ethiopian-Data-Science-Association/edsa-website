@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/pinia/main'
 import { mdiCheckDecagram } from '@mdi/js'
 import BaseLevel from '@/components/BaseLevel.vue'
 import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/pinia/main'
 import { mdiLinkedin} from '@mdi/js'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import BaseLevel from '@/components/BaseLevel.vue'

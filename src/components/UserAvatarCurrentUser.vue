@@ -1,5 +1,5 @@
 <script setup>
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/pinia/main'
 import UserAvatar from '@/components/UserAvatar.vue'
 
 const mainStore = useMainStore()
