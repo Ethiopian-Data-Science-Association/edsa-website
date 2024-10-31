@@ -3,9 +3,10 @@ import { createPinia } from 'pinia'
 import { VueFire, VueFireAuth } from 'vuefire'
 import App from './App.vue'
 import router from './router'
+import { store } from './store'
 import { useDarkModeStore } from './pinia/darkMode'
 import { useMainStore } from '@/pinia/main.js'
-import { firebaseApp } from './firebase'
+import { firebaseApp } from './firebase/firebaseInit'
 
 import './css/main.css'
 
@@ -13,12 +14,15 @@ import './css/main.css'
 const pinia = createPinia()
 
 // Create Vue app
-createApp(App).use(router).use(pinia).use(VueFire, {
-  firebaseApp,
-  modules: [
-    VueFireAuth(),
-  ],
-}).mount('#app')
+createApp(App)
+  .use(router)
+  .use(pinia)
+  .use(store)
+  .use(VueFire, {
+    firebaseApp,
+    modules: [VueFireAuth()]
+  })
+  .mount('#app')
 
 // Init main store
 const mainStore = useMainStore(pinia)
@@ -28,7 +32,7 @@ mainStore.fetchSampleClients()
 mainStore.fetchSampleHistory()
 
 // Dark mode
-// Uncomment, if you'd like to restore persisted darkMode setting, 
+// Uncomment, if you'd like to restore persisted darkMode setting,
 // or use `prefers-color-scheme: dark`. Make sure to uncomment localStorage block in src/stores/darkMode.js
 const darkModeStore = useDarkModeStore(pinia)
 
