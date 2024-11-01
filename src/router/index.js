@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory  } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Memberships from '@/views/Memberships.vue'
 import Home from '@/views/HomeView.vue'
 import FAQ from '@/views/FAQ.vue'
@@ -23,7 +23,7 @@ const routes = [
     path: '/memberships',
     name: 'memberships',
     component: Memberships
-  }, 
+  },
   {
     meta: {
       title: 'FAQ'
@@ -63,7 +63,23 @@ const routes = [
     path: '/certifications/:id',
     name: 'CertificationDetail',
     component: () => import('@/views/CertificationDetail.vue')
-  }, 
+  },
+  {
+    meta: {
+      title: 'Blogs'
+    },
+    path: '/blogs',
+    name: 'blogs',
+    component: () => import('@/views/BlogsPage.vue')
+  },
+  {
+    meta: {
+      title: 'Blog'
+    },
+    path: '/blogs/:id',
+    name: 'blog',
+    component: () => import('@/views/SingleBlog.vue')
+  },
   {
     meta: {
       title: 'Forms'
@@ -81,7 +97,7 @@ const routes = [
     component: () => import('@/views/RegularMembershipForm.vue')
   },
   {
-    meta: {  
+    meta: {
       title: 'InstitutionMembershipForm'
     },
     path: '/institution-membership-form',
@@ -158,8 +174,8 @@ const router = createRouter({
   history: createWebHistory('/edsa-website'), // The web Base URL attaches on each route
   routes,
   scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { top: 0 };
+    return savedPosition || { top: 0 }
   }
-});
+})
 
 export default router
