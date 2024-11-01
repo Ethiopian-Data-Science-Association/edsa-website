@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth'
 import { useFirebaseAuth } from 'vuefire'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
-import { useDarkModeStore } from '@/stores/darkMode.js'
+import { useDarkModeStore } from '@/pinia/darkMode.js'
 import BaseIcon from '@/components/BaseIcon.vue'
 import FormControl from '@/components/FormControl.vue'
 import NavBar from '@/components/NavBar.vue'
@@ -40,7 +40,7 @@ const menuClick = (event, item) => {
         router.push('/login')
       })
       .catch((error) => {
-        console.log(error.message)
+        console.error(error.message)
       })
   }
 }
