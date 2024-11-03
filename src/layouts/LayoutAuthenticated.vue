@@ -7,7 +7,7 @@ import { useFirebaseAuth } from 'vuefire'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
 import { useDarkModeStore } from '@/pinia/darkMode.js'
-import BaseIcon from '@/components/BaseIcon.vue'ዖ
+import BaseIcon from '@/components/BaseIcon.vue'
 import FormControl from '@/components/FormControl.vue'
 import NavBar from '@/components/NavBar.vue'
 import NavBarItemPlain from '@/components/NavBarItemPlain.vue'

@@ -5,11 +5,11 @@
       <CardBoxWidget
         v-if="blogs"
         v-for="(blog, index) in blogs"
-        :key="index"
+        :key="blog.slug"
         :title="blog.title"
         :description="blog.description"
         :imageUrl="blog.coverImage"
-        :buttonUrl="`/edsa-website/blogs/${blog.slug}`"
+        :buttonUrl="sanitizeUrl(`/edsa-website/blogs/${blog.slug}`)"
         buttonColor="text-blue-500 dark:text-blue-400"
         buttonFontWeight="font-medium"
         buttonText="Read More"
@@ -33,6 +33,7 @@
 import { computed, onMounted } from 'vue';
 import { store } from '../store/index';
 import CardBoxWidget from './CardBoxWidget.vue';
+import {sanitizeUrl} from "../utils/utils.js"
 
 const pageSize = 10
 
