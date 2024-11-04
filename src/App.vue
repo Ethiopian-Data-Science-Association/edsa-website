@@ -4,7 +4,7 @@ import { onMounted } from 'vue';
 import { store } from './store';
 
 onMounted(() => {
-store.commit("setLocalforageConfig");
+  store.commit("setLocalforageConfig");
 });
 </script>
 
