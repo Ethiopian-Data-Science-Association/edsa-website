@@ -8,7 +8,6 @@
         alt="Blog Image"
         class="w-full h-64 object-cover mb-4"
       />
-      {{ blog.content }}
       <Markdown :source="blog.content" />
     </SectionMain>
   </LayoutAuthenticated>

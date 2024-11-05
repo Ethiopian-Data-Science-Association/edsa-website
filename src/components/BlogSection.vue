@@ -9,7 +9,7 @@
         :title="blog.title"
         :description="blog.description"
         :imageUrl="blog.coverImage"
-        :buttonUrl="sanitizeUrl(`/edsa-website/blogs/${blog.slug}`)"
+        :buttonUrl="`/edsa-website/blogs/${sanitizeUrl(blog.slug)}`"
         buttonColor="text-blue-500 dark:text-blue-400"
         buttonFontWeight="font-medium"
         buttonText="Read More"
