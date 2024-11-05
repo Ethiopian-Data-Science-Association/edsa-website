@@ -3,10 +3,10 @@ import {
   mdiMonitor,
   mdiLock,
   mdiSquareEditOutline,
-  mdiCertificateOutline ,
+  mdiCertificateOutline,
   mdiTelevisionGuide,
   mdiResponsive,
-  mdiAccountMultiplePlus ,
+  mdiAccountMultiplePlus
 } from '@mdi/js'
 
 export default [
@@ -18,12 +18,12 @@ export default [
   {
     to: '/memberships',
     label: 'Memberships',
-    icon: mdiAccountMultiplePlus 
+    icon: mdiAccountMultiplePlus
   },
   {
     to: '/certifications',
     label: 'Certifications',
-    icon: mdiCertificateOutline 
+    icon: mdiCertificateOutline
   },
   {
     to: '/forms',
@@ -31,8 +31,13 @@ export default [
     icon: mdiSquareEditOutline
   },
   {
-    to: '/ui',
+    to: '/blogs',
     label: 'Blogs',
+    icon: mdiTelevisionGuide
+  },
+  {
+    to: '/ui',
+    label: 'UI',
     icon: mdiTelevisionGuide
   },
   {
@@ -49,5 +54,5 @@ export default [
     to: '/login',
     label: 'Login',
     icon: mdiLock
-  }, 
+  }
 ]

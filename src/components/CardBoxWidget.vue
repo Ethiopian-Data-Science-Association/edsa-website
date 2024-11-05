@@ -63,7 +63,7 @@ defineProps({
         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
           {{ title }}
         </h3>
-        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow">
+        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow max-h-48 overflow-clip text-ellipsis">
           {{ description }}
         </p>
 
