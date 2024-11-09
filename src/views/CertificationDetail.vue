@@ -7,6 +7,7 @@
           <h2 class="text-4xl font-bold">{{ certificationTitle }}</h2>
           <div class="flex space-x-2 ml-4">
             <button
+              @click="navigateToEdit"
               class="flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
               <svg :width="24" :height="24">
                 <path :d="mdiPencil" />
@@ -75,13 +76,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import { mdiPencil, mdiArchive } from '@mdi/js';
-import { useRoute } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
 const certificationId = route.params.id;
 const certificationTitle = ref('');
 const certificationDescription = ref('');
@@ -99,11 +101,15 @@ const fetchCertificationData = async (id) => {
   certificationDescription.value = data.description;
 };
 
+// Function to navigate to the Edit Certification page
+const navigateToEdit = () => {
+  router.push({ name: 'certification-edit-form', params: { id: certificationId } });
+};
+
 onMounted(() => {
   fetchCertificationData(certificationId);
 });
 </script>
-
 
 <style scoped>
 .text-2xl {
@@ -112,11 +118,9 @@ onMounted(() => {
 
 .bg-green-500 {
   background-color: #10b981;
-  /* Adjust green color as needed */
 }
 
 .hover\:bg-green-600:hover {
   background-color: #059669;
-  /* Darker shade for hover */
 }
 </style>
