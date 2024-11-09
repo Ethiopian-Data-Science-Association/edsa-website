@@ -1,7 +1,7 @@
 <template>
   <footer class="py-2 px-6 text-center">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-      <div class="mb-2 sm:mb-0">
+      <div class="mb-2 sm:mb-0 mr-4">
         <b>&copy;{{ year }} <a href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank">All rights reserved Ethiopian Data Science Association</a>.</b>
       </div>
       <div class="flex flex-col sm:flex-row sm:space-x-4">
