@@ -169,11 +169,9 @@ const { value: syllabus, errorMessage: syllabusError } = useField('syllabus');
 const { value: amountDue, errorMessage: amountDueError } = useField('amountDue');
 
 const submit = handleSubmit(async (values) => {
-    console.log("Form submitted with values:", values);
     try {
         isLoading.value = true;
-        // Form submission logic
-        console.log("Form submitted with values:", values);
+        // Form submission logic 
     } catch (error) {
         generalError.value = error.message;
     } finally {
