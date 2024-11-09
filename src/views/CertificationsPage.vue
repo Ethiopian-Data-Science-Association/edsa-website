@@ -53,7 +53,7 @@ import { mdiPlus, mdiCertificate } from '@mdi/js';
 import { useRouter } from 'vue-router';
 
 // Mock user role
-const isAdmin = false; // Set to true if the user is an admin
+const isAdmin = true; // Set to true if the user is an admin
 
 const router = useRouter();
 

@@ -54,10 +54,10 @@
                 </div>
             </FormField>
 
-            <!-- Duration -->
-            <FormField label="Duration (Hours)">
+            <!-- Duration Field with Dropdown for Time Selection -->
+            <FormField label="Duration (HH:mm)">
                 <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="duration" type="number" placeholder="Enter duration in hours" :icon="mdiClock"
+                    <FormControl v-model="duration" type="time" placeholder="Enter duration in HH:mm" :icon="mdiClock"
                         :disabled="isSubmitting || isLoading" />
                     <p v-if="durationError" class="text-red-500">{{ durationError }}</p>
                 </div>
@@ -109,7 +109,8 @@
             <!-- Submit and Reset Buttons -->
             <template #footer>
                 <BaseDivider />
-                <BaseButton class="mr-6" type="submit" color="info" label="Submit" :disabled="isSubmitting || isLoading" />
+                <BaseButton class="mr-6" type="submit" color="info" label="Submit"
+                    :disabled="isSubmitting || isLoading" />
                 <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
             </template>
         </CardBox>
@@ -141,9 +142,9 @@ const schema = yup.object({
     title: yup.string().required().label('title'),
     description: yup.string().required("Description is required"),
     rating: yup.number().min(1).max(5).required("Rating must be between 1 and 5"),
-    level: yup.string().required("Level is required"),
+    level: yup.string().required("Level is required").oneOf(['Beginner', 'Intermediate', 'Advanced']),
     isActive: yup.boolean(),
-    duration: yup.number().min(1, "Duration must be at least 1 hour").required("Duration is required"),
+    duration: yup.string().required("Duration is required"),
     startDateTime: yup.date().required("Start date & time is required"),
     updateDateTime: yup.date(),
     givenBy: yup.string().required("Instructor's name is required"),

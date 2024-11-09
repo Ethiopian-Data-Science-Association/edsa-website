@@ -58,13 +58,12 @@
           </div>
         </FormField>
 
-        <!-- Duration -->
+        <!-- Duration Field with Dropdown for Time Selection -->
         <FormField label="Duration (HH:mm)">
           <div class="flex flex-col gap-y-1.5">
             <FormControl v-model="duration" type="time" placeholder="Enter duration in HH:mm" :icon="mdiClock"
               :disabled="isSubmitting || isLoading" />
             <p v-if="durationError" class="text-red-500">{{ durationError }}</p>
-
           </div>
         </FormField>
 
@@ -110,7 +109,8 @@
 
         <template #footer>
           <BaseDivider />
-          <BaseButton class="mr-6" type="submit" color="info" label="Save Changes" :disabled="isSubmitting || isLoading" />
+          <BaseButton class="mr-6" type="submit" color="info" label="Save Changes"
+            :disabled="isSubmitting || isLoading" />
           <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
         </template>
       </CardBox>
@@ -143,7 +143,7 @@ const schema = yup.object({
   title: yup.string().required("Title is required"),
   description: yup.string().required("Description is required"),
   rating: yup.number().min(1).max(5).required("Rating must be between 1 and 5"),
-  level: yup.string().required("Level is required"),
+  level: yup.string().required("Level is required").oneOf(['Beginner', 'Intermediate', 'Advanced']),
   isActive: yup.boolean(),
   duration: yup.string().required("Duration is required"),
   startDate: yup.date().required("Start date & time is required"),
@@ -202,7 +202,8 @@ onMounted(async () => {
 const saveChanges = handleSubmit(async (values) => {
   try {
     isLoading.value = true;
-    // Form submission logic 
+    // Form submission logic
+    console.log(values) 
   } catch (error) {
     generalError.value = error.message;
   } finally {
