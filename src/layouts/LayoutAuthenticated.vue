@@ -44,23 +44,12 @@ const menuClick = (event, item) => {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-50 dark:bg-slate-800">
-    <!-- Sidebar and Main Content Area -->
-    <div class="flex flex-grow">
-      <!-- Aside Menu with Full Height and Scrollable Content -->
-      <AsideMenu
-        :is-aside-mobile-expanded="isAsideMobileExpanded"
-        :is-aside-lg-active="isAsideLgActive"
-        :menu="menuAside"
-        class="h-full overflow-y-auto bg-gray-50 dark:bg-slate-800 fixed xl:static w-60"
-        @menu-click="menuClick"
-        @aside-lg-close-click="isAsideLgActive = false"
-      />
-
-      <!-- Main Content and Navbar -->
+  <div class="flex flex-col min-h-screen">
+    <!-- Header, Navigation, and Sidebar -->
+    <div :class="{'overflow-hidden lg:overflow-visible': isAsideMobileExpanded}">
       <div
         :class="[layoutAsidePadding, { 'ml-60 lg:ml-0': isAsideMobileExpanded }]"
-        class="flex flex-col w-full transition-position lg:w-auto"
+        class="pt-14 min-h-screen w-screen transition-position lg:w-auto bg-gray-50 dark:bg-slate-800 dark:text-slate-100 flex-grow"
       >
         <NavBar
           :menu="menuNavBar"
@@ -77,27 +66,31 @@ const menuClick = (event, item) => {
             <BaseIcon :path="mdiMenu" size="24" />
           </NavBarItemPlain>
         </NavBar>
-        <main class="flex-grow p-6">
-          <slot />
-        </main>
+        <AsideMenu
+          :is-aside-mobile-expanded="isAsideMobileExpanded"
+          :is-aside-lg-active="isAsideLgActive"
+          :menu="menuAside"
+          @menu-click="menuClick"
+          @aside-lg-close-click="isAsideLgActive = false"
+        />
+        <slot />
       </div>
     </div>
 
     <!-- Footer Section -->
-    <div class="flex justify-end bg-gray-50 dark:bg-slate-800 p-4 text-gray-600 dark:text-gray-400 text-sm">
+    <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 text-gray-600 dark:text-gray-400 text-sm">
+      <!-- Empty Space on the Left for Justification -->
+      <div></div>
+
+      <!-- Footer Content on the Right -->
       <FooterBar />
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Ensures that the layout spans the full height without causing scrolling */
+/* Ensures the footer is aligned at the bottom and spans the full width */
 .min-h-screen {
-  min-height: 100vh;
-}
-
-/* Sidebar styling for a consistent full-height look */
-.h-full {
-  height: 100vh;
+  min-height: 100h;
 }
 </style>
