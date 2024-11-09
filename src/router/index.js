@@ -82,6 +82,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Certification Register Form'
+    },
+    path: '/certifications/register/:id',
+    name: 'certification-register-form',
+    component: () => import('@/views/CertificationRegistration.vue')
+  },
+  {
+    meta: {
       title: 'Blogs'
     },
     path: '/blogs',
