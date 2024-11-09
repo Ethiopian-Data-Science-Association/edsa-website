@@ -61,8 +61,16 @@ const routes = [
       title: 'Certification Detail'
     },
     path: '/certifications/:id',
-    name: 'CertificationDetail',
+    name: 'certification-detail',
     component: () => import('@/views/CertificationDetail.vue')
+  },
+  {
+    meta: {
+      title: 'Certification Create Form'
+    },
+    path: '/certification-create-form',
+    name: 'certification-create-form',
+    component: () => import('@/views/CertificationCreateForm.vue')
   },
   {
     meta: {
