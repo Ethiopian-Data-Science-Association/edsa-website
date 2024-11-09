@@ -74,6 +74,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Certification Edit Form'
+    },
+    path: '/certifications/edit/:id',
+    name: 'certification-edit-form',
+    component: () => import('@/views/CertificationEditForm.vue')
+  },
+  {
+    meta: {
       title: 'Blogs'
     },
     path: '/blogs',
