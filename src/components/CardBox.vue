@@ -12,6 +12,14 @@ const props = defineProps({
     type: String,
     default: 'flex-col'
   },
+  customClass: {
+    type: String,
+    default: ''
+  },
+  isCustomClass : {
+    type: Boolean,
+    default: false
+  },
   hasComponentLayout: Boolean,
   hasTable: Boolean,
   isForm: Boolean,
@@ -51,7 +59,7 @@ const submit = (event) => {
 <template>
   <component
     :is="isForm ? 'form' : 'div'"
-    :class="componentClass"
+    :class="[!isCustomClass ? componentClass : '', isCustomClass ? customClass : '']"
     class="bg-white flex"
     @submit="submit"
   >

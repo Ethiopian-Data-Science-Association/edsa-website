@@ -1,125 +1,136 @@
 <template>
-    <SectionMain>
-        <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create Certification" main>
-            <BaseButton label="Back to Certifications" color="contrast" rounded-full small
-                @click="backToCertificationPage" />
-        </SectionTitleLineWithButton>
-        <CardBox is-form @submit.prevent="submit">
-            <div v-if="generalError" class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded">
-                {{ generalError }}
-            </div>
+    <LayoutAuthenticated>
+        <div class="flex flex-col min-h-screen">
+            <SectionMain>
+                <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create Certification" main>
+                    <BaseButton label="Back to Certifications" color="contrast" rounded-full small
+                        @click="backToCertificationPage" />
+                </SectionTitleLineWithButton>
+                <CardBox is-form @submit.prevent="submit"
+                    class="mb-4 p-4 border border-black-500 rounded" :isCustomClass="isDarkMode"
+                    :custom-class="'rounded-2xl flex-col flex bg-gray-100 text-black dark:bg-slate-800 dark:text-white'">
+                    <div v-if="generalError" class="mb-4 p-4 text-rose-500  border border-red-400 rounded">
+                        {{ generalError }}
+                    </div>
 
-            <!-- Certification Title -->
-            <FormField label="Certification Title">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="title" name="title" placeholder="Enter certification title" :icon="mdiAccount"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="titleError" class="text-red-500">{{ titleError }}</p>
-                </div>
-            </FormField>
+                    <FormField label="Certification Title" class="dark:text-gray-200">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="title" name="title" placeholder="Enter certification title"
+                                :icon="mdiAccount"
+                                class="bg-gray-200 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 border dark:border-gray-700 rounded"
+                                :disabled="isSubmitting || isLoading" />
+                            <p v-if="titleError" class="text-red-500">{{ titleError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Certification Description -->
-            <FormField label="Certification Description">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="description" type="textarea" placeholder="Enter certification description"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="descriptionError" class="text-red-500">{{ descriptionError }}</p>
-                </div>
-            </FormField>
+                    <!-- Certification Description -->
+                    <FormField label="Certification Description" class="dark:text-gray-200">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="description" type="textarea"
+                                placeholder="Enter certification description" :disabled="isSubmitting || isLoading" />
+                            <p v-if="descriptionError" class="text-red-500">{{ descriptionError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Certification Rating -->
-            <FormField label="Certification Rating">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="rating" type="number" placeholder="Enter rating (1-5)" :icon="mdiStar" min="1"
-                        max="5" :disabled="isSubmitting || isLoading" />
-                    <p v-if="ratingError" class="text-red-500">{{ ratingError }}</p>
-                </div>
-            </FormField>
+                    <!-- Certification Rating -->
+                    <FormField label="Certification Rating">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="rating" type="number" placeholder="Enter rating (1-5)" :icon="mdiStar"
+                                min="1" max="5" :disabled="isSubmitting || isLoading" />
+                            <p v-if="ratingError" class="text-red-500">{{ ratingError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Certification Level -->
-            <FormField label="Certification Level">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="level" type="select" :options="['Beginner', 'Intermediate', 'Advanced']"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="levelError" class="text-red-500">{{ levelError }}</p>
-                </div>
-            </FormField>
+                    <!-- Certification Level -->
+                    <FormField label="Certification Level">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="level" type="select"
+                                :options="['Beginner', 'Intermediate', 'Advanced']"
+                                :disabled="isSubmitting || isLoading" />
+                            <p v-if="levelError" class="text-red-500">{{ levelError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Active Status Toggle -->
-            <FormField label="Active Status">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="isActive" type="checkbox" label="Is Active"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="isActiveError" class="text-red-500">{{ isActiveError }}</p>
-                </div>
-            </FormField>
+                    <!-- Active Status Toggle -->
+                    <FormField label="Active Status">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="isActive" type="checkbox" label="Is Active"
+                                :disabled="isSubmitting || isLoading" />
+                            <p v-if="isActiveError" class="text-red-500">{{ isActiveError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Duration Field with Dropdown for Time Selection -->
-            <FormField label="Duration (HH:mm)">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="duration" type="time" placeholder="Enter duration in HH:mm" :icon="mdiClock"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="durationError" class="text-red-500">{{ durationError }}</p>
-                </div>
-            </FormField>
+                    <!-- Duration Field with Dropdown for Time Selection -->
+                    <FormField label="Duration (HH:mm)">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="duration" type="time" placeholder="Enter duration in HH:mm"
+                                :icon="mdiClock" :disabled="isSubmitting || isLoading" />
+                            <p v-if="durationError" class="text-red-500">{{ durationError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Start Date and Time -->
-            <FormField label="Start Date & Time">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="startDateTime" type="datetime-local" :icon="mdiCalendar"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="startDateTimeError" class="text-red-500">{{ startDateTimeError }}</p>
-                </div>
-            </FormField>
+                    <!-- Start Date and Time -->
+                    <FormField label="Start Date & Time">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="startDateTime" type="datetime-local" :icon="mdiCalendar"
+                                class="text-white" :disabled="isSubmitting || isLoading" />
+                            <p v-if="startDateTimeError" class="text-red-500">{{ startDateTimeError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Update Date and Time -->
-            <FormField label="Last Updated Date & Time">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="updateDateTime" type="datetime-local" :icon="mdiCalendar"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="updateDateTimeError" class="text-red-500">{{ updateDateTimeError }}</p>
-                </div>
-            </FormField>
+                    <!-- Update Date and Time -->
+                    <FormField label="Last Updated Date & Time">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="updateDateTime" type="datetime-local" :icon="mdiCalendar"
+                                :disabled="isSubmitting || isLoading" />
+                            <p v-if="updateDateTimeError" class="text-red-500">{{ updateDateTimeError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Instructor Name -->
-            <FormField label="Course Given By">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="givenBy" placeholder="Instructor's name" :icon="mdiSchool"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="givenByError" class="text-red-500">{{ givenByError }}</p>
-                </div>
-            </FormField>
+                    <!-- Instructor Name -->
+                    <FormField label="Course Given By">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="givenBy" placeholder="Instructor's name" :icon="mdiSchool"
+                                :disabled="isSubmitting || isLoading" />
+                            <p v-if="givenByError" class="text-red-500">{{ givenByError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Attach Syllabus -->
-            <FormField label="Attach Syllabus">
-                <FormControl type="file" v-model="syllabus" :icon="mdiFile" placeholder="Upload syllabus"
-                    :disabled="isSubmitting || isLoading" />
-                <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
-            </FormField>
+                    <!-- Attach Syllabus -->
+                    <FormField label="Attach Syllabus">
+                        <FormControl type="file" v-model="syllabus" :icon="mdiFile" placeholder="Upload syllabus"
+                            :disabled="isSubmitting || isLoading" />
+                        <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
+                    </FormField>
 
-            <!-- Amount Due -->
-            <FormField label="Amount Due">
-                <div class="flex flex-col gap-y-1.5">
-                    <FormControl v-model="amountDue" type="number" placeholder="Enter amount in USD" :icon="mdiCash"
-                        :disabled="isSubmitting || isLoading" />
-                    <p v-if="amountDueError" class="text-red-500">{{ amountDueError }}</p>
-                </div>
-            </FormField>
+                    <!-- Amount Due -->
+                    <FormField label="Amount Due">
+                        <div class="flex flex-col gap-y-1.5">
+                            <FormControl v-model="amountDue" type="number" placeholder="Enter amount in USD"
+                                :icon="mdiCash" :disabled="isSubmitting || isLoading" />
+                            <p v-if="amountDueError" class="text-red-500">{{ amountDueError }}</p>
+                        </div>
+                    </FormField>
 
-            <!-- Submit and Reset Buttons -->
-            <template #footer>
-                <BaseDivider />
-                <BaseButton class="mr-6" type="submit" color="info" label="Submit"
-                    :disabled="isSubmitting || isLoading" />
-                <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
-            </template>
-        </CardBox>
-    </SectionMain>
+                    <!-- Submit and Reset Buttons -->
+                    <template #footer>
+                        <BaseDivider />
+                        <BaseButton class="mr-6" type="submit" color="info" label="Submit"
+                            :disabled="isSubmitting || isLoading" />
+                        <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
+                    </template>
+                </CardBox>
+            </SectionMain>
+        </div>
+    </LayoutAuthenticated>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { computed } from 'vue'
+import { useDarkModeStore } from '@/pinia/darkMode.js'
 import { useRouter } from 'vue-router';
+import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import { mdiBallotOutline, mdiAccount, mdiCalendar, mdiClock, mdiFile, mdiStar, mdiCash, mdiSchool } from '@mdi/js';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBox from '@/components/CardBox.vue';
@@ -183,6 +194,13 @@ const submit = handleSubmit(async (values) => {
 const backToCertificationPage = () => {
     router.back();
 };
+
+const isDarkMode = computed(() => {
+    if (useDarkModeStore().isEnabled) {
+        return true
+    }
+    return false
+})
 </script>
 
 <style scoped>
