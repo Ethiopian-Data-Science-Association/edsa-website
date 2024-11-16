@@ -6,10 +6,10 @@
                     <BaseButton label="Back to Certifications" color="contrast" rounded-full small
                         @click="backToCertificationPage" />
                 </SectionTitleLineWithButton>
-                <CardBox is-form @submit.prevent="submit"
-                    class="mb-4 p-4 border border-black-500 rounded" :isCustomClass="isDarkMode"
+                <CardBox is-form @submit.prevent="submit" class="mb-4 p-4 border border-black-500 rounded"
+                    :isCustomClass="isDarkMode"
                     :custom-class="'rounded-2xl flex-col flex bg-gray-100 text-black dark:bg-slate-800 dark:text-white'">
-                    <div v-if="generalError" class="mb-4 p-4 text-rose-500  border border-red-400 rounded">
+                    <div v-if="generalError" class="mb-4 p-4 text-rose-500 border border-red-400 rounded">
                         {{ generalError }}
                     </div>
 
@@ -81,16 +81,16 @@
                     <!-- Update Date and Time -->
                     <FormField label="Last Updated Date & Time">
                         <div class="flex flex-col gap-y-1.5">
-                            <FormControl v-model="updateDateTime" type="datetime-local" :icon="mdiCalendar"
+                            <FormControl v-model="endDateTime" type="datetime-local" :icon="mdiCalendar"
                                 :disabled="isSubmitting || isLoading" />
-                            <p v-if="updateDateTimeError" class="text-red-500">{{ updateDateTimeError }}</p>
+                            <p v-if="endDateTimeError" class="text-red-500">{{ endDateTimeError }}</p>
                         </div>
                     </FormField>
 
                     <!-- Instructor Name -->
                     <FormField label="Course Given By">
                         <div class="flex flex-col gap-y-1.5">
-                            <FormControl v-model="givenBy" placeholder="Instructor's name" :icon="mdiSchool"
+                            <FormControl v-model="instructorName" placeholder="Instructor's name" :icon="mdiSchool"
                                 :disabled="isSubmitting || isLoading" />
                             <p v-if="givenByError" class="text-red-500">{{ givenByError }}</p>
                         </div>
@@ -102,6 +102,13 @@
                             :disabled="isSubmitting || isLoading" />
                         <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
                     </FormField>
+
+                    <!-- Attach Syllabus -->
+                    <!-- <FormField label="Attach Syllabus">
+                        <DocumentUpload @document-uploaded="onDocumentUploaded" saveUrl="certification/syllabus/"
+                            title="Upload Syllabus" />
+                        <p v-if="syllabusError && !syllabusPath" class="text-red-500">{{ syllabusError }}</p>
+                    </FormField> -->
 
                     <!-- Amount Due -->
                     <FormField label="Amount Due">
@@ -126,12 +133,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { computed } from 'vue'
-import { useDarkModeStore } from '@/pinia/darkMode.js'
+import { ref, watch } from 'vue';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
-import { mdiBallotOutline, mdiAccount, mdiCalendar, mdiClock, mdiFile, mdiStar, mdiCash, mdiSchool } from '@mdi/js';
+import DocumentUpload from '@/components/DocumentUpload.vue';
+import { mdiBallotOutline, mdiAccount, mdiCalendar, mdiClock, mdiStar, mdiCash, mdiSchool } from '@mdi/js';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBox from '@/components/CardBox.vue';
 import FormField from '@/components/FormField.vue';
@@ -145,8 +154,10 @@ import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 
 const router = useRouter();
+const store = useStore();
 const isLoading = ref(false);
 const generalError = ref('');
+const syllabusPath = ref(''); // Store the uploaded syllabus path
 
 // Define the validation schema using yup
 const schema = yup.object({
@@ -157,9 +168,9 @@ const schema = yup.object({
     isActive: yup.boolean(),
     duration: yup.string().required("Duration is required"),
     startDateTime: yup.date().required("Start date & time is required"),
-    updateDateTime: yup.date(),
-    givenBy: yup.string().required("Instructor's name is required"),
-    syllabus: yup.mixed().required("Please attach a syllabus"),
+    endDateTime: yup.date().required("Tentative end date is required"),
+    instructorName: yup.string().required("Instructor's name is required"),
+    syllabus: yup.string().required("Please upload a syllabus").default(''),
     amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
 
@@ -175,15 +186,45 @@ const { value: level, errorMessage: levelError } = useField('level');
 const { value: isActive, errorMessage: isActiveError } = useField('isActive');
 const { value: duration, errorMessage: durationError } = useField('duration');
 const { value: startDateTime, errorMessage: startDateTimeError } = useField('startDateTime');
-const { value: updateDateTime, errorMessage: updateDateTimeError } = useField('updateDateTime');
-const { value: givenBy, errorMessage: givenByError } = useField('givenBy');
+const { value: endDateTime, errorMessage: endDateTimeError } = useField('endDateTime');
+const { value: instructorName, errorMessage: givenByError } = useField('instructorName');
 const { value: syllabus, errorMessage: syllabusError } = useField('syllabus');
 const { value: amountDue, errorMessage: amountDueError } = useField('amountDue');
 
+const onDocumentUploaded = (path) => {
+    syllabusPath.value = path; // Store uploaded file path
+    syllabus.value = path; // Update the form field to remove validation error
+};
+
+watch(syllabusPath, (newPath) => {
+    if (newPath) {
+        syllabus.value = newPath; // Remove syllabus error when a file is uploaded
+    }
+});
+
 const submit = handleSubmit(async (values) => {
+    console.log(values)
     try {
         isLoading.value = true;
-        // Form submission logic 
+        const certificationId = `cert_${Date.now()}`;
+
+        const certificationData = {
+            id: certificationId,
+            title: values.title,
+            description: values.description,
+            rating: values.rating,
+            level: values.level,
+            isActive: values.isActive,
+            duration: values.duration,
+            startDateTime: values.startDateTime,
+            endDateTime: values.endDateTime,
+            instructorName: values.instructorName,
+            syllabus: syllabusPath.value, // Use the uploaded syllabus path here
+            amountDue: values.amountDue,
+        };
+
+        await store.dispatch('certification/addCertification', certificationData);
+        router.push('/certifications');
     } catch (error) {
         generalError.value = error.message;
     } finally {
@@ -195,12 +236,7 @@ const backToCertificationPage = () => {
     router.back();
 };
 
-const isDarkMode = computed(() => {
-    if (useDarkModeStore().isEnabled) {
-        return true
-    }
-    return false
-})
+const isDarkMode = computed(() => useDarkModeStore().isEnabled);
 </script>
 
 <style scoped>
