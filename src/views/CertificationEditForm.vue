@@ -8,7 +8,8 @@
             <BaseButton :icon="mdiArrowLeft" label="Back to Certifications" @click="goBack" color="contrast" />
           </div>
 
-          <CardBox is-form @submit.prevent="saveChanges" class="mb-4 p-4 border border-black-500 rounded" :isCustomClass="isDarkMode"
+          <CardBox is-form @submit.prevent="saveChanges" class="mb-4 p-4 border border-black-500 rounded"
+            :isCustomClass="isDarkMode"
             :custom-class="'rounded-2xl flex-col flex bg-gray-100 text-black dark:bg-slate-800 dark:text-white'">
             <div v-if="generalError" class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded">
               {{ generalError }}
@@ -84,9 +85,9 @@
             <!-- Last Updated Date and Time -->
             <FormField label="Last Updated Date & Time">
               <div class="flex flex-col gap-y-1.5">
-                <FormControl v-model="lastUpdated" type="datetime-local" :icon="mdiCalendar"
+                <FormControl v-model="endDateTime" type="datetime-local" :icon="mdiCalendar"
                   :disabled="isSubmitting || isLoading" />
-                <p v-if="lastUpdatedError" class="text-red-500">{{ lastUpdatedError }}</p>
+                <p v-if="endDateTimeError" class="text-red-500">{{ endDateTimeError }}</p>
 
               </div>
             </FormField>
@@ -126,8 +127,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { computed } from 'vue'
-import { useDarkModeStore } from '@/pinia/darkMode.js'
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { useDarkModeStore } from '@/pinia/darkMode.js';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { mdiAccount, mdiCalendar, mdiClock, mdiStar, mdiCash, mdiSchool, mdiArrowLeft } from '@mdi/js';
@@ -143,6 +145,7 @@ import { toTypedSchema } from '@vee-validate/yup';
 
 const route = useRoute();
 const router = useRouter();
+const store = useStore();
 const certificationId = route.params.id;
 const isLoading = ref(false);
 const generalError = ref('');
@@ -156,7 +159,7 @@ const schema = yup.object({
   isActive: yup.boolean(),
   duration: yup.string().required("Duration is required"),
   startDate: yup.date().required("Start date & time is required"),
-  lastUpdated: yup.date(),
+  endDateTime: yup.date(),
   courseProvider: yup.string().required("Course provider is required"),
   amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
@@ -173,45 +176,56 @@ const { value: level, errorMessage: levelError } = useField('level');
 const { value: isActive, errorMessage: isActiveError } = useField('isActive');
 const { value: duration, errorMessage: durationError } = useField('duration');
 const { value: startDate, errorMessage: startDateTimeError } = useField('startDate');
-const { value: lastUpdated, errorMessage: lastUpdatedError } = useField('lastUpdated');
+const { value: endDateTime, errorMessage: endDateTimeError } = useField('endDateTime');
 const { value: courseProvider, errorMessage: courseProviderError } = useField('courseProvider');
 const { value: amountDue, errorMessage: amountDueError } = useField('amountDue');
 
-// Mock fetch function to populate form with existing data
-const fetchCertificationData = async (id) => {
-  return {
-    title: `Certification ${id}`,
-    description: `Detailed description of certification ${id}.`,
-    rating: 4,
-    level: 'Intermediate',
-    isActive: true,
-    duration: '02:30',
-    startDate: '2024-08-26T08:30',
-    lastUpdated: '2024-08-26T08:30',
-    courseProvider: 'Provider Name',
-    amountDue: 100,
-  };
-};
-
-// Populate form data on component mount
+// Fetch certification data on mount
 onMounted(async () => {
-  const data = await fetchCertificationData(certificationId);
-  title.value = data.title;
-  description.value = data.description;
-  rating.value = data.rating;
-  level.value = data.level;
-  isActive.value = data.isActive;
-  duration.value = data.duration;
-  startDate.value = data.startDate;
-  lastUpdated.value = data.lastUpdated;
-  courseProvider.value = data.courseProvider;
-  amountDue.value = data.amountDue;
+  try {
+    isLoading.value = true;
+    await store.dispatch('certification/fetchCertification', certificationId);
+    const data = store.state.certification.certificationData;
+
+    // Populate form fields with fetched data
+    title.value = data.title;
+    description.value = data.description;
+    rating.value = data.rating;
+    level.value = data.level;
+    isActive.value = data.isActive;
+    duration.value = data.duration;
+    startDate.value = data.startDateTime;
+    endDateTime.value = data.endDateTime;
+    courseProvider.value = data.instructorName;
+    amountDue.value = data.amountDue;
+  } catch (error) {
+    generalError.value = error.message;
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const saveChanges = handleSubmit(async (values) => {
   try {
     isLoading.value = true;
-    // Form submission logic
+    const certificationData = {
+      id: certificationId,
+      title: values.title,
+      description: values.description,
+      rating: values.rating,
+      level: values.level,
+      isActive: values.isActive,
+      duration: values.duration,
+      startDateTime: values.startDate,
+      endDateTime: values.endDateTime,
+      instructorName: values.courseProvider,
+      syllabus: values.syllabus,
+      amountDue: values.amountDue,
+    };
+
+    // Dispatch action to update the certification
+    await store.dispatch('certification/updateCertification', certificationData);
+    router.push('/certifications');
   } catch (error) {
     generalError.value = error.message;
   } finally {
