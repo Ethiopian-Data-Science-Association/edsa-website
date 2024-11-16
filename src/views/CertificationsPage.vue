@@ -11,7 +11,7 @@
             label="Create"
             :icon="mdiPlus"
             color="success"
-            class="rounded-full bg-green-500 text-white hover:bg-green-600"
+            class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12" 
             @click="goToCreatePage"
           />
           <BaseButton
@@ -24,27 +24,44 @@
           />
         </div>
 
-        <!-- Certifications Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Certifications Grid or Empty State -->
+        <div v-if="certifications.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <CardBoxWidget
-            v-for="(certification, index) in displayedCertifications"
+            v-for="(certification, index) in certifications"
             :key="certification.id"
             :title="certification.title"
             :description="certification.description"
-            :imageUrl="certification.image"
-            :buttonUrl="certification.link"
+            :imageUrl="certification.image || 'favicon.png'"
             buttonColor="text-blue-500 dark:text-blue-400"
             buttonFontWeight="font-medium"
             buttonText="View Details"
+            @click="viewCertificationDetail(certification)"
           />
         </div>
+
+        <!-- Empty State -->
+        <div v-else class="flex flex-col items-center text-center py-16">
+          <img src="/public/favicon.png" alt="No certifications available" class="w-24 h-24 mb-4" />
+          <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No certifications available</p>
+          <p class="text-gray-500 dark:text-gray-400">Check back later or add a new certification.</p>
+          <BaseButton
+            v-if="isAdmin"
+            label="Create Certification"
+            :icon="mdiPlus"
+            color="success"
+            class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600"
+            @click="goToCreatePage"
+          />
+        </div>
+
       </SectionMain>
     </div>
   </LayoutAuthenticated>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , onMounted} from 'vue';
+import { useStore } from 'vuex';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBoxWidget from '@/components/CardBoxWidget.vue';
@@ -57,39 +74,18 @@ const isAdmin = true; // Set to true if the user is an admin
 
 const router = useRouter();
 
-const certifications = ref([
-  {
-    id: "1",
-    title: "Certification 1",
-    description: "Brief description for certification 1.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/1"
-  },
-  {
-    id: "2",
-    title: "Certification 2",
-    description: "Brief description for certification 2.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/2"
-  },
-]);
+const store = useStore();
 
-const myCertificates = ref([
-  {
-    id: "3",
-    title: "Enrolled Certification 1",
-    description: "Brief description for enrolled certification 1.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/enrolled/1"
-  },
-  {
-    id: "4",
-    title: "Enrolled Certification 2",
-    description: "Brief description for enrolled certification 2.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/enrolled/2"
-  },
-]);
+const certifications = ref([]);
+
+const myCertificates = ref([]);
+
+
+onMounted(async () => {
+  await store.dispatch('certification/fetchCertifications');
+  certifications.value = store.state.certification?.certifications || [];
+  //TODO:: Logic to set myCertificates if needed
+});
 
 const displayedCertifications = ref(certifications.value);
 
@@ -100,6 +96,11 @@ const goToCreatePage = () => {
 const showMyCertificates = () => {
   displayedCertifications.value = myCertificates.value;
 };
+
+const viewCertificationDetail = (certification) => {
+  router.push({ name: 'certification-detail', params: { id: certification.id } });
+};
+
 </script>
 
 <style scoped>
