@@ -70,7 +70,7 @@
           </div>
           <div v-if="registrationStatus === ''" class="flex items-center">
             <span class="text-gray-500 mr-4">💰 Amount Due:</span>
-            <span class="font-medium">{{ certification.amountDue }}</span>
+            <span class="font-medium">{{ formattedAmount }}</span>
           </div>
         </div>
 
@@ -168,7 +168,6 @@ onMounted(async () => {
   // Fetch the certification details based on certificationId
   await store.dispatch('certification/fetchCertification', certificationId);
   const { certificationData } = store.state.certification;// certificationData;
-  console.log(certificationData)
   // Set the certification data
   certification.value = {
     title: certificationData.title,
@@ -176,7 +175,7 @@ onMounted(async () => {
     level: certificationData.level,
     duration: certificationData.duration,
     endDateTime: formatFirestoreTimestamp(certificationData.endDateTime) || '',
-    certificateInfo: certificationData.certificateInfo,
+    certificateInfo: certificationData.certificateInfo || 'Certificate of completion',
     startDate: formatFirestoreTimestamp(certificationData.startDateTime) || '',
     providerName: certificationData.instructorName,
     amountDue: certificationData.amountDue,
@@ -187,6 +186,10 @@ onMounted(async () => {
 
   registrationStatus.value = certificationData.registrationStatus || '';
 });
+
+// Format the displayed money with the currency format
+const formattedAmount = computed(() => `${certification.value.amountDue} ETB`);
+
 </script>
 
 <style scoped>
