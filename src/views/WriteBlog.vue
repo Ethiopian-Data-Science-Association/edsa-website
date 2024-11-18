@@ -92,7 +92,7 @@ const onContentChange = (newContent) => {
 const submit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
-    // Your submission logic here, using values.title and content.value
+    // submission logic goes here, using values.title and content.value
   } catch (error) {
     generalError.value = error.message
   } finally {
