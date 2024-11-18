@@ -98,6 +98,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Write Blogs'
+    },
+    path: '/blogs/write',
+    name: 'writeBlog',
+    component: () => import('@/views/WriteBlog.vue')
+  },
+  {
+    meta: {
       title: 'Blog'
     },
     path: '/blogs/:id',
