@@ -1,6 +1,9 @@
 <template>
   <LayoutAuthenticated>
     <SectionMain class="p-6 mb-6">
+      <div class="flex justify-end">
+        <BaseButton @click="handleWriteBlogBtn" color="contrast" label="Write Blog"/>
+      </div>
       <!-- Blog Section -->
       <BlogSection />
     </SectionMain>
@@ -10,7 +13,15 @@
 <script setup>
 import BlogSection from '@/components/BlogSection.vue'
 import SectionMain from "@/components/SectionMain.vue"
+import BaseButton from "@/components/BaseButton.vue "
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
+const handleWriteBlogBtn = ()=>{
+  router.push("/blogs/write")
+}
 </script>
 
 <style>
