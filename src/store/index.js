@@ -42,7 +42,8 @@ export const store = createStore({
         city: state.user.userData.city || '', // Default to empty string if undefined
         country: state.user.userData.country || '', // Default to empty string if undefined
         profilePicture: state.user.userData.profilePicture || '', // Default to empty string if undefined
-        role: state.user.userData.role || 'REGULAR' // Default value if needed
+        role: state.user.userData.role || 'REGULAR', // Default value if needed
+        certifications: state.user.userData.certifications || [] // the list of registered/paid certifications
       }
 
       localforage.setItem('user', serializedUser).catch((error) => console.error(error))
