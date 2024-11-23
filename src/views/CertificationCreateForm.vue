@@ -252,6 +252,7 @@ const submit = handleSubmit(async (values) => {
             instructorName: values.instructorName,
             syllabus: values.syllabus,
             amountDue: values.amountDue,
+            users: []
         };
 
         await store.dispatch('certification/addCertification', certificationData);

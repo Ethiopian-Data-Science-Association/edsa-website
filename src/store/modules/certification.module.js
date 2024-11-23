@@ -31,7 +31,7 @@ const actions = {
           value: docSnap.data(),
         });
       } else {
-        console.log('No such certification!');
+        alert('No such certification!');
       }
     } catch (error) {
       console.error('Error fetching certification:', error);
@@ -57,7 +57,6 @@ const actions = {
         users: arrayUnion(userEntry),
       });
 
-      console.log(`User ${userId} registered for certification ${certificationId}`);
     } catch (error) {
       console.error('Error registering user to certification:', error);
     }
