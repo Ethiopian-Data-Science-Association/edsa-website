@@ -4,6 +4,7 @@ export const googleAuthProvider = new GoogleAuthProvider()
 </script>
 <script setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex';
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk, mdiGoogle } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
@@ -20,8 +21,9 @@ import { useForm, useField } from 'vee-validate'
 import { useFirebaseAuth } from 'vuefire'
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 
-const isLoading = ref(false)
-const generalError = ref('')
+const isLoading = ref(false);
+const generalError = ref('');
+const store = useStore();
 
 const auth = useFirebaseAuth()
 
@@ -43,7 +45,8 @@ const router = useRouter()
 const submit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
-    await signInWithEmailAndPassword(auth, values.email, values.password)
+    const { user } = await signInWithEmailAndPassword(auth, values.email, values.password);
+    await store.dispatch('user/setUser', user);
     router.replace('/')
   } catch (error) {
     generalError.value = error.message
@@ -55,11 +58,12 @@ const submit = handleSubmit(async (values) => {
 const loginWithGoogle = async () => {
   try {
     isLoading.value = true
-    await signInWithPopup(auth, googleAuthProvider)
+    const { user } = await signInWithPopup(auth, googleAuthProvider)
+    await store.dispatch('user/setUser', user);
     router.replace('/')
-  }catch(error){
+  } catch (error) {
     generalError.value = error.message
-  }finally{isLoading.value = false}
+  } finally { isLoading.value = false }
 
 }
 </script>
@@ -68,63 +72,43 @@ const loginWithGoogle = async () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <div
-          v-if="generalError"
-          class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded"
-        >
+        <div v-if="generalError" class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded">
           {{ generalError }}
         </div>
         <FormField label="Email" help="Please enter your email">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="email"
-              :icon="mdiAccount"
-              name="email"
-              autocomplete="username"
-              :disabled="isSubmitting || isLoading"
-            />
+            <FormControl v-model="email" :icon="mdiAccount" name="email" autocomplete="username"
+              :disabled="isSubmitting || isLoading" />
             <p v-if="emailError" class="mt-1 text-sm text-rose-500">{{ emailError }}</p>
           </div>
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="password"
-              :icon="mdiAsterisk"
-              type="password"
-              name="password"
-              autocomplete="current-password"
-              :disabled="isSubmitting || isLoading"
-            />
+            <FormControl v-model="password" :icon="mdiAsterisk" type="password" name="password"
+              autocomplete="current-password" :disabled="isSubmitting || isLoading" />
             <p v-if="passwordError" class="mt-1 text-sm text-rose-500">{{ passwordError }}</p>
           </div>
         </FormField>
 
         <FormCheckRadio v-model="remember" name="remember" label="Remember" :input-value="true" />
         <div class="mt-3 text-base underline">
-        <RouterLink to="/forgot-password">Forgot Password</RouterLink>
+          <RouterLink to="/forgot-password">Forgot Password</RouterLink>
         </div>
         <template #footer>
           <div class="flex flex-col gap-y-3">
-          <BaseButtons class="flex flex-row">
-            <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
-          </BaseButtons>
-          
-          <div class="flex gap-x-2 justify-center items-center">
+            <BaseButtons class="flex flex-row">
+              <BaseButton type="submit" color="info" label="Login" />
+              <BaseButton to="/dashboard" color="info" outline label="Back" />
+            </BaseButtons>
+
+            <div class="flex gap-x-2 justify-center items-center">
               <hr class="border-gray-700 w-full" />
               or
               <hr class="border-gray-700 w-full" />
             </div>
-            <BaseButton
-              :icon="mdiGoogle"
-              color="info"
-              outline
-              label="Login with Google"
-              :disabled="isSubmitting || isLoading"
-              @click="loginWithGoogle"
-            />
+            <BaseButton :icon="mdiGoogle" color="info" outline label="Login with Google"
+              :disabled="isSubmitting || isLoading" @click="loginWithGoogle" />
           </div>
         </template>
       </CardBox>
