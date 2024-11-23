@@ -159,7 +159,10 @@ const schema = yup.object({
   isActive: yup.boolean(),
   duration: yup.string().required("Duration is required"),
   startDate: yup.date().required("Start date & time is required"),
-  endDateTime: yup.date(),
+  endDateTime: yup
+    .date()
+    .required("End date & time is required")
+    .min(yup.ref('startDate'), "End date must be after the start date"),
   courseProvider: yup.string().required("Course provider is required"),
   amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
@@ -194,8 +197,8 @@ onMounted(async () => {
     level.value = data.level;
     isActive.value = data.isActive;
     duration.value = data.duration;
-    startDate.value = data.startDateTime;
-    endDateTime.value = data.endDateTime;
+    startDate.value = formatDateTimeForInput(convertFirebaseTimestampToDate(data.startDateTime));
+    endDateTime.value = formatDateTimeForInput(convertFirebaseTimestampToDate(data.endDateTime));
     courseProvider.value = data.instructorName;
     amountDue.value = data.amountDue;
   } catch (error) {
@@ -204,6 +207,20 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+// Utility function to convert Firebase timestamp to JavaScript Date
+const convertFirebaseTimestampToDate = (timestamp) => {
+  if (timestamp && timestamp.seconds) {
+    return new Date(timestamp.seconds * 1000);
+  }
+  return null;
+};
+
+// Utility function to format Date for datetime-local input
+const formatDateTimeForInput = (date) => {
+  if (!date) return null;
+  return date.toISOString().slice(0, 16); // Format to "yyyy-MM-ddThh:mm"
+};
 
 const saveChanges = handleSubmit(async (values) => {
   try {
@@ -219,7 +236,6 @@ const saveChanges = handleSubmit(async (values) => {
       startDateTime: values.startDate,
       endDateTime: values.endDateTime,
       instructorName: values.courseProvider,
-      syllabus: values.syllabus,
       amountDue: values.amountDue,
     };
 
