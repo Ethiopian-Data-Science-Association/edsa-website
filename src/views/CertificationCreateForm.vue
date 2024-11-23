@@ -8,7 +8,7 @@
                 </SectionTitleLineWithButton>
 
                 <!-- Notification Bar -->
-                <div v-if="notificationMessage" class="mb-4">
+                <div v-if="notificationMessage !== ''" class="mb-4">
                     <NotificationBar :color="notificationColor" :icon="notificationIcon"
                         :outline="notificationsOutline">
                         <b>{{ notificationTitle }}</b>. {{ notificationMessage }}
@@ -113,7 +113,9 @@
                     <!-- Attach Syllabus -->
                     <FormField label="Attach Syllabus">
                         <FormControl type="file" v-model="syllabus" :icon="mdiFile" placeholder="Upload syllabus"
-                            :disabled="isSubmitting || isLoading" @change="onSyllabusUpload" />
+                            :disabled="isSubmitting || isLoading" :documentStoragePath="paths.CERTIFICATION_UPLOAD_PATH"
+                            @file-upload-success="onSyllabusUploadCompletedEvent"
+                            @file-upload-error="onSyllabusUploadFailedEvent" />
                         <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
                     </FormField>
 
@@ -140,8 +142,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { computed } from 'vue';
+import { ref,computed, watch } from 'vue'; 
 import { useStore } from 'vuex';
 import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
@@ -158,12 +159,12 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
+import { paths } from '@/shared/constants/paths';
 
 const router = useRouter();
 const store = useStore();
 const isLoading = ref(false);
 const generalError = ref('');
-const syllabusPath = ref('');
 const notificationMessage = ref('');
 const notificationTitle = ref('');
 const notificationColor = ref('');
@@ -178,9 +179,19 @@ const schema = yup.object({
     isActive: yup.boolean(),
     duration: yup.string().required("Duration is required"),
     startDateTime: yup.date().required("Start date & time is required"),
-    endDateTime: yup.date().required("Tentative end date is required"),
+    endDateTime: yup
+    .date()
+    .required("End date & time is required")
+    .test(
+      "is-after-start",
+      "End date must be after start date",
+      function (value) {
+        const { startDateTime } = this.parent; 
+        return value > startDateTime; // Ensure endDateTime is after startDateTime
+      }
+    ),
     instructorName: yup.string().required("Instructor's name is required"),
-    syllabus: yup.string().required("Please upload a syllabus").default(''),
+    syllabus: yup.string().required("Please upload a syllabus"),
     amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
 
@@ -200,31 +211,15 @@ const { value: instructorName, errorMessage: instructorNameError } = useField('i
 const { value: syllabus, errorMessage: syllabusError } = useField('syllabus');
 const { value: amountDue, errorMessage: amountDueError } = useField('amountDue');
 
-watch(syllabusPath, (newPath) => {
-    if (newPath) {
-        syllabus.value = newPath;
-    }
-});
-
-const onSyllabusUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-        const payload = {
-            document: file,
-            documentUrl: 'certifications/syllabus/',
-            documentName: file.name,
-            metadata: file.type,
-        };
-        await store.dispatch('shared/uploadDocument', { payload });
-        syllabusPath.value = store.state.shared.documentPath;
-        showNotification('Success', 'Syllabus uploaded successfully.', 'success', mdiCheckCircle);
-    } catch (error) {
-        console.error('Error uploading syllabus:', error);
-        showNotification('Error', 'Failed to upload syllabus. Please try again.', 'danger', mdiAlertCircle);
-    }
+const onSyllabusUploadCompletedEvent = async () => {
+    const documentPath = computed(() => store.getters['shared/documentPath']);
+    syllabus.value = documentPath.value;
+    showNotification('Success', 'Syllabus uploaded successfully.', 'success', mdiCheckCircle);
 };
+
+const onSyllabusUploadFailedEvent = async () => {
+    showNotification('Error', 'Failed to upload syllabus. Please try again.', 'danger', mdiAlertCircle);
+}
 
 const showNotification = (title, message, color, icon) => {
     notificationTitle.value = title;
@@ -241,8 +236,6 @@ const clearNotification = () => {
 };
 
 const submit = handleSubmit(async (values) => {
-    console.log('value',values);
-    return 
     try {
         isLoading.value = true;
         const certificationId = `cert_${Date.now()}`;
@@ -257,7 +250,7 @@ const submit = handleSubmit(async (values) => {
             startDateTime: values.startDateTime,
             endDateTime: values.endDateTime,
             instructorName: values.instructorName,
-            syllabus: syllabusPath.value,
+            syllabus: values.syllabus,
             amountDue: values.amountDue,
         };
 
