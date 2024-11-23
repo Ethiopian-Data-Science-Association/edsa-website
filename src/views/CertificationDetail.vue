@@ -78,8 +78,8 @@
         <div class="flex justify-between">
           <BaseButton v-if="registrationStatus === ''" @click="navigateToRegistration" label="Register Now"
             class="bg-green-500 text-white hover:bg-green-600" />
-          <a :href="certification.syllabusUrl" download="Syllabus_DLDC2024"
-            class="text-blue-600 dark:text-blue-400 font-medium border border-blue-600 dark:border-blue-400 py-2 px-4 rounded hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white transition">
+          <a :href="certification.syllabusUrl" :download="certification.syllabusUrl" target="_blank"
+            class="text-blue-600 cursor-pointer dark:text-blue-400 font-medium border border-blue-600 dark:border-blue-400 py-2 px-4 rounded hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white transition">
             Download Syllabus
           </a>
         </div>
@@ -104,7 +104,6 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const certificationId = route.params.id;
-
 const certification = ref({
   title: '',
   description: '',
@@ -180,7 +179,7 @@ onMounted(async () => {
     providerName: certificationData.instructorName,
     amountDue: certificationData.amountDue,
     rating: certificationData.rating,
-    syllabusUrl: certificationData.syllabusUrl,
+    syllabusUrl: certificationData.syllabus,
     imageUrl: certificationData.imageUrl
   };
 
