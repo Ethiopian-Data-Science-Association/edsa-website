@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
  * @param {Object} timestamp - The Firestore timestamp object with seconds and nanoseconds fields.
  * @returns {string} The formatted date string.
  */
-export function formatFirestoreTimestamp(timestamp) {
+export const formatFirestoreTimestamp = (timestamp) => {
   if (!timestamp || typeof timestamp.seconds !== 'number') {
     throw new Error('Invalid timestamp format');
   }
