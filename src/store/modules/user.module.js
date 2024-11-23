@@ -1,78 +1,83 @@
-import { getField, updateField } from 'vuex-map-fields';
-import { db } from '@/firebase/firebaseInit';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getField, updateField } from 'vuex-map-fields'
+import { db } from '@/firebase/firebaseInit'
+import { store } from '../index'
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore'
 
 const state = {
-  userData: {},
-};
+  userData: {}
+}
 
 const actions = {
-  async hydrateUser() {
-    const value = await localforage.getItem('userData');
-    if (value) {
-      state.userData = {};
-      state.userData = value.userData;
-    }
-  },
-
   async addUser({ commit }, user) {
     try {
       await setDoc(doc(db, 'users', user.uid), user).then(() => {
         commit('updateField', {
           path: 'userData',
-          value: user,
-        });
-        store.commit('persistUser');
-      });
+          value: user
+        })
+        store.commit('persistUser') // for the localforage IndexDB persistance
+      })
     } catch (error) {
-      console.error('Error adding user information to Firestore:', error);
+      console.error('Error adding user information to Firestore:', error)
     }
   },
 
   async getUser({ commit }, userId) {
     try {
-      const docRef = doc(db, 'users', userId);
-      const docSnap = await getDoc(docRef);
+      const docRef = doc(db, 'users', userId)
+      const docSnap = await getDoc(docRef)
 
       if (docSnap.exists()) {
         commit('updateField', {
           path: 'userData',
-          value: docSnap.data(),
-        });
+          value: docSnap.data()
+        })
       } else {
-        console.error('No such user!');
+        console.error('No such user!')
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching user data:', error)
+    }
+  },
+
+  async setUser({ commit }, user) {
+    try {
+      commit('updateField', {
+        path: 'userData',
+        value: user
+      })
+      store.commit('persistUser') // for the localforage IndexDB persistance
+    } catch (error) {
+      console.error('Error setting user information to Firestore:', error)
     }
   },
 
   async registerCertificationToUser({ _ }, { userId, certificationId }) {
     try {
-      const userRef = doc(db, 'users', userId);
-      const certificationEntry = { cid: certificationId, status: 'Registered' };
+      const userRef = doc(db, 'users', userId)
+      const certificationEntry = { cid: certificationId, status: 'Registered' }
 
       await updateDoc(userRef, {
-        certifications: arrayUnion(certificationEntry),
-      });
+        certifications: arrayUnion(certificationEntry)
+      })
     } catch (error) {
-      console.error('Error registering certification to user:', error);
+      console.error('Error registering certification to user:', error)
     }
-  },
-};
+  }
+}
 
 const mutations = {
-  updateField,
-};
+  updateField
+}
 
 const getters = {
-  getField,
-};
+  getField
+}
 
 export default {
   namespaced: true,
   state,
   actions,
   mutations,
-  getters,
-};
+  getters
+}
