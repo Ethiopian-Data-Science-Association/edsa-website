@@ -82,8 +82,8 @@
               </div>
             </FormField>
 
-            <!-- Last Updated Date and Time -->
-            <FormField label="Last Updated Date & Time">
+            <!-- End Date and Time -->
+            <FormField label="End Date & Time">
               <div class="flex flex-col gap-y-1.5">
                 <FormControl v-model="endDateTime" type="datetime-local" :icon="mdiCalendar"
                   :disabled="isSubmitting || isLoading" />
@@ -142,6 +142,7 @@ import BaseDivider from '@/components/BaseDivider.vue';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
+import {  formatDateTimeForInput , convertFirebaseTimestampToDate} from '@/utils/parseDateTime';
 
 const route = useRoute();
 const router = useRouter();
@@ -207,20 +208,6 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
-
-// Utility function to convert Firebase timestamp to JavaScript Date
-const convertFirebaseTimestampToDate = (timestamp) => {
-  if (timestamp && timestamp.seconds) {
-    return new Date(timestamp.seconds * 1000);
-  }
-  return null;
-};
-
-// Utility function to format Date for datetime-local input
-const formatDateTimeForInput = (date) => {
-  if (!date) return null;
-  return date.toISOString().slice(0, 16); // Format to "yyyy-MM-ddThh:mm"
-};
 
 const saveChanges = handleSubmit(async (values) => {
   try {
