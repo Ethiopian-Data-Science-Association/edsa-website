@@ -15,6 +15,7 @@ const props = defineProps({
   options: { type: Array, default: null },
   type: { type: String, default: 'text' },
   modelValue: { type: [String, Number, Boolean, Array, Object], default: '' },
+  documentStoragePath: { type: String, default: '', required: false },
   required: Boolean,
   borderless: Boolean,
   transparent: Boolean,
@@ -92,19 +93,18 @@ const onFilePicked = async (event) => {
 
   // Upload file via shared module
   try {
-    const metadata = { contentType: file.type };
-    const uploadPath = `uploads/${Date.now()}_${file.name}`; // Unique upload path
+    const metadata = { contentType: file.type.toString() };
+    const uploadPath = `${props.documentStoragePath}${Date.now()}_${file.name}`; // Unique upload path
     await store.dispatch('shared/uploadDocument', {
       payload: {
         document: file,
-        documentUrl: uploadPath,
+        documentStoragePath: uploadPath,
         metadata,
       },
-    });
-
+    }); 
     // Emit success event with the uploaded file path
-    emit('file-upload-success', store.state.shared.documentPath);
-  } catch (error) {
+    emit('file-upload-success');
+  } catch (error) { // emit failed to upload event
     emit('file-upload-error', 'File upload failed. Please try again.');
   }
 };
@@ -136,52 +136,18 @@ if (props.ctrlKFocus) {
 
 <template>
   <div class="relative">
-    <select
-      v-if="computedType === 'select'"
-      :id="id"
-      v-model="computedValue"
-      :name="name"
-      :class="inputElClass"
-    >
+    <select v-if="computedType === 'select'" :id="id" v-model="computedValue" :name="name" :class="inputElClass">
       <option v-for="option in options" :key="option.id ?? option" :value="option">
         {{ option.label ?? option }}
       </option>
     </select>
-    <textarea
-      v-else-if="computedType === 'textarea'"
-      :id="id"
-      v-model="computedValue"
-      :class="inputElClass"
-      :name="name"
-      :maxlength="maxlength"
-      :placeholder="placeholder"
-      :required="required"
-    />
-    <input
-      v-else-if="computedType === 'file'"
-      :id="id"
-      ref="fileEl"
-      :name="name"
-      :type="computedType"
-      :required="required"
-      :placeholder="placeholder"
-      :class="inputElClass"
-      @change="onFilePicked"
-    />
-    <input
-      v-else
-      :id="id"
-      ref="inputEl"
-      v-model="computedValue"
-      :name="name"
-      :maxlength="maxlength"
-      :inputmode="inputmode"
-      :autocomplete="autocomplete"
-      :required="required"
-      :placeholder="placeholder"
-      :type="computedType"
-      :class="inputElClass"
-    />
+    <textarea v-else-if="computedType === 'textarea'" :id="id" v-model="computedValue" :class="inputElClass"
+      :name="name" :maxlength="maxlength" :placeholder="placeholder" :required="required" />
+    <input v-else-if="computedType === 'file'" :id="id" ref="fileEl" :name="name" :type="computedType"
+      :required="required" :placeholder="placeholder" :class="inputElClass" @change="onFilePicked" />
+    <input v-else :id="id" ref="inputEl" v-model="computedValue" :name="name" :maxlength="maxlength"
+      :inputmode="inputmode" :autocomplete="autocomplete" :required="required" :placeholder="placeholder"
+      :type="computedType" :class="inputElClass" />
     <FormControlIcon v-if="icon" :icon="icon" :h="controlIconH" />
   </div>
 </template>
