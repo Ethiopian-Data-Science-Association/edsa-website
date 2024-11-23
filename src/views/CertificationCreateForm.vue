@@ -116,7 +116,7 @@
                             :disabled="isSubmitting || isLoading" :documentStoragePath="paths.CERTIFICATION_UPLOAD_PATH"
                             @file-upload-success="onSyllabusUploadCompletedEvent"
                             @file-upload-error="onSyllabusUploadFailedEvent" />
-                        <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
+                        <p v-if="syllabusError" class="text-white-500"> {{ syllabusError }}</p>
                     </FormField>
 
                     <!-- Amount Due -->
@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref,computed, watch } from 'vue'; 
+import { ref,computed } from 'vue'; 
 import { useStore } from 'vuex';
 import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
@@ -191,7 +191,7 @@ const schema = yup.object({
       }
     ),
     instructorName: yup.string().required("Instructor's name is required"),
-    syllabus: yup.string().required("Please upload a syllabus"),
+    syllabus: yup.string(),
     amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
 
