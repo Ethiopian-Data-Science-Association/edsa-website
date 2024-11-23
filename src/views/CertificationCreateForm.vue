@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref,computed } from 'vue'; 
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
@@ -180,16 +180,16 @@ const schema = yup.object({
     duration: yup.string().required("Duration is required"),
     startDateTime: yup.date().required("Start date & time is required"),
     endDateTime: yup
-    .date()
-    .required("End date & time is required")
-    .test(
-      "is-after-start",
-      "End date must be after start date",
-      function (value) {
-        const { startDateTime } = this.parent; 
-        return value > startDateTime; // Ensure endDateTime is after startDateTime
-      }
-    ),
+        .date()
+        .required("End date & time is required")
+        .test(
+            "is-after-start",
+            "End date must be after start date",
+            function (value) {
+                const { startDateTime } = this.parent;
+                return value > startDateTime; // Ensure endDateTime is after startDateTime
+            }
+        ),
     instructorName: yup.string().required("Instructor's name is required"),
     syllabus: yup.string(),
     amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
@@ -239,6 +239,13 @@ const submit = handleSubmit(async (values) => {
     try {
         isLoading.value = true;
         const certificationId = `cert_${Date.now()}`;
+
+        /* TODO:: Place check again once uploading is allowed on the Firebase config
+         if (!values.syllabus) {
+             showNotification('Error', ' Syllabus should be uploaded. Upload Syllabus and try again.', 'danger', mdiAlertCircle);
+             return;
+         } */
+
         const certificationData = {
             id: certificationId,
             title: values.title,
@@ -250,7 +257,7 @@ const submit = handleSubmit(async (values) => {
             startDateTime: values.startDateTime,
             endDateTime: values.endDateTime,
             instructorName: values.instructorName,
-            syllabus: values.syllabus,
+            syllabus: values.syllabus || '', // empty string for DEVELOPMENT purposes only. So that create won't fail
             amountDue: values.amountDue,
             users: []
         };
