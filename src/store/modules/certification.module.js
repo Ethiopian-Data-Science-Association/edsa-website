@@ -98,6 +98,32 @@ const actions = {
     } catch (error) {
       console.error('Error updating certification:', error)
     }
+  },
+  async archiveCertification({ commit, state }, certification) {
+    debugger;
+    try {
+      const docRef = doc(db, 'certifications', certification.id)
+
+      // Update only the isActive field in Firestore
+      await updateDoc(docRef, { isActive: false })
+
+      // Update the local Vuex store's certificationData
+      commit('updateField', {
+        path: 'certificationData.isActive',
+        value: false
+      })
+
+      // If you have an array of certifications in the state, update it as well
+      const index = state.certifications.findIndex((c) => c.id === certification.id)
+      if (index !== -1) {
+        commit('updateField', {
+          path: `certifications[${index}].isActive`,
+          value: false
+        })
+      }
+    } catch (error) {
+      console.error('Error archiving certification:', error)
+    }
   }
 }
 

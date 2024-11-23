@@ -10,7 +10,7 @@
               class="flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
               <BaseIcon :path="mdiPencil" />
             </button>
-            <button
+            <button @click="archiveCertificate" :loading="isLoading"
               class="flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
               <BaseIcon :path="mdiArchive" />
             </button>
@@ -104,7 +104,9 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const certificationId = route.params.id;
+const isLoading = ref(false);
 const certification = ref({
+  id: route.params.id,
   title: '',
   description: '',
   level: '',
@@ -159,6 +161,21 @@ const navigateToEdit = () => {
   router.push({ name: 'certification-edit-form', params: { id: certificationId } });
 };
 
+
+const archiveCertificate = async () => {
+  try {
+    isLoading.value = true;
+    const updatedCertification = { ...certification.value, isActive: false };
+    await store.dispatch('certification/archiveCertification', updatedCertification);
+    alert('Certification has been archived.');
+    router.push('/certifications');
+  } catch (error) {
+    console.error('Error archiving certification:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 const navigateToRegistration = () => {
   router.push({ name: 'certification-register-form', params: { id: certificationId } });
 };
@@ -169,9 +186,11 @@ onMounted(async () => {
   const { certificationData } = store.state.certification;// certificationData;
   // Set the certification data
   certification.value = {
+    id: certificationData.id,
     title: certificationData.title,
     description: certificationData.description,
     level: certificationData.level,
+    isActive: certificationData.isActive,
     duration: certificationData.duration,
     endDateTime: formatFirestoreTimestamp(certificationData.endDateTime) || '',
     certificateInfo: certificationData.certificateInfo || 'Certificate of completion',
