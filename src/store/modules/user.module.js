@@ -1,55 +1,78 @@
-import { getField, updateField } from 'vuex-map-fields'
-import { db } from '@/firebase/firebaseInit'
-import { store } from '..'
-import { doc, setDoc } from 'firebase/firestore'
-import localforage from 'localforage'
+import { getField, updateField } from 'vuex-map-fields';
+import { db } from '@/firebase/firebaseInit';
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 const state = {
-  userData: {}
-}
+  userData: {},
+};
 
 const actions = {
   async hydrateUser() {
-    const value = await localforage.getItem('userData')
+    const value = await localforage.getItem('userData');
     if (value) {
-      /* Flush out state values and reassign */
-      state.userData = {}
-
-      /* Hydrate Users */
-      state.userData = value.userData
+      state.userData = {};
+      state.userData = value.userData;
     }
   },
 
   async addUser({ commit }, user) {
-    // Add user information to Firestore on sign up
     try {
       await setDoc(doc(db, 'users', user.uid), user).then(() => {
-          // Set the user to the Vuex state before persisting
-          commit('updateField', {
-            path: 'userData',
-            value: user
-          })
-          // persist User on the Index DB
-          store.commit('persistUser')
-      })
+        commit('updateField', {
+          path: 'userData',
+          value: user,
+        });
+        store.commit('persistUser');
+      });
     } catch (error) {
-      console.error('Error adding user information to Firestore:', error)
+      console.error('Error adding user information to Firestore:', error);
     }
-  }
-}
+  },
+
+  async getUser({ commit }, userId) {
+    try {
+      const docRef = doc(db, 'users', userId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        commit('updateField', {
+          path: 'userData',
+          value: docSnap.data(),
+        });
+      } else {
+        console.error('No such user!');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  },
+
+  async registerCertificationToUser({ _ }, { userId, certificationId }) {
+    try {
+      const userRef = doc(db, 'users', userId);
+      const certificationEntry = { cid: certificationId, status: 'Registered' };
+
+      await updateDoc(userRef, {
+        certifications: arrayUnion(certificationEntry),
+      });
+    } catch (error) {
+      console.error('Error registering certification to user:', error);
+    }
+  },
+};
 
 const mutations = {
-  updateField
-}
+  updateField,
+};
 
 const getters = {
-  getField
-}
+  getField,
+};
 
 export default {
   namespaced: true,
   state,
   actions,
   mutations,
-  getters
-}
+  getters,
+};
