@@ -73,7 +73,7 @@ defineProps({
             {{ linkText }}
             <BaseIcon :path="mdiArrowRight" class="ml-2 w-5 h-5" />
           </a>
-          <a v-if="buttonUrl" :href="buttonUrl" :class="`${buttonColor} ${buttonFontWeight} block text-center px-4 py-2 mt-2 border-2 rounded-full transition`">
+          <a v-if="buttonUrl || buttonText" :href="buttonUrl" :class="`${buttonColor} ${buttonFontWeight} block text-center px-4 py-2 mt-2 border-2 rounded-full transition cursor-pointer`">
             {{ buttonText }}
           </a>
         </div>

@@ -6,37 +6,28 @@
         <!-- Header with Title and Button -->
         <div class="flex items-center justify-between mb-8">
           <h2 class="text-3xl font-bold">Our Certifications</h2>
-          <BaseButton
-            v-if="isAdmin"
-            label="Create"
-            :icon="mdiPlus"
-            color="success"
-            class="rounded-full bg-green-500 text-white hover:bg-green-600"
-            @click="goToCreatePage"
-          />
-          <BaseButton
-            v-else
-            label="My Certificates"
-            :icon="mdiCertificate"
-            color="primary"
-            class="rounded-full bg-blue-500 text-white hover:bg-blue-600"
-            @click="showMyCertificates"
-          />
+          <BaseButton v-if="isAdmin" label="Create" :icon="mdiPlus" color="success"
+            class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12" @click="goToCreatePage" />
+          <BaseButton :label="isShowingAll ? 'My Certificates' : 'All Certifications'" :icon="mdiCertificate"
+            color="primary" class="rounded-full bg-blue-500 text-white hover:bg-blue-600"
+            @click="toggleCertifications" />
         </div>
 
-        <!-- Certifications Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <CardBoxWidget
-            v-for="(certification, index) in displayedCertifications"
-            :key="certification.id"
-            :title="certification.title"
-            :description="certification.description"
-            :imageUrl="certification.image"
-            :buttonUrl="certification.link"
-            buttonColor="text-blue-500 dark:text-blue-400"
-            buttonFontWeight="font-medium"
-            buttonText="View Details"
-          />
+        <!-- Certifications Grid or Empty State -->
+        <div v-if="displayedCertifications.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardBoxWidget v-for="(certification, index) in displayedCertifications" :key="certification.id"
+            :title="certification.title" :description="certification.description"
+            :imageUrl="certification.image || 'favicon.png'" buttonColor="text-blue-500 dark:text-blue-400"
+            buttonFontWeight="font-medium" buttonText="View Details" @click="viewCertificationDetail(certification)" />
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="flex flex-col items-center text-center py-16">
+          <img src="/public/favicon.png" alt="No certifications available" class="w-24 h-24 mb-4" />
+          <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No certifications available</p>
+          <p class="text-gray-500 dark:text-gray-400">Check back later or add a new certification.</p>
+          <BaseButton v-if="isAdmin" label="Create Certification" :icon="mdiPlus" color="success"
+            class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600" @click="goToCreatePage" />
         </div>
       </SectionMain>
     </div>
@@ -44,66 +35,76 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBoxWidget from '@/components/CardBoxWidget.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import { mdiPlus, mdiCertificate } from '@mdi/js';
 import { useRouter } from 'vue-router';
+import localforage from 'localforage';
 
-// Mock user role
-const isAdmin = true; // Set to true if the user is an admin
-
+const isAdmin = true; // Assume admin status for demonstration
 const router = useRouter();
+const store = useStore();
 
-const certifications = ref([
-  {
-    id: "1",
-    title: "Certification 1",
-    description: "Brief description for certification 1.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/1"
-  },
-  {
-    id: "2",
-    title: "Certification 2",
-    description: "Brief description for certification 2.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/2"
-  },
-]);
+const certifications = ref([]);
+const myCertificates = ref([]);
+const displayedCertifications = ref([]);
+const isShowingAll = ref(true);
 
-const myCertificates = ref([
-  {
-    id: "3",
-    title: "Enrolled Certification 1",
-    description: "Brief description for enrolled certification 1.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/enrolled/1"
-  },
-  {
-    id: "4",
-    title: "Enrolled Certification 2",
-    description: "Brief description for enrolled certification 2.",
-    image: `${import.meta.env.VITE_BASE_URL}public/favicon.png`,
-    link: "/edsa-website/certifications/enrolled/2"
-  },
-]);
+const fetchUserCertifications = async () => {
+  try {
+    // Fetch user data from local storage
+    const { uid } = await localforage.getItem('user');
+    await store.dispatch('user/getUser', uid);
+    const userData = store.state.user.userData;
 
-const displayedCertifications = ref(certifications.value);
-
-const goToCreatePage = () => {
-  router.push('/certification-create-form'); // Replace with the actual route for creating certifications
+    if (userData && userData.certifications?.length > 0) {
+      const userCertificationIds = userData.certifications.map((cert) => cert.cid);
+      // Fetch certifications based on user certification IDs
+      await store.dispatch('certification/fetchCertificationsByIds', userCertificationIds);
+      myCertificates.value = store.state.certification.certifications;
+    } else {
+      myCertificates.value = [];
+    }
+  } catch (error) {
+    console.error('Error fetching user certifications:', error);
+    myCertificates.value = [];
+  }
 };
 
-const showMyCertificates = () => {
-  displayedCertifications.value = myCertificates.value;
+onMounted(async () => {
+  await store.dispatch('certification/fetchCertifications');
+  certifications.value = store.state.certification.certifications || [];
+  displayedCertifications.value = certifications.value; // Show all certifications by default
+});
+
+const goToCreatePage = () => {
+  router.push('/certification-create-form');
+};
+
+const toggleCertifications = async () => {
+  if (isShowingAll.value) {
+    // Show only "My Certifications"
+    if (!myCertificates.value.length) {
+      await fetchUserCertifications();
+    }
+    displayedCertifications.value = myCertificates.value;
+  } else {
+    // Show "All Certifications"
+    displayedCertifications.value = certifications.value;
+  }
+  isShowingAll.value = !isShowingAll.value; // Toggle the state
+};
+
+const viewCertificationDetail = (certification) => {
+  router.push({ name: 'certification-detail', params: { id: certification.id } });
 };
 </script>
 
 <style scoped>
-/* Ensure the footer stays visible without scrolling */
 .min-h-screen {
   min-height: 100vh;
 }

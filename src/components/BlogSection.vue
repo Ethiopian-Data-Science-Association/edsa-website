@@ -33,7 +33,7 @@
 import { computed, onMounted } from 'vue';
 import { store } from '../store/index';
 import CardBoxWidget from './CardBoxWidget.vue';
-import {sanitizeUrl} from "../utils/utils.js"
+import {sanitizeUrl} from "../utils/sanitizeUrl.utils.js"
 
 const pageSize = 10
 

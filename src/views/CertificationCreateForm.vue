@@ -6,13 +6,27 @@
                     <BaseButton label="Back to Certifications" color="contrast" rounded-full small
                         @click="backToCertificationPage" />
                 </SectionTitleLineWithButton>
-                <CardBox is-form @submit.prevent="submit"
-                    class="mb-4 p-4 border border-black-500 rounded" :isCustomClass="isDarkMode"
+
+                <!-- Notification Bar -->
+                <div v-if="notificationMessage !== ''" class="mb-4">
+                    <NotificationBar :color="notificationColor" :icon="notificationIcon"
+                        :outline="notificationsOutline">
+                        <b>{{ notificationTitle }}</b>. {{ notificationMessage }}
+                        <template #right>
+                            <BaseButton label="Dismiss" :color="notificationsOutline ? notificationColor : 'white'"
+                                :outline="notificationsOutline" rounded-full small @click="clearNotification" />
+                        </template>
+                    </NotificationBar>
+                </div>
+
+                <CardBox is-form @submit.prevent="submit" class="mb-4 p-4 border border-black-500 rounded"
+                    :isCustomClass="isDarkMode"
                     :custom-class="'rounded-2xl flex-col flex bg-gray-100 text-black dark:bg-slate-800 dark:text-white'">
-                    <div v-if="generalError" class="mb-4 p-4 text-rose-500  border border-red-400 rounded">
+                    <div v-if="generalError" class="mb-4 p-4 text-rose-500 border border-red-400 rounded">
                         {{ generalError }}
                     </div>
 
+                    <!-- Certification Title -->
                     <FormField label="Certification Title" class="dark:text-gray-200">
                         <div class="flex flex-col gap-y-1.5">
                             <FormControl v-model="title" name="title" placeholder="Enter certification title"
@@ -51,7 +65,7 @@
                         </div>
                     </FormField>
 
-                    <!-- Active Status Toggle -->
+                    <!-- Active Status -->
                     <FormField label="Active Status">
                         <div class="flex flex-col gap-y-1.5">
                             <FormControl v-model="isActive" type="checkbox" label="Is Active"
@@ -60,7 +74,7 @@
                         </div>
                     </FormField>
 
-                    <!-- Duration Field with Dropdown for Time Selection -->
+                    <!-- Duration -->
                     <FormField label="Duration (HH:mm)">
                         <div class="flex flex-col gap-y-1.5">
                             <FormControl v-model="duration" type="time" placeholder="Enter duration in HH:mm"
@@ -78,29 +92,31 @@
                         </div>
                     </FormField>
 
-                    <!-- Update Date and Time -->
+                    <!-- End Date and Time -->
                     <FormField label="Last Updated Date & Time">
                         <div class="flex flex-col gap-y-1.5">
-                            <FormControl v-model="updateDateTime" type="datetime-local" :icon="mdiCalendar"
+                            <FormControl v-model="endDateTime" type="datetime-local" :icon="mdiCalendar"
                                 :disabled="isSubmitting || isLoading" />
-                            <p v-if="updateDateTimeError" class="text-red-500">{{ updateDateTimeError }}</p>
+                            <p v-if="endDateTimeError" class="text-red-500">{{ endDateTimeError }}</p>
                         </div>
                     </FormField>
 
                     <!-- Instructor Name -->
                     <FormField label="Course Given By">
                         <div class="flex flex-col gap-y-1.5">
-                            <FormControl v-model="givenBy" placeholder="Instructor's name" :icon="mdiSchool"
+                            <FormControl v-model="instructorName" placeholder="Instructor's name" :icon="mdiSchool"
                                 :disabled="isSubmitting || isLoading" />
-                            <p v-if="givenByError" class="text-red-500">{{ givenByError }}</p>
+                            <p v-if="instructorNameError" class="text-red-500">{{ instructorNameError }}</p>
                         </div>
                     </FormField>
 
                     <!-- Attach Syllabus -->
                     <FormField label="Attach Syllabus">
                         <FormControl type="file" v-model="syllabus" :icon="mdiFile" placeholder="Upload syllabus"
-                            :disabled="isSubmitting || isLoading" />
-                        <p v-if="syllabusError" class="text-red-500">{{ syllabusError }}</p>
+                            :disabled="isSubmitting || isLoading" :documentStoragePath="paths.CERTIFICATION_UPLOAD_PATH"
+                            @file-upload-success="onSyllabusUploadCompletedEvent"
+                            @file-upload-error="onSyllabusUploadFailedEvent" />
+                        <p v-if="syllabusError" class="text-white-500"> {{ syllabusError }}</p>
                     </FormField>
 
                     <!-- Amount Due -->
@@ -126,12 +142,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { computed } from 'vue'
-import { useDarkModeStore } from '@/pinia/darkMode.js'
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
-import { mdiBallotOutline, mdiAccount, mdiCalendar, mdiClock, mdiFile, mdiStar, mdiCash, mdiSchool } from '@mdi/js';
+import NotificationBar from '@/components/NotificationBar.vue';
+import { mdiBallotOutline, mdiAccount, mdiCalendar, mdiClock, mdiStar, mdiCash, mdiSchool, mdiFile, mdiCheckCircle, mdiAlertCircle } from '@mdi/js';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBox from '@/components/CardBox.vue';
 import FormField from '@/components/FormField.vue';
@@ -139,16 +156,21 @@ import FormControl from '@/components/FormControl.vue';
 import BaseDivider from '@/components/BaseDivider.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue';
-
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
+import { paths } from '@/shared/constants/paths';
 
 const router = useRouter();
+const store = useStore();
 const isLoading = ref(false);
 const generalError = ref('');
+const notificationMessage = ref('');
+const notificationTitle = ref('');
+const notificationColor = ref('');
+const notificationIcon = ref('');
+const notificationsOutline = ref(true);
 
-// Define the validation schema using yup
 const schema = yup.object({
     title: yup.string().required().label('title'),
     description: yup.string().required("Description is required"),
@@ -157,17 +179,26 @@ const schema = yup.object({
     isActive: yup.boolean(),
     duration: yup.string().required("Duration is required"),
     startDateTime: yup.date().required("Start date & time is required"),
-    updateDateTime: yup.date(),
-    givenBy: yup.string().required("Instructor's name is required"),
-    syllabus: yup.mixed().required("Please attach a syllabus"),
+    endDateTime: yup
+        .date()
+        .required("End date & time is required")
+        .test(
+            "is-after-start",
+            "End date must be after start date",
+            function (value) {
+                const { startDateTime } = this.parent;
+                return value > startDateTime; // Ensure endDateTime is after startDateTime
+            }
+        ),
+    instructorName: yup.string().required("Instructor's name is required"),
+    syllabus: yup.string(),
     amountDue: yup.number().min(0, "Amount due must be at least 0").required("Amount due is required"),
 });
 
 const { handleSubmit, isSubmitting, resetForm } = useForm({
-    validationSchema: toTypedSchema(schema)
+    validationSchema: toTypedSchema(schema),
 });
 
-// Define individual fields with error message handling
 const { value: title, errorMessage: titleError } = useField('title');
 const { value: description, errorMessage: descriptionError } = useField('description');
 const { value: rating, errorMessage: ratingError } = useField('rating');
@@ -175,17 +206,68 @@ const { value: level, errorMessage: levelError } = useField('level');
 const { value: isActive, errorMessage: isActiveError } = useField('isActive');
 const { value: duration, errorMessage: durationError } = useField('duration');
 const { value: startDateTime, errorMessage: startDateTimeError } = useField('startDateTime');
-const { value: updateDateTime, errorMessage: updateDateTimeError } = useField('updateDateTime');
-const { value: givenBy, errorMessage: givenByError } = useField('givenBy');
+const { value: endDateTime, errorMessage: endDateTimeError } = useField('endDateTime');
+const { value: instructorName, errorMessage: instructorNameError } = useField('instructorName');
 const { value: syllabus, errorMessage: syllabusError } = useField('syllabus');
 const { value: amountDue, errorMessage: amountDueError } = useField('amountDue');
+
+const onSyllabusUploadCompletedEvent = async () => {
+    const documentPath = computed(() => store.getters['shared/documentPath']);
+    syllabus.value = documentPath.value;
+    showNotification('Success', 'Syllabus uploaded successfully.', 'success', mdiCheckCircle);
+};
+
+const onSyllabusUploadFailedEvent = async () => {
+    showNotification('Error', 'Failed to upload syllabus. Please try again.', 'danger', mdiAlertCircle);
+}
+
+const showNotification = (title, message, color, icon) => {
+    notificationTitle.value = title;
+    notificationMessage.value = message;
+    notificationColor.value = color;
+    notificationIcon.value = icon;
+};
+
+const clearNotification = () => {
+    notificationMessage.value = '';
+    notificationTitle.value = '';
+    notificationColor.value = '';
+    notificationIcon.value = '';
+};
 
 const submit = handleSubmit(async (values) => {
     try {
         isLoading.value = true;
-        // Form submission logic 
+        const certificationId = `cert_${Date.now()}`;
+
+        /* TODO:: Place check again once uploading is allowed on the Firebase config
+         if (!values.syllabus) {
+             showNotification('Error', ' Syllabus should be uploaded. Upload Syllabus and try again.', 'danger', mdiAlertCircle);
+             return;
+         } */
+
+        const certificationData = {
+            id: certificationId,
+            title: values.title,
+            description: values.description,
+            rating: values.rating,
+            level: values.level,
+            isActive: values.isActive,
+            duration: values.duration,
+            startDateTime: values.startDateTime,
+            endDateTime: values.endDateTime,
+            instructorName: values.instructorName,
+            syllabus: values.syllabus || '', // empty string for DEVELOPMENT purposes only. So that create won't fail
+            amountDue: values.amountDue,
+            users: []
+        };
+
+        await store.dispatch('certification/addCertification', certificationData);
+        showNotification('Success', 'Certification created successfully.', 'success', mdiCheckCircle);
+        router.push('/certifications');
     } catch (error) {
         generalError.value = error.message;
+        showNotification('Error', 'Failed to create certification. Please try again.', 'danger', mdiAlertCircle);
     } finally {
         isLoading.value = false;
     }
@@ -195,12 +277,7 @@ const backToCertificationPage = () => {
     router.back();
 };
 
-const isDarkMode = computed(() => {
-    if (useDarkModeStore().isEnabled) {
-        return true
-    }
-    return false
-})
+const isDarkMode = computed(() => useDarkModeStore().isEnabled);
 </script>
 
 <style scoped>

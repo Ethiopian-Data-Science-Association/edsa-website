@@ -1,6 +1,5 @@
 import { getField, updateField } from 'vuex-map-fields';
 import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import localforage from 'localforage';
 import { roles } from '@/shared/constants/roles';
 import { store } from '../index';
 
@@ -12,14 +11,7 @@ const state = {
   fetchedUserData: null
 };
 
-const actions = {
-  async hydrateAuth({ commit }) {
-    const value = await localforage.getItem('auth');
-    if (value) {
-      commit('setUserData', value);
-    }
-  },
-
+const actions = { 
   async signUpUser({ commit },   payload) {
     const auth = getAuth();
     try {
@@ -35,7 +27,8 @@ const actions = {
         city: payload.city || '',
         country: payload.country || '',
         profilePicture: '',
-        role: roles.REGULAR  // default value
+        role: roles.REGULAR,  // default value
+        certifications: [] // this will contain the certifications registered/taken
       };
       commit('updateField', { path: 'user', value: userData });
       await store.dispatch('user/addUser', userData, { root: true });

@@ -16,7 +16,6 @@
               <option value="PayPal">PayPal</option>
               <option value="Bank Transfer">Bank Transfer</option>
             </select>
-
           </div>
 
           <div class="flex flex-col col-span-1 sm:col-span-2 md:flex-row md:items-center">
@@ -42,7 +41,7 @@
 
           <div class="flex flex-col col-span-2">
             <label class="font-medium text-gray-700 dark:text-gray-300">You are registering for</label>
-            <p class="mt-2">{{ startDate }}</p>
+            <p class="mt-2">{{ formattedStartDate }}</p>
           </div>
 
           <div class="flex flex-col">
@@ -75,23 +74,74 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { computed } from 'vue'
-import { useDarkModeStore } from '@/pinia/darkMode.js'
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import localforage from 'localforage';
+import { useDarkModeStore } from '@/pinia/darkMode.js';
 import CardBoxModal from '@/components/CardBoxModal.vue';
 import FormCheckRadio from '@/components/FormCheckRadio.vue';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 
-const certificationTitle = ref('Introduction to Data Science');
-const amountDue = ref(675.00); // Example value
-const startDate = ref('September 1, 2024');
-const email = ref('user@example.com'); // Placeholder email
-const phoneNumber = ref('123-456-7890'); // Placeholder phone number
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+
+// Retrieve certification ID from the route
+const certificationId = route.params.id;
+
+// Certification Data
+const certificationTitle = ref('');
+const amountDue = ref(0);
+const startDate = ref('');
+
+// User Data
+const uid = ref('');
+const email = ref('');
+const phoneNumber = ref('--'); // Default to '--'
 
 // Payment Mode & Modal Controls
 const selectedMode = ref('');
 const modalOneActive = ref(false);
 const paymentConfirmed = ref(false);
+
+const fetchUserData = async () => {
+  try {
+    const user = await localforage.getItem('user');
+    if (user) {
+      await store.dispatch('user/getUser', user.uid);
+      const userData = store.state.user.userData;
+
+      uid.value = userData.uid;
+      email.value = userData.email || '--';
+      phoneNumber.value = userData.phoneNumber || '--';
+    } else {
+      console.error('User data not found in localforage.');
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  }
+};
+
+onMounted(async () => {
+  try {
+    // Fetch certification data
+    await store.dispatch('certification/fetchCertification', certificationId);
+    const certification = store.state.certification.certificationData;
+    certificationTitle.value = certification.title || 'N/A';
+    amountDue.value = certification.amountDue || 0;
+    startDate.value = certification.startDateTime.seconds * 1000; // Convert to milliseconds
+
+    // Fetch user data
+    await fetchUserData();
+  } catch (error) {
+    console.error('Error fetching certification or user data:', error);
+  }
+});
+
+const formattedStartDate = computed(() =>
+  startDate.value ? new Date(startDate.value).toLocaleString() : '--'
+);
 
 const openModal = () => {
   if (selectedMode.value) {
@@ -103,19 +153,33 @@ const confirmPayment = () => {
   modalOneActive.value = false;
 };
 
-const register = () => {
-  if (paymentConfirmed.value) {
-    alert('Registered successfully!'); // Placeholder for actual registration logic
+const register = async () => {
+  // since we are missing uid we have to go and redo the step
+  if (uid.value === '') {
+    router.back()
+    return
+  }
+  const userId = uid.value; // Retrieved userId  
+  const certificationId = route.params.id;
+
+  try {
+    // Register user to certification
+    await store.dispatch('certification/registerUserToCertification', { certificationId, userId });
+
+    // Add certification to user
+    await store.dispatch('user/registerCertificationToUser', { userId, certificationId });
+    router.push('/certifications'); // Redirect after registration
+  } catch (error) {
+    console.error('Error during registration:', error);
   }
 };
 
-const toggleClass = computed(() => {
-  if (useDarkModeStore().isEnabled) {
-    return 'bg-black text-white focus:bg-[#1a1a1a] hover:bg-[#333] focus:outline-none w-full mt-2 p-2 border rounded'
-  }
-  return 'select-bg-dark w-full mt-2 p-2 border rounded'
-})
 
+const toggleClass = computed(() =>
+  useDarkModeStore().isEnabled
+    ? 'bg-black text-white focus:bg-[#1a1a1a] hover:bg-[#333] focus:outline-none w-full mt-2 p-2 border rounded'
+    : 'select-bg-dark w-full mt-2 p-2 border rounded'
+);
 </script>
 
 <style scoped>
@@ -126,6 +190,7 @@ const toggleClass = computed(() => {
 .bg-blue-500 {
   background-color: #3b82f6;
 }
+
 .hover\:bg-blue-600:hover {
   background-color: #2563eb;
 }
