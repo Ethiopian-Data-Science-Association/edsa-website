@@ -63,9 +63,7 @@ defineProps({
         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
           {{ title }}
         </h3>
-        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow max-h-48 overflow-clip text-ellipsis">
-          {{ description }}
-        </p>
+        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow max-h-48 overflow-clip text-ellipsis prose max-w-none  dark:prose-invert prose-sm sm:prose-sm lg:prose-base xl:prose-lg focus:outline-none" v-html="description"></p>
 
         <!-- Conditional Rendering of Link or Button -->
         <div class="mt-auto">

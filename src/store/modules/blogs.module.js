@@ -1,11 +1,6 @@
 import { db } from '@/firebase/firebaseInit'
-import {
-    collection,
-    getDocs,
-    limit,
-    query,
-    where
-} from 'firebase/firestore'
+import { collection, getDocs, limit, query, where, doc, setDoc } from 'firebase/firestore'
+
 import { getField, updateField } from 'vuex-map-fields'
 
 const state = {
@@ -14,8 +9,19 @@ const state = {
 }
 
 const actions = {
+  async addBlog({ commit }, blog) {
+    try {
+      await setDoc(doc(db, 'blogs', blog.slug), blog)
+      commit('updateField', {
+        path: 'singleBlog',
+        value: blog
+      })
+    } catch (error) {
+      console.error('Error adding Blog:', error)
+    }
+  },
+
   async getBlogs({ commit }, { pageSize = 10, lastDoc = null }) {
-    console.log('here')
     try {
       const q = query(
         collection(db, 'blogs'),
@@ -39,10 +45,7 @@ const actions = {
 
   async getSingleBlog({ commit }, slug) {
     try {
-      const q = query(
-        collection(db, 'blogs'),
-        where('slug', '==', slug) 
-      )
+      const q = query(collection(db, 'blogs'), where('slug', '==', slug))
 
       const querySnapshot = await getDocs(q)
 
