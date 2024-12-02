@@ -1,11 +1,6 @@
 import { db } from '@/firebase/firebaseInit'
-import {
-    collection,
-    getDocs,
-    limit,
-    query,
-    where
-} from 'firebase/firestore'
+import { collection, getDocs, limit, query, where, doc, setDoc } from 'firebase/firestore'
+
 import { getField, updateField } from 'vuex-map-fields'
 
 const state = {
@@ -14,8 +9,19 @@ const state = {
 }
 
 const actions = {
+  async addBlog({ commit }, blog) {
+    try {
+      await setDoc(doc(db, 'blogs', blog.slug), blog)
+      commit('updateField', {
+        path: 'singleBlog',
+        value: blog
+      })
+    } catch (error) {
+      console.error('Error adding Blog:', error)
+    }
+  },
+
   async getBlogs({ commit }, { pageSize = 10, lastDoc = null }) {
-    console.log('here')
     try {
       const q = query(
         collection(db, 'blogs'),
@@ -27,11 +33,14 @@ const actions = {
 
       const querySnapshot = await getDocs(q)
       const blogs = []
+
       querySnapshot.forEach((doc) => {
         blogs.push({ id: doc.id, ...doc.data() })
       })
-
-      commit('setBlogs', blogs)
+      commit('updateField', {
+        path: 'blogs',
+        value: blogs
+      })
     } catch (error) {
       console.error('Error fetching and setting blogs:', error)
     }
@@ -39,16 +48,23 @@ const actions = {
 
   async getSingleBlog({ commit }, slug) {
     try {
-      const q = query(
-        collection(db, 'blogs'),
-        where('slug', '==', slug) 
-      )
+      const q = query(collection(db, 'blogs'), where('slug', '==', slug))
 
       const querySnapshot = await getDocs(q)
 
       if (!querySnapshot.empty) {
         const blogData = querySnapshot.docs[0] // Get the first document
-        commit('setSingleBlog', { id: blogData.id, ...blogData.data() }) // Commit the single blog data
+        // To update store you always need the updateField helper function (vuex-map-fields)
+        // Commit the single blog data
+        console.log('blogData', blogData.id , blogData.data())
+        const singleBlogValue = { id: blogData.id, ...blogData.data() }; 
+        console.log('singleBlogValue',singleBlogValue)
+
+        commit('updateField', {
+          path: 'singleBlog',
+          value: singleBlogValue
+        })
+        // commit('setSingleBlog', { id: blogData.id, ...blogData.data() }) // Commit the single blog data
       } else {
         console.log('No such document with this slug!')
       }
