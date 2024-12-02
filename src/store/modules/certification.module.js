@@ -100,7 +100,6 @@ const actions = {
     }
   },
   async archiveCertification({ commit, state }, certification) {
-    debugger;
     try {
       const docRef = doc(db, 'certifications', certification.id)
 

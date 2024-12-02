@@ -33,11 +33,14 @@ const actions = {
 
       const querySnapshot = await getDocs(q)
       const blogs = []
+
       querySnapshot.forEach((doc) => {
         blogs.push({ id: doc.id, ...doc.data() })
       })
-
-      commit('setBlogs', blogs)
+      commit('updateField', {
+        path: 'blogs',
+        value: blogs
+      })
     } catch (error) {
       console.error('Error fetching and setting blogs:', error)
     }
@@ -51,7 +54,17 @@ const actions = {
 
       if (!querySnapshot.empty) {
         const blogData = querySnapshot.docs[0] // Get the first document
-        commit('setSingleBlog', { id: blogData.id, ...blogData.data() }) // Commit the single blog data
+        // To update store you always need the updateField helper function (vuex-map-fields)
+        // Commit the single blog data
+        console.log('blogData', blogData.id , blogData.data())
+        const singleBlogValue = { id: blogData.id, ...blogData.data() }; 
+        console.log('singleBlogValue',singleBlogValue)
+
+        commit('updateField', {
+          path: 'singleBlog',
+          value: singleBlogValue
+        })
+        // commit('setSingleBlog', { id: blogData.id, ...blogData.data() }) // Commit the single blog data
       } else {
         console.log('No such document with this slug!')
       }
