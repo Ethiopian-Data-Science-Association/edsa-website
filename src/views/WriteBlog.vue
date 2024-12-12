@@ -64,6 +64,7 @@ import slugify from 'slugify'
 import { mdiCheckCircle } from '@mdi/js'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import localforage from "localforage"
 
 const store = useStore()
 const router = useRouter()
@@ -108,11 +109,12 @@ const clearNotification = () => {
 }
 
 const submit = handleSubmit(async (values) => {
-  const userId = store.state.auth.userId 
+  // const userId = store.state.auth.userId 
+  const { uid } = await localforage.getItem('user');
   const slug = slugify(values.title.toLowerCase())
   const blogsData = {
     isPublished: false,
-    ownerId: userId,
+    ownerId: uid,
     publishedAt:  Date.now(),
     updatedAt: Date.now(),
     slug,
