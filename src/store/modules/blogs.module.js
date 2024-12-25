@@ -49,7 +49,7 @@ const actions = {
       const q = query(
         collection(db, 'blogs'),
         where('ownerId', '==', uid),
-        // orderBy('updatedAt', 'desc'),
+        orderBy('updatedAt', 'desc'),
         limit(pageSize)
         // lastDoc ? startAfter(lastDoc) : null
       )

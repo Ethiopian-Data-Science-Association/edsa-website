@@ -1,9 +1,7 @@
 <script setup>
 import CardBox from '@/components/CardBox.vue'
-import BaseButton from '@/components/BaseButton.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { mdiArrowRight } from '@mdi/js'
-import { boolean } from 'yup'
 import PillTag from '@/components/PillTag.vue'
 
 defineProps({
@@ -12,7 +10,7 @@ defineProps({
     required: true
   },
   isPublished: {
-    type: boolean,
+    type: Boolean,
   },
   description: {
     type: String,
@@ -59,9 +57,9 @@ defineProps({
 
 <template>
   <CardBox :no-padding="true">
-    <div class="flex justify-end p-2">
+    <div class="flex justify-end p-2" v-if="isPublished">
       <PillTag
-        v-if="isPublished === false"
+        v-if="!isPublished"
         color="warning"
         label="pending"
         :small="pillsSmall"
