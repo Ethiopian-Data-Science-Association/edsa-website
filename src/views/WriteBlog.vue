@@ -124,7 +124,7 @@ const submit = handleSubmit(async (values) => {
     isLoading.value = true
     await store.dispatch('blogs/addBlog', blogsData)
     showNotification('Success', 'Blog created successfully.', 'success', mdiCheckCircle)
-    router.push('/blogs')
+    router.push('/blogs/my-blogs')
   } catch (error) {
     generalError.value = error.message
   } finally {

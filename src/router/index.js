@@ -106,6 +106,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'My Blogs'
+    },
+    path: '/blogs/my-blogs',
+    name: 'myBlog',
+    component: () => import('@/views/MyBlogsView.vue')
+  },
+  {
+    meta: {
       title: 'Blog'
     },
     path: '/blogs/:id',
