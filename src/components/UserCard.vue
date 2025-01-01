@@ -1,39 +1,40 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useMainStore } from '@/pinia/main'
+import { computed, onMounted } from 'vue'
 import { mdiCheckDecagram } from '@mdi/js'
 import BaseLevel from '@/components/BaseLevel.vue'
 import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadio from '@/components/FormCheckRadio.vue'
 import PillTag from '@/components/PillTag.vue'
+import { store } from '@/store'
+import localforage from 'localforage'
 
-const mainStore = useMainStore()
+const user = computed(() => store.state.user.userData)
 
-const userName = computed(() => mainStore.userName)
+const fetchUser = async () => {
+  try {
+    const userData = await localforage.getItem('user')
+    if (userData && userData.uid) {
+      await store.dispatch('user/getUser', userData.uid)
+    } else {
+      console.error('User data not found in local storage.')
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error)
+  }
+}
 
-const userSwitchVal = ref(false)
+onMounted(fetchUser)
 </script>
 
 <template>
   <CardBox>
     <BaseLevel type="justify-around lg:justify-center">
-      <UserAvatarCurrentUser class="lg:mx-12" />
+      <UserAvatarCurrentUser class="lg:mx-12" :username="user?.fullName"  :avatarUrl="user?.profilePicture" />
       <div class="space-y-3 text-center md:text-left lg:mx-12">
-        <div class="flex justify-center md:block">
-          <FormCheckRadio
-            v-model="userSwitchVal"
-            name="notifications-switch"
-            type="switch"
-            label="Notifications"
-            :input-value="true"
-          />
-        </div>
         <h1 class="text-2xl">
-          Howdy, <b>{{ userName }}</b
+          Hello, <b>{{ user?.fullName }}</b
           >!
         </h1>
-        <p>Last login <b>12 mins ago</b> from <b>127.0.0.1</b></p>
         <div class="flex justify-center md:block">
           <PillTag label="Verified" color="info" :icon="mdiCheckDecagram" />
         </div>
