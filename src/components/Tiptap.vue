@@ -119,6 +119,13 @@
       >
         <TiptapMenubarIcon :icon="mdiRedo" />
       </button>
+      <div class="control-group">
+        <div class="button-group">
+          <button class="p-1 disabled:text-gray-400" type="button"  @click="addImage">
+            <TiptapMenubarIcon :icon="mdiImage" />
+          </button>
+        </div>
+      </div>
     </section>
     <EditorContent :editor="editor" />
   </div>
@@ -128,7 +135,11 @@
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
+import Image from '@tiptap/extension-image'
 import TiptapMenubarIcon from './TiptapMenubarIcon.vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import ImageResize from 'tiptap-extension-resize-image';
 
 import {
   mdiMinus,
@@ -145,20 +156,24 @@ import {
   mdiFormatHeader2,
   mdiFormatHeader3,
   mdiFormatHeader4,
+  mdiImage
 } from '@mdi/js'
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: String
 })
 
+const store = useStore()
+
 const emit = defineEmits(['update:modelValue'])
+
 
 const editor = useEditor({
   content: props.modelValue,
   onUpdate: ({ editor }) => {
     emit('update:modelValue', editor.getHTML())
   },
-  extensions: [StarterKit, Underline],
+  extensions: [StarterKit, Underline, Image, ImageResize],
   editorProps: {
     attributes: {
       class:
@@ -166,4 +181,29 @@ const editor = useEditor({
     }
   }
 })
+
+const addImage = () => {
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = 'image/*'
+
+  fileInput.onchange = async (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      const metadata = { contentType: file.type.toString() }
+      const uploadPath = `/blogs/${Date.now()}_${file.name}` // Unique upload path
+      await store.dispatch('shared/uploadDocument', {
+        payload: {
+          document: file,
+          documentStoragePath: uploadPath,
+          metadata
+        }
+      })
+      const imgPath = computed(() => store.getters['shared/documentPath']);
+      editor.value.chain().focus().setImage({ src: imgPath.value }).run()
+    }
+  }
+
+  fileInput.click()
+}
 </script>

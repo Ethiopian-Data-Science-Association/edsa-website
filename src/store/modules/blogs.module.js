@@ -1,7 +1,8 @@
 import { db } from '@/firebase/firebaseInit'
-import { collection, getDocs, limit, query, where, doc, setDoc } from 'firebase/firestore'
+import { collection, getDocs, limit, query, where, doc, setDoc, orderBy } from 'firebase/firestore'
 
 import { getField, updateField } from 'vuex-map-fields'
+import localforage from 'localforage'
 
 const state = {
   blogs: [],
@@ -37,6 +38,30 @@ const actions = {
       querySnapshot.forEach((doc) => {
         blogs.push({ id: doc.id, ...doc.data() })
       })
+      commit('updateField', {
+        path: 'blogs',
+        value: blogs
+      })
+    } catch (error) {
+      console.error('Error fetching and setting blogs:', error)
+    }
+  },
+
+  async getMyBlogs({ commit }, { pageSize = 10, lastDoc = null, uid }) {
+    try {
+      const q = query(
+        collection(db, 'blogs'),
+        where('ownerId', '==', uid),
+        orderBy('updatedAt', 'desc'),
+        limit(pageSize)
+        // lastDoc ? startAfter(lastDoc) : null
+      )
+      const querySnapshot = await getDocs(q)
+      const blogs = []
+      querySnapshot.forEach((doc) => {
+        blogs.push({ id: doc.id, ...doc.data() })
+      })
+
       commit('updateField', {
         path: 'blogs',
         value: blogs

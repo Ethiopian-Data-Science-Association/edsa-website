@@ -58,7 +58,6 @@ const submitPass = () => {
           <FormField label="Avatar" help="Max 500kb">
             <FormFilePicker label="Upload" />
           </FormField>
-
           <FormField label="Name" help="Required. Your name">
             <FormControl
               v-model="profileForm.name"

@@ -1,13 +1,16 @@
 <script setup>
 import CardBox from '@/components/CardBox.vue'
-import BaseButton from '@/components/BaseButton.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
 import { mdiArrowRight } from '@mdi/js'
+import PillTag from '@/components/PillTag.vue'
 
 defineProps({
   title: {
     type: String,
     required: true
+  },
+  isPublished: {
+    type: Boolean,
   },
   description: {
     type: String,
@@ -54,6 +57,25 @@ defineProps({
 
 <template>
   <CardBox :no-padding="true">
+    <div class="flex justify-end p-2" v-if="isPublished">
+      <PillTag
+        v-if="!isPublished"
+        color="warning"
+        label="pending"
+        :small="pillsSmall"
+        :outline="pillsOutline"
+        :icon="pillsIcon"
+      />
+      <PillTag
+        v-if="isPublished"
+        color="success"
+        label="Published"
+        :small="pillsSmall"
+        :outline="pillsOutline"
+        :icon="pillsIcon"
+      />
+    </div>
+
     <div class="flex flex-col h-full">
       <!-- Image -->
       <img :src="imageUrl" alt="Card Image" class="rounded-t-3xl w-full h-48 object-cover" />
@@ -63,15 +85,26 @@ defineProps({
         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
           {{ title }}
         </h3>
-        <p class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow max-h-48 overflow-clip text-ellipsis prose max-w-none  dark:prose-invert prose-sm sm:prose-sm lg:prose-base xl:prose-lg focus:outline-none" v-html="description"></p>
+        <p
+          class="mt-2 mb-4 text-gray-600 dark:text-slate-400 flex-grow max-h-48 overflow-clip text-ellipsis prose max-w-none dark:prose-invert prose-sm sm:prose-sm lg:prose-base xl:prose-lg focus:outline-none"
+          v-html="description"
+        ></p>
 
         <!-- Conditional Rendering of Link or Button -->
         <div class="mt-auto">
-          <a v-if="linkUrl" :href="linkUrl" :class="`${linkColor} ${linkFontWeight} flex items-center`">
+          <a
+            v-if="linkUrl"
+            :href="linkUrl"
+            :class="`${linkColor} ${linkFontWeight} flex items-center`"
+          >
             {{ linkText }}
             <BaseIcon :path="mdiArrowRight" class="ml-2 w-5 h-5" />
           </a>
-          <a v-if="buttonUrl || buttonText" :href="buttonUrl" :class="`${buttonColor} ${buttonFontWeight} block text-center px-4 py-2 mt-2 border-2 rounded-full transition cursor-pointer`">
+          <a
+            v-if="buttonUrl || buttonText"
+            :href="buttonUrl"
+            :class="`${buttonColor} ${buttonFontWeight} block text-center px-4 py-2 mt-2 border-2 rounded-full transition cursor-pointer`"
+          >
             {{ buttonText }}
           </a>
         </div>
