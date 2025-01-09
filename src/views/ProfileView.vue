@@ -1,7 +1,15 @@
 <script setup>
 import { reactive } from 'vue'
 import { useMainStore } from '@/pinia/main'
-import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword, mdiGithub } from '@mdi/js'
+import {
+  mdiAccount,
+  mdiMail,
+  mdiAsterisk,
+  mdiFormTextboxPassword,
+  mdiGithub,
+  mdiCheckCircle,
+  mdiAlertCircle
+} from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
@@ -13,27 +21,96 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-
+import * as yup from 'yup'
+import { ref } from 'vue'
+import { useForm, useField } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/yup'
+import { useStore } from 'vuex'
+import NotificationBar from '@/components/NotificationBar.vue'
 const mainStore = useMainStore()
+
+const store = useStore()
 
 const profileForm = reactive({
   name: mainStore.userName,
   email: mainStore.userEmail
 })
 
-const passwordForm = reactive({
-  password_current: '',
-  password: '',
-  password_confirmation: ''
+const notificationMessage = ref('')
+const notificationTitle = ref('')
+const notificationColor = ref('')
+const notificationIcon = ref('')
+const notificationsOutline = ref(true)
+
+const showNotification = (title, message, color, icon) => {
+  notificationTitle.value = title
+  notificationMessage.value = message
+  notificationColor.value = color
+  notificationIcon.value = icon
+}
+
+const clearNotification = () => {
+  notificationMessage.value = ''
+  notificationTitle.value = ''
+  notificationColor.value = ''
+  notificationIcon.value = ''
+}
+
+const passwordSchema = yup.object({
+  passwordCurrent: yup
+    .string()
+    .required('Current password is required')
+    .min(8, 'Minimum 8 characters')
+    .max(50, 'Maximum 50 characters'),
+  password: yup
+    .string()
+    .required('New password is required')
+    .min(8, 'Minimum 8 characters')
+    .max(50, 'Maximum 50 characters'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required')
 })
+
+const { handleSubmit, isSubmitting } = useForm({
+  validationSchema: toTypedSchema(passwordSchema)
+})
+
+const { value: passwordCurrent, errorMessage: passwordCurrentError } = useField('passwordCurrent')
+const { value: password, errorMessage: passwordError } = useField('password')
+const { value: confirmPassword, errorMessage: confirmPasswordError } = useField('confirmPassword')
 
 const submitProfile = () => {
   mainStore.setUser(profileForm)
 }
 
-const submitPass = () => {
-  //
-}
+const submitPass = handleSubmit(async (values) => {
+  try {
+    isLoading.value = true
+    const passwordData = {
+      currentPassword: values.passwordCurrent,
+      newPassword: values.password,
+      confirmNewPassword: values.confirmPassword
+    }
+    await store.dispatch('auth/updatePassword', passwordData)
+    showNotification('Success', 'Certification created successfully.', 'success', mdiCheckCircle)
+  } catch (error) {
+    console.error(error)
+    generalError.value = error.message
+    showNotification(
+      'Error',
+      'Failed to update password. Please try again.',
+      'danger',
+      mdiAlertCircle
+    )
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const isLoading = ref(false)
+const generalError = ref('')
 </script>
 
 <template>
@@ -52,6 +129,28 @@ const submitPass = () => {
       </SectionTitleLineWithButton>
 
       <UserCard class="mb-6" />
+
+      <!-- Notification Bar -->
+      <div v-if="notificationMessage !== ''" class="mb-4">
+        <NotificationBar
+          :color="notificationColor"
+          :icon="notificationIcon"
+          :outline="notificationsOutline"
+        >
+          <b>{{ notificationTitle }}</b
+          >. {{ notificationMessage }}
+          <template #right>
+            <BaseButton
+              label="Dismiss"
+              :color="notificationsOutline ? notificationColor : 'white'"
+              :outline="notificationsOutline"
+              rounded-full
+              small
+              @click="clearNotification"
+            />
+          </template>
+        </NotificationBar>
+      </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CardBox is-form @submit.prevent="submitProfile">
@@ -87,45 +186,73 @@ const submitPass = () => {
         </CardBox>
 
         <CardBox is-form @submit.prevent="submitPass">
+          <div
+            v-if="generalError"
+            class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded"
+          >
+            {{ generalError }}
+          </div>
           <FormField label="Current password" help="Required. Your current password">
-            <FormControl
-              v-model="passwordForm.password_current"
-              :icon="mdiAsterisk"
-              name="password_current"
-              type="password"
-              required
-              autocomplete="current-password"
-            />
+            <div class="flex flex-col gap-y-1.5">
+              <FormControl
+                v-model="passwordCurrent"
+                :icon="mdiAsterisk"
+                name="passwordCurrent"
+                type="password"
+                autocomplete="current-password"
+                :disabled="isSubmitting || isLoading"
+              />
+              <p v-if="passwordCurrentError" class="mt-1 text-sm text-rose-500">
+                {{ passwordCurrentError }}
+              </p>
+            </div>
           </FormField>
-
           <BaseDivider />
 
           <FormField label="New password" help="Required. New password">
-            <FormControl
-              v-model="passwordForm.password"
-              :icon="mdiFormTextboxPassword"
-              name="password"
-              type="password"
-              required
-              autocomplete="new-password"
-            />
+            <div class="flex flex-col gap-y-1.5">
+              <FormControl
+                v-model="password"
+                :icon="mdiFormTextboxPassword"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                :disabled="isSubmitting || isLoading"
+              />
+              <p v-if="passwordError" class="mt-1 text-sm text-rose-500">{{ passwordError }}</p>
+            </div>
           </FormField>
 
           <FormField label="Confirm password" help="Required. New password one more time">
-            <FormControl
-              v-model="passwordForm.password_confirmation"
-              :icon="mdiFormTextboxPassword"
-              name="password_confirmation"
-              type="password"
-              required
-              autocomplete="new-password"
-            />
+            <div class="flex flex-col gap-y-1.5">
+              <FormControl
+                v-model="confirmPassword"
+                :icon="mdiFormTextboxPassword"
+                name="confirmPassword"
+                type="password"
+                autocomplete="new-password"
+                :disabled="isSubmitting || isLoading"
+              />
+              <p v-if="confirmPasswordError" class="mt-1 text-sm text-rose-500">
+                {{ confirmPasswordError }}
+              </p>
+            </div>
           </FormField>
 
           <template #footer>
             <BaseButtons>
-              <BaseButton type="submit" color="info" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
+              <BaseButton
+                type="submit"
+                color="info"
+                label="Submit"
+                :disabled="isSubmitting || isLoading"
+              />
+              <BaseButton
+                color="info"
+                label="Options"
+                outline
+                :disabled="isSubmitting || isLoading"
+              />
             </BaseButtons>
           </template>
         </CardBox>
