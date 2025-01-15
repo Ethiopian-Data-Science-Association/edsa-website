@@ -3,8 +3,8 @@
     <h2 class="text-3xl font-bold text-center mb-8">Latest from our Blogs</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <CardBoxWidget
-        v-if="blogs"
         v-for="(blog, index) in blogs"
+        v-if="blogs"
         :key="blog.slug"
         :title="blog.title"
         :description="blog.content"

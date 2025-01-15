@@ -6,7 +6,8 @@ import {
   mdiCertificateOutline,
   mdiTelevisionGuide,
   mdiResponsive,
-  mdiAccountMultiplePlus
+  mdiAccountMultiplePlus,
+  mdiPost
 } from '@mdi/js'
 
 export default [
@@ -34,6 +35,11 @@ export default [
     to: '/blogs',
     label: 'Blogs',
     icon: mdiTelevisionGuide
+  },
+  {
+    to: '/blogs/my-blogs',
+    label: 'My Blogs',
+    icon: mdiPost
   },
   {
     to: '/ui',
