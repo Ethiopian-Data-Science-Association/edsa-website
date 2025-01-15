@@ -46,7 +46,30 @@ const actions = {
     } catch (error) {
       console.error(error);
     }
-  }
+  },
+
+  async signUpUserWithGoogle({ commit },   payload) {
+    try {
+      const userData = {
+        email: payload.email,
+        fullName: payload.name, 
+        phoneNumber: payload.phoneNumber || '', 
+        uid: payload.uid,
+        bio: '',
+        city: payload.city || '',
+        country: payload.country || '',
+        profilePicture: '',
+        role: roles.REGULAR,  // default value
+        certifications: [] // this will contain the certifications registered/taken
+      };
+      commit('updateField', { path: 'user', value: userData });
+      await store.dispatch('user/addUser', userData, { root: true });
+      console.info('Successfully registered! Please login.');
+      return userData; 
+    } catch (error) {
+      alert(error.message);
+    }
+  },
 };
 
 const mutations = {

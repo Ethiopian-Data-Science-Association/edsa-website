@@ -56,9 +56,7 @@ const actions = {
         limit(pageSize)
         // lastDoc ? startAfter(lastDoc) : null
       )
-      console.log("get my blogs", uid)
       const querySnapshot = await getDocs(q)
-      console.log(querySnapshot)
       const blogs = []
       querySnapshot.forEach((doc) => {
         blogs.push({ id: doc.id, ...doc.data() })

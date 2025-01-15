@@ -200,7 +200,7 @@ const addImage = () => {
         }
       })
       const imgPath = computed(() => store.getters['shared/documentPath']);
-      editor.value.chain().focus().setImage({ src: imgPath.value }).run()
+      if(editor) editor.value.chain().focus().setImage({ src: imgPath.value }).run()
     }
   }
 
