@@ -11,6 +11,7 @@ defineProps({
   },
   isPublished: {
     type: Boolean,
+    required: false
   },
   description: {
     type: String,
@@ -57,7 +58,7 @@ defineProps({
 
 <template>
   <CardBox :no-padding="true">
-    <div class="flex justify-end p-2" v-if="isPublished">
+    <div class="flex justify-end p-2">
       <PillTag
         v-if="!isPublished"
         color="warning"
@@ -81,7 +82,7 @@ defineProps({
       <img :src="imageUrl" alt="Card Image" class="rounded-t-3xl w-full h-48 object-cover" />
 
       <!-- Content -->
-      <div class="p-4 flex flex-col flex-grow">
+      <div class="p-4 flex flex-col flex-grow min-h-[200px]">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
           {{ title }}
         </h3>
@@ -91,7 +92,7 @@ defineProps({
         ></p>
 
         <!-- Conditional Rendering of Link or Button -->
-        <div class="mt-auto">
+        <div class="mt-auto mt-[-.125rem]">
           <a
             v-if="linkUrl"
             :href="linkUrl"
