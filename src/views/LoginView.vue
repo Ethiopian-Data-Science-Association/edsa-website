@@ -94,6 +94,7 @@ const loginWithGoogle = async () => {
         <FormCheckRadio v-model="remember" name="remember" label="Remember" :input-value="true" />
         <div class="mt-3 text-base underline">
           <RouterLink to="/forgot-password">Forgot Password</RouterLink>
+          <RouterLink to="/signup" class="ml-6">Create an Account!</RouterLink>
         </div>
         <template #footer>
           <div class="flex flex-col gap-y-3">
