@@ -17,12 +17,12 @@ const props = defineProps({
 })
 
 const avatar = computed(() =>
-  props.avatar !== ''
+  props.avatar && props.avatar !== ''  // short circuit for the null
     ? props.avatar
     : `https://api.dicebear.com/7.x/${props.api}/svg?seed=${props.avatar.replace(
-        /[^a-z0-9]+/gi,
-        '-'
-      )}.svg`
+      /[^a-z0-9]+/gi,
+      '-'
+    )}.svg`
 )
 
 const username = computed(() => props.username)
@@ -30,11 +30,8 @@ const username = computed(() => props.username)
 
 <template>
   <div>
-    <img
-      :src="avatar"
-      :alt="username"
-      class="rounded-full block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800"
-    />
+    <img :src="avatar" :alt="username"
+      class="rounded-full block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800" />
     <slot />
   </div>
 </template>
