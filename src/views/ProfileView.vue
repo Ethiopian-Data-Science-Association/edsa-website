@@ -93,10 +93,9 @@ const submitPass = handleSubmit(async (values) => {
       newPassword: values.password,
       confirmNewPassword: values.confirmPassword
     }
-    await store.dispatch('auth/updatePassword', passwordData)
-    showNotification('Success', 'Certification created successfully.', 'success', mdiCheckCircle)
+    const passwordUpdateResponse = await store.dispatch('auth/updateUserPassword', passwordData)
+    showNotification('Success', passwordUpdateResponse , 'success', mdiCheckCircle)
   } catch (error) {
-    console.error(error)
     generalError.value = error.message
     showNotification(
       'Error',

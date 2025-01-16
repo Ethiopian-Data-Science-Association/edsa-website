@@ -3,7 +3,9 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-  updatePassword
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from 'firebase/auth'
 import { roles } from '@/shared/constants/roles'
 import { store } from '../index'
@@ -76,26 +78,36 @@ const actions = {
     }
   },
 
-  async updatePassword({ commit }, { currentPassword, newPassword, confirmNewPassword }) {
+  async updateUserPassword({ _ }, { currentPassword, newPassword, confirmNewPassword }) {
+    let errorMsg = 'Error updating password. Please retry or contact tech support.';
     try {
+      debugger
+      // This is caught by the validator but good for safety
       if (newPassword !== confirmNewPassword) {
-        throw new Error("Passwords don't match")
+        errorMsg = "Passwords don't match";
       }
 
       if (currentPassword === newPassword) {
-        return
+        errorMsg =  'New password cannot be the same as the current password';
       }
 
       const auth = getAuth()
 
       const user = auth.currentUser
 
-      await createUserWithEmailAndPassword(auth, user.email, currentPassword)
+      if (!user) {
+        errorMsg = 'No user is currently signed in';
+      }
+
+      // Re-authenticate the user with their current credentials
+      const credential = EmailAuthProvider.credential(user.email, currentPassword)
+      await reauthenticateWithCredential(user, credential)
 
       await updatePassword(user, newPassword)
+
+      return 'Password updated successfully'
     } catch (error) {
-      console.error('Error updating password:', error)
-      throw new Error("Error updating password")
+      throw new Error(error);
     }
   }
 }
