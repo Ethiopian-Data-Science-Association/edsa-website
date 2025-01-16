@@ -36,7 +36,6 @@ export const store = createStore({
     },
     // persist User data if change happens like new project creation
     persistUser: (state) => {
-      debugger
       const serializedUser = {
         email: state.user.userData.email,
         fullName: state.user.userData.fullName,

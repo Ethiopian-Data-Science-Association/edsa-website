@@ -14,8 +14,6 @@ const fetchUser = async () => {
   try {
     const userData = await localforage.getItem('user')
     if (userData && userData.uid) {
-      debugger;
-
       await store.dispatch('user/getUser', userData.uid)
     } else {
       console.error('User data not found in local storage.')
