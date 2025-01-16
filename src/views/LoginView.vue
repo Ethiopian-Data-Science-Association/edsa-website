@@ -100,7 +100,7 @@ const loginWithGoogle = async () => {
           <div class="flex flex-col gap-y-3">
             <BaseButtons class="flex flex-row">
               <BaseButton type="submit" color="info" label="Login" />
-              <BaseButton to="/dashboard" color="info" outline label="Back" />
+              <BaseButton to="/" color="info" outline label="Back" />
             </BaseButtons>
 
             <div class="flex gap-x-2 justify-center items-center">

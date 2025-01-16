@@ -6,6 +6,7 @@ import {
 } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
+import BaseButton from '@/components/BaseButton.vue'
 import CardBoxWidget from '@/components/CardBoxWidget.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
@@ -93,7 +94,7 @@ onMounted(() => {
       <BlogSection />
 
       <!-- Contact Us section -->
-       <ContactUs/>
+      <ContactUs />
     </SectionMain>
   </LayoutAuthenticated>
 </template>

@@ -10,7 +10,8 @@ const props = defineProps({
   },
   username: {
     type: String,
-    required: true
+    required: true,
+    default: ''
   },
 })
 </script>

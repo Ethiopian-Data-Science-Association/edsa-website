@@ -81,9 +81,7 @@ const actions = {
         const blogData = querySnapshot.docs[0] // Get the first document
         // To update store you always need the updateField helper function (vuex-map-fields)
         // Commit the single blog data
-        console.log('blogData', blogData.id , blogData.data())
         const singleBlogValue = { id: blogData.id, ...blogData.data() }; 
-        console.log('singleBlogValue',singleBlogValue)
 
         commit('updateField', {
           path: 'singleBlog',
@@ -91,7 +89,7 @@ const actions = {
         })
         // commit('setSingleBlog', { id: blogData.id, ...blogData.data() }) // Commit the single blog data
       } else {
-        console.log('No such document with this slug!')
+        console.error('No such document with this slug!')
       }
     } catch (error) {
       console.error('Error fetching single blog by slug:', error)
