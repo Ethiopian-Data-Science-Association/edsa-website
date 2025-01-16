@@ -109,7 +109,6 @@ const clearNotification = () => {
 }
 
 const submit = handleSubmit(async (values) => {
-  // const userId = store.state.auth.userId 
   const { uid } = await localforage.getItem('user');
   const slug = slugify(values.title.toLowerCase())
   const blogsData = {
