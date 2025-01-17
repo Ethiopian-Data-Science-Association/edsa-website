@@ -60,6 +60,7 @@ const loginWithGoogle = async () => {
     isLoading.value = true
     const { user } = await signInWithPopup(auth, googleAuthProvider)
     await store.dispatch('user/setUser', user);
+    await store.dispatch('user/checkUserAcl', user);
     router.replace('/')
   } catch (error) {
     generalError.value = error.message

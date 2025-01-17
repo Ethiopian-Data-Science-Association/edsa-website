@@ -26,13 +26,13 @@ const actions = {
       // Prepare user data for Firestore, replacing undefined values with empty strings
       const userData = {
         email: user.email,
-        fullName: payload.name,
+        fullName: user.displayName || '',
         phoneNumber: payload.phoneNumber || '',
         uid: user.uid,
         bio: '',
         city: payload.city || '',
         country: payload.country || '',
-        profilePicture: '',
+        profilePicture: user.photoURL || '',
         certifications: [] // this will contain the certifications registered/taken
       }
       commit('updateField', { path: 'fetchedUserData', value: userData })
