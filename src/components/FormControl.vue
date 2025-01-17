@@ -16,6 +16,7 @@ const props = defineProps({
   type: { type: String, default: 'text' },
   modelValue: { type: [String, Number, Boolean, Array, Object], default: '' },
   documentStoragePath: { type: String, default: '', required: false },
+  isReadOnly: { type: Boolean, default: false, required: false },
   required: Boolean,
   borderless: Boolean,
   transparent: Boolean,
@@ -147,7 +148,7 @@ if (props.ctrlKFocus) {
       :required="required" :placeholder="placeholder" :class="inputElClass" @change="onFilePicked" />
     <input v-else :id="id" ref="inputEl" v-model="computedValue" :name="name" :maxlength="maxlength"
       :inputmode="inputmode" :autocomplete="autocomplete" :required="required" :placeholder="placeholder"
-      :type="computedType" :class="inputElClass" />
+      :type="computedType" :class="inputElClass" :readonly="isReadOnly"/>
     <FormControlIcon v-if="icon" :icon="icon" :h="controlIconH" />
   </div>
 </template>
