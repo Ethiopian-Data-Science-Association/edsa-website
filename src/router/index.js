@@ -90,6 +90,22 @@ const routes = [
   },
   {
     meta: {
+      title: 'Library'
+    },
+    path: '/library',
+    name: 'library',
+    component: () => import('@/views/LibraryPage.vue')
+  },
+  {
+    meta: {
+      title: 'Library Create Form'
+    },
+    path: '/library-create-form',
+    name: 'library-create-form',
+    component: () => import('@/views/LibraryResourceCreateForm.vue')
+  },
+  {
+    meta: {
       title: 'Blogs'
     },
     path: '/blogs',

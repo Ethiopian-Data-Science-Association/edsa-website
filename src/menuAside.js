@@ -27,7 +27,7 @@ export default [
     icon: mdiCertificateOutline
   },
   {
-    to: '/forms',
+    to: '/library',
     label: 'Library',
     icon: mdiSquareEditOutline
   },
