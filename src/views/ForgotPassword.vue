@@ -23,7 +23,7 @@
         <template #footer>
           <BaseButtons class="flex flex-row">
             <BaseButton type="submit" color="info" label="Reset" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
+            <BaseButton to="/" color="info" outline label="Back" />
           </BaseButtons>
         </template>
       </CardBox>

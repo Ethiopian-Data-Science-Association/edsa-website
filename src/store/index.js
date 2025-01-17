@@ -6,14 +6,17 @@ export const store = createStore({
   modules, // all modules in store
   mutations: {
     // Configure Localforage on App Loading . Added localstorage as a fallback option
-   setLocalforageConfig: async () => {
-      let driver = ''; 
-      localforage.ready().then(function() {
-        // This code runs once localforage fully initialized the selected driver.
-        driver = localforage.config()?.name; // LocalStorage found
-    }).catch(function (error) {
-        console.error(error); // No available storage method found.
-    });
+    setLocalforageConfig: async () => {
+      let driver = ''
+      localforage
+        .ready()
+        .then(function () {
+          // This code runs once localforage fully initialized the selected driver.
+          driver = localforage.config()?.name // LocalStorage found
+        })
+        .catch(function (error) {
+          console.error(error) // No available storage method found.
+        })
 
       // Check if the driver is INDEXEDDB or LOCALSTORAGE is attched
       if (driver) {
@@ -23,7 +26,7 @@ export const store = createStore({
           driver: [localforage.INDEXEDDB, localforage.LOCALSTORAGE],
           name: 'EDSA'
         })
-        localforage.setDriver([localforage.INDEXEDDB, localforage.LOCALSTORAGE]) 
+        localforage.setDriver([localforage.INDEXEDDB, localforage.LOCALSTORAGE])
         localforage.setItem('driver', 1).catch((error) => console.error(error))
       }
     },
@@ -42,11 +45,12 @@ export const store = createStore({
         city: state.user.userData.city || '', // Default to empty string if undefined
         country: state.user.userData.country || '', // Default to empty string if undefined
         profilePicture: state.user.userData.profilePicture || '', // Default to empty string if undefined
-        role: state.user.userData.role || 'REGULAR', // Default value if needed
         certifications: state.user.userData.certifications || [] // the list of registered/paid certifications
       }
+      // Before storing, make sure to serialize the data and stringify
+      const serializedUserData = JSON.parse(JSON.stringify(serializedUser))
 
-      localforage.setItem('user', serializedUser).catch((error) => console.error(error))
+      localforage.setItem('user', serializedUserData).catch((error) => console.error(error))
     },
     // Un-Persist all data in IndexDb meaning remove all data in store on logout
     unpersistAll: () => {

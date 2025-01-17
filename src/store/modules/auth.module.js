@@ -7,7 +7,6 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential
 } from 'firebase/auth'
-import { roles } from '@/shared/constants/roles'
 import { store } from '../index'
 
 const state = {
@@ -27,18 +26,18 @@ const actions = {
       // Prepare user data for Firestore, replacing undefined values with empty strings
       const userData = {
         email: user.email,
-        fullName: payload.name,
-        phoneNumber: payload.phoneNumber || '',
+        fullName: payload?.name || user?.displayName || '',
+        phoneNumber: user?.phoneNumber || '',
         uid: user.uid,
         bio: '',
-        city: payload.city || '',
-        country: payload.country || '',
-        profilePicture: '',
-        role: roles.REGULAR, // default value
+        city: user?.city || '',
+        country: user?.country || '',
+        profilePicture: user?.photoURL || '',
         certifications: [] // this will contain the certifications registered/taken
       }
-      commit('updateField', { path: 'user', value: userData })
-      await store.dispatch('user/addUser', userData, { root: true })
+      commit('updateField', { path: 'fetchedUserData', value: userData })
+      await store.dispatch('user/addUser', userData, { root: true }) // add the user to firebase
+      await store.dispatch('user/addAcl', { uid: user.uid, email: user.email }) // set the correct the ACL
       console.info('Successfully registered! Please login.')
       return user
     } catch (error) {
@@ -59,18 +58,18 @@ const actions = {
     try {
       const userData = {
         email: payload.email,
-        fullName: payload.name,
-        phoneNumber: payload.phoneNumber || '',
+        fullName: payload?.fullName,
+        phoneNumber: payload?.phoneNumber || '',
         uid: payload.uid,
         bio: '',
-        city: payload.city || '',
-        country: payload.country || '',
-        profilePicture: '',
-        role: roles.REGULAR, // default value
+        city: payload?.city || '',
+        country: payload?.country || '',
+        profilePicture: payload?.profilePicture || '',
         certifications: [] // this will contain the certifications registered/taken
       }
       commit('updateField', { path: 'user', value: userData })
       await store.dispatch('user/addUser', userData, { root: true })
+      await store.dispatch('user/addAcl', { uid: payload.uid, email: payload.email })
       console.info('Successfully registered! Please login.')
       return userData
     } catch (error) {
@@ -79,16 +78,15 @@ const actions = {
   },
 
   async updateUserPassword({ _ }, { currentPassword, newPassword, confirmNewPassword }) {
-    let errorMsg = 'Error updating password. Please retry or contact tech support.';
+    let errorMsg = 'Error updating password. Please retry or contact tech support.'
     try {
-      debugger
       // This is caught by the validator but good for safety
       if (newPassword !== confirmNewPassword) {
-        errorMsg = "Passwords don't match";
+        errorMsg = "Passwords don't match"
       }
 
       if (currentPassword === newPassword) {
-        errorMsg =  'New password cannot be the same as the current password';
+        errorMsg = 'New password cannot be the same as the current password'
       }
 
       const auth = getAuth()
@@ -96,7 +94,7 @@ const actions = {
       const user = auth.currentUser
 
       if (!user) {
-        errorMsg = 'No user is currently signed in';
+        errorMsg = 'No user is currently signed in'
       }
 
       // Re-authenticate the user with their current credentials
@@ -107,7 +105,7 @@ const actions = {
 
       return 'Password updated successfully'
     } catch (error) {
-      throw new Error(error);
+      throw new Error(error)
     }
   }
 }

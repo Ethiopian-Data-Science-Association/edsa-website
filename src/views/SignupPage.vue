@@ -2,55 +2,32 @@
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <div
-          v-if="generalError"
-          class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded"
-        >
+        <div v-if="generalError" class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded">
           {{ generalError }}
         </div>
         <FormField label="Fullname" help="Please enter your fullname">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="name"
-              :icon="mdiAccount"
-              name="name"
-              :disabled="isSubmitting || isLoading"
-            />
+            <FormControl v-model="name" :icon="mdiAccount" name="name" :disabled="isSubmitting || isLoading" />
             <p v-if="nameError" class="mt-1 text-sm text-rose-500">{{ nameError }}</p>
           </div>
         </FormField>
         <FormField label="Email" help="Please enter your email">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="email"
-              :icon="mdiEmail"
-              name="email"
-              :disabled="isSubmitting || isLoading"
-            />
+            <FormControl v-model="email" :icon="mdiEmail" name="email" :disabled="isSubmitting || isLoading" />
             <p v-if="emailError" class="text-sm text-rose-500">{{ emailError }}</p>
           </div>
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="password"
-              :icon="mdiAsterisk"
-              type="password"
-              name="password"
-              :disabled="isSubmitting || isLoading"
-            />
+            <FormControl v-model="password" :icon="mdiAsterisk" type="password" name="password"
+              :disabled="isSubmitting || isLoading" />
             <p v-if="passwordError" class="mt-1 text-sm text-rose-500">{{ passwordError }}</p>
           </div>
         </FormField>
         <FormField label="Confirm Password" help="Please confirm your password">
           <div class="flex flex-col gap-y-1.5">
-            <FormControl
-              v-model="confirmPassword"
-              :icon="mdiAsterisk"
-              type="password"
-              name="confirmPassword"
-            />
+            <FormControl v-model="confirmPassword" :icon="mdiAsterisk" type="password" name="confirmPassword" />
             <p v-if="confirmPasswordError" class="mt-1 text-sm text-rose-500">
               {{ confirmPasswordError }}
             </p>
@@ -60,19 +37,8 @@
         <template #footer>
           <div class="flex flex-col gap-y-3">
             <BaseButtons class="flex flex-row">
-              <BaseButton
-                type="submit"
-                color="info"
-                label="Signup"
-                :disabled="isSubmitting || isLoading"
-              />
-              <BaseButton
-                to="/dashboard"
-                color="info"
-                outline
-                label="Back"
-                :disabled="isSubmitting || isLoading"
-              />
+              <BaseButton type="submit" color="info" label="Signup" :disabled="isSubmitting || isLoading" />
+              <BaseButton to="/" color="info" outline label="Back" :disabled="isSubmitting || isLoading" />
             </BaseButtons>
 
             <div class="flex gap-x-2 justify-center items-center">
@@ -80,14 +46,8 @@
               or
               <hr class="border-gray-700 w-full" />
             </div>
-            <BaseButton
-              :icon="mdiGoogle"
-              color="info"
-              outline
-              label="Signup with Google"
-              :disabled="isSubmitting || isLoading"
-              @click="signUpWithGoogle"
-            />
+            <BaseButton :icon="mdiGoogle" color="info" outline label="Signup with Google"
+              :disabled="isSubmitting || isLoading" @click="signUpWithGoogle" />
           </div>
         </template>
       </CardBox>
@@ -102,7 +62,7 @@ export const googleAuthProvider = new GoogleAuthProvider()
 </script>
 <script setup>
 import { mdiAccount, mdiAsterisk, mdiEmail, mdiGoogle } from '@mdi/js'
-import { updateProfile, signInWithPopup } from 'firebase/auth'
+import { signInWithPopup } from 'firebase/auth'
 import { useFirebaseAuth } from 'vuefire'
 import { useRouter } from 'vue-router'
 import { useForm, useField } from 'vee-validate'
@@ -146,8 +106,7 @@ const router = useRouter()
 const submit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
-    const user = await store.dispatch('auth/signUpUser', values) // User data is already destructured
-    await updateProfile(user, { displayName: values.name })
+    await store.dispatch('auth/signUpUser', values) // User data is already destructured
     router.replace('/')
   } catch (error) {
     console.error(error)
@@ -159,18 +118,24 @@ const submit = handleSubmit(async (values) => {
 
 const signUpWithGoogle = async () => {
   isLoading.value = true
+  let user = null;
   try {
-    const user = await signInWithPopup(auth, googleAuthProvider)
-    const userData = {
-      email: user.user.email,
-      fullName: user.user.displayName,
-      phoneNumber: user.user.phoneNumber || '',
-      uid: user.uid,
-      profilePicture: user.user.photoURL
+    await signInWithPopup(auth, googleAuthProvider).then((result) => {
+      // The signed-in user info.
+      user = result.user;
+    })
+    if (user) {
+      const userData = {
+        email: user.email,
+        fullName: user?.displayName || '', 
+        phoneNumber: user?.phoneNumber || '',
+        uid: user.uid,
+        profilePicture: user?.photoURL || ''
+      }
+      await store.dispatch('auth/signUpUserWithGoogle', userData) // User data is already destructured
+      router.replace('/')
     }
-    await store.dispatch('auth/signUpUserWithGoogle', userData) // User data is already destructured
-    await updateProfile(userData, { displayName: user.user.displayName })
-    router.replace('/')
+
   } catch (error) {
     generalError.value = error.message
   } finally {

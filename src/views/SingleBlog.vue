@@ -42,9 +42,7 @@ watch(
   blog,
   (newBlog) => {
     if (newBlog?.content) {
-      console.log('New Blog Loaded:', newBlog);
       sanitizedHtml.value = DOMPurify.sanitize(newBlog.content);
-      console.log('Sanitized HTML:', sanitizedHtml.value);
     }
   },
   { immediate: true } // Ensures the watcher runs initially
