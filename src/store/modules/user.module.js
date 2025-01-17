@@ -86,13 +86,13 @@ const actions = {
           if (!userCheck) {
             const userData = {
               email: user.email,
-              fullName: user.displayName || '',
-              phoneNumber: user.phoneNumber || '',
+              fullName: user?.displayName  || '',
+              phoneNumber: user?.phoneNumber || '',
               uid: user.uid,
               bio: '',
-              city: user.city || '',
-              country: user.country || '',
-              profilePicture: user.photoURL || '',
+              city: user?.city || '',
+              country: user?.country || '',
+              profilePicture: user?.photoURL || '',
               certifications: []
             }
             await store.dispatch('user/addUser', userData, { root: true }) // add the user to firebase

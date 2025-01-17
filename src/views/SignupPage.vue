@@ -106,7 +106,7 @@ const router = useRouter()
 const submit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
-    const user = await store.dispatch('auth/signUpUser', values) // User data is already destructured
+    await store.dispatch('auth/signUpUser', values) // User data is already destructured
     router.replace('/')
   } catch (error) {
     console.error(error)
@@ -127,10 +127,10 @@ const signUpWithGoogle = async () => {
     if (user) {
       const userData = {
         email: user.email,
-        fullName: user.displayName,
-        phoneNumber: user.phoneNumber || '',
+        fullName: user?.displayName || '', 
+        phoneNumber: user?.phoneNumber || '',
         uid: user.uid,
-        profilePicture: user.photoURL
+        profilePicture: user?.photoURL || ''
       }
       await store.dispatch('auth/signUpUserWithGoogle', userData) // User data is already destructured
       router.replace('/')

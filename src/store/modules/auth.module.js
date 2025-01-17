@@ -26,13 +26,13 @@ const actions = {
       // Prepare user data for Firestore, replacing undefined values with empty strings
       const userData = {
         email: user.email,
-        fullName: user.displayName || '',
-        phoneNumber: payload.phoneNumber || '',
+        fullName: payload?.name || user?.displayName || '',
+        phoneNumber: user?.phoneNumber || '',
         uid: user.uid,
         bio: '',
-        city: payload.city || '',
-        country: payload.country || '',
-        profilePicture: user.photoURL || '',
+        city: user?.city || '',
+        country: user?.country || '',
+        profilePicture: user?.photoURL || '',
         certifications: [] // this will contain the certifications registered/taken
       }
       commit('updateField', { path: 'fetchedUserData', value: userData })
@@ -58,13 +58,13 @@ const actions = {
     try {
       const userData = {
         email: payload.email,
-        fullName: payload.fullName,
-        phoneNumber: payload.phoneNumber || '',
+        fullName: payload?.fullName,
+        phoneNumber: payload?.phoneNumber || '',
         uid: payload.uid,
         bio: '',
-        city: payload.city || '',
-        country: payload.country || '',
-        profilePicture: payload.profilePicture || '',
+        city: payload?.city || '',
+        country: payload?.country || '',
+        profilePicture: payload?.profilePicture || '',
         certifications: [] // this will contain the certifications registered/taken
       }
       commit('updateField', { path: 'user', value: userData })
