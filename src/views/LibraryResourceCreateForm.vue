@@ -73,7 +73,7 @@
                         <p v-if="resourceError" class="text-white-500"> {{ resourceError }}</p>
                     </FormField>
 
-    
+
                     <!-- Submit and Reset Buttons -->
                     <template #footer>
                         <BaseDivider />
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useDarkModeStore } from '@/pinia/darkMode.js';
 import { useRouter } from 'vue-router';
@@ -105,12 +105,18 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
+import localforage from 'localforage'
 import { paths } from '@/shared/constants/paths';
+
+onMounted(() => {
+    fetchUser();
+})
 
 const router = useRouter();
 const store = useStore();
 const isLoading = ref(false);
 const generalError = ref('');
+const userId = ref('Anonyms');
 const notificationMessage = ref('');
 const notificationTitle = ref('');
 const notificationColor = ref('');
@@ -120,7 +126,7 @@ const notificationsOutline = ref(true);
 const schema = yup.object({
     title: yup.string().required().label('Resource title is required.'),
     description: yup.string().required("Resource description is required."),
-    resourceType: yup.string().required("resourceType is required.").oneOf(['Academic Paper', 'External Course', 'Podcast', 'Slides', 'Video', 'White Paper']), 
+    resourceType: yup.string().required("resourceType is required.").oneOf(['Academic Paper', 'External Course', 'Podcast', 'Slides', 'Video', 'White Paper']),
     resourceLink: yup.string(),
     resource: yup.string(),
 });
@@ -175,9 +181,9 @@ const submit = handleSubmit(async (values) => {
             title: values.title,
             description: values.description,
             resourceType: values.resourceType,
-            resourceLink: values.resourceLink,
+            resourceLink: values.resourceLink || '',
             resource: values.resource || '', // empty string for DEVELOPMENT purposes only. So that create won't fail
-            users: []
+            resourceUploadedBy: userId.value   // this is the user that Uploaded the resource
         };
 
         await store.dispatch('library/addResource', resourceData);
@@ -196,6 +202,20 @@ const backToLibraryPage = () => {
 };
 
 const isDarkMode = computed(() => useDarkModeStore().isEnabled);
+
+const fetchUser = async () => {
+    try {
+        const userData = await localforage.getItem('user')
+        if (userData && userData.uid) {
+            const userFound = await store.dispatch('user/getUser', userData.uid) // if returned true then pick it from the localForage
+            if(userFound) userId.value = userData.uid;
+        } else {
+            console.error('User data not found in local storage.')
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error)
+    }
+}
 </script>
 
 <style scoped>

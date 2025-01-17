@@ -1,161 +1,186 @@
 <template>
     <LayoutAuthenticated>
-      <div class="flex flex-col min-h-screen">
-        <!-- Main Content -->
-        <SectionMain class="flex-grow">
-          <!-- Header with Title and Button -->
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-bold">Library / Resources</h2>
-            <BaseButton 
-              v-if="isAdmin"
-              label="Add Resource" 
-              :icon="mdiPlus" 
-              color="success"
-              class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12" 
-              @click="goToCreatePage" 
-            />
-          </div>
-  
-          <!-- Category Filter Pills -->
-          <div class="flex justify-center mb-6 space-x-4">
-            <PillTag
-              v-for="category in categories"
-              :key="category"
-              :label="category"
-              :color="selectedCategory === category ? 'info' : 'lightDark'"
-              :outline="selectedCategory !== category"
-              @click="toggleCategory(category)"
-            />
-          </div>
-  
-          <!-- Resources Grid or Empty State -->
-          <div v-if="filteredResources.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <CardBox
-              v-for="resource in filteredResources"
-              :key="resource.id"
-              class="shadow-md hover:shadow-lg transition-shadow"
-            >
-              <CardBoxComponentTitle :title="resource.title">
-                <BaseButton :icon="mdiOpenInNew" color="whiteDark" small rounded-full />
-              </CardBoxComponentTitle>
-  
-              <p class="text-gray-500 mb-4">{{ resource.description }}</p>
-  
-              <!-- PDF Download -->
-              <div v-if="resource.type === 'pdf'" class="flex justify-center">
-                <a
-                  :href="resource.url"
-                  download
-                  class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-                >
-                  Download PDF
-                </a>
-              </div>
-  
-              <!-- HTML Content Preview -->
-              <div v-if="resource.type === 'html'" class="text-sm bg-gray-50 border rounded p-3">
-                <div v-html="resource.content"></div>
-              </div>
-            </CardBox>
-          </div>
-  
-          <!-- Empty State -->
-          <div v-else class="flex flex-col items-center text-center py-16">
-            <img src="/public/favicon.png" alt="No resources available" class="w-24 h-24 mb-4" />
-            <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No resources available</p>
-            <p class="text-gray-500 dark:text-gray-400">Check back later or add a new resource.</p>
-            <BaseButton
-              v-if="isAdmin"
-              label="Add Resource"
-              :icon="mdiPlus"
-              color="success"
-              class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600"
-              @click="goToCreatePage"
-            />
-          </div>
-        </SectionMain>
-      </div>
+        <div class="flex flex-col min-h-screen">
+            <!-- Main Content -->
+            <SectionMain class="flex-grow">
+                <!-- Header with Title and Button -->
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold">Library / Resources</h2>
+                    <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
+                        class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12"
+                        @click="navigateToCreatePage" />
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="flex justify-center mb-6 space-x-4">
+                    <PillTag v-for="category in categories" :key="category" :label="category"
+                        :color="selectedCategory === category ? 'info' : 'lightDark'"
+                        :outline="selectedCategory !== category" @click="selectCategory(category)" />
+                </div>
+
+                <!-- Resources Grid -->
+                <div v-if="filteredResources.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <CardBox v-for="resource in filteredResources" :key="resource.id"
+                        class="shadow-md hover:shadow-lg transition-shadow">
+                        <!-- Title with dynamic padding -->
+                        <CardBoxComponentTitle :title="resource.title" :style="{
+                            paddingBottom: resource.title.length > 50 ? '1.5rem' : '5.5rem',
+                        }"></CardBoxComponentTitle>
+
+                        <!-- Description with more lines -->
+                        <p class="text-gray-500 mb-4 overflow-hidden"
+                            style="display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; min-height: 150px;">
+                            {{ resource.description }}
+                        </p>
+
+                        <!-- Clickable Link and Delete Button -->
+                        <div class="flex justify-between items-center">
+                            <!-- Open Resource Link -->
+                            <a :href="resource.resourceLink" target="_blank" rel="noopener noreferrer"
+                                class="text-blue-500 hover:underline text-sm">
+                                Open Resource
+                            </a>
+
+                            <!-- Delete Button -->
+                            <BaseButton :icon="mdiDelete" color="danger" small rounded-full
+                                @click="deleteResource(resource.id)" />
+                        </div>
+                    </CardBox>
+                </div>
+
+                <!-- Load More Button -->
+                <div v-if="filteredResources.length && !hasReachedEnd" class="mt-6 flex justify-center">
+                    <BaseButton v-if="!isLoading" label="Load More" color="primary"
+                        class="bg-blue-500 text-white hover:bg-blue-600" @click="loadMoreResources" />
+                    <p v-else class="text-gray-500">Loading...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="filteredResources.length === 0" class="flex flex-col items-center text-center py-16">
+                    <img src="/public/favicon.png" alt="No resources available" class="w-24 h-24 mb-4" />
+                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No resources available</p>
+                    <p class="text-gray-500 dark:text-gray-400">Check back later or add a new resource.</p>
+                    <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
+                        class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600"
+                        @click="navigateToCreatePage" />
+                </div>
+            </SectionMain>
+        </div>
     </LayoutAuthenticated>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from "vue";
-  import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
-  import SectionMain from "@/components/SectionMain.vue";
-  import CardBox from "@/components/CardBox.vue";
-  import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
-  import BaseButton from "@/components/BaseButton.vue";
-  import PillTag from "@/components/PillTag.vue";
-  import { mdiPlus, mdiOpenInNew } from "@mdi/js";
-  import { useRouter } from "vue-router";
-  
-  const router = useRouter();
-  
-  const isAdmin = true; // Assume admin status for demonstration
-  const selectedCategory = ref("All");
-  const categories = ref(["All", "Research", "Technology", "Education"]);
-  
-  const resources = ref([
-    {
-      id: 1,
-      title: "Academic Paper",
-      description: "An in-depth analysis of AI.",
-      type: "pdf",
-      url: "https://example.com/academic-paper.pdf",
-      category: "Research",
-    },
-    {
-      id: 2,
-      title: "White Paper",
-      description: "Blockchain technology overview.",
-      type: "html",
-      content: "<p>This is a white paper summary...</p>",
-      category: "Technology",
-    },
-    {
-      id: 3,
-      title: "External Course",
-      description: "Mastering Vue.js 3.",
-      type: "pdf",
-      url: "https://example.com/vue-course.pdf",
-      category: "Education",
-    },
-  ]);
-  
-  const filteredResources = computed(() =>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
+import SectionMain from "@/components/SectionMain.vue";
+import CardBox from "@/components/CardBox.vue";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
+import BaseButton from "@/components/BaseButton.vue";
+import PillTag from "@/components/PillTag.vue";
+
+import { mdiPlus, mdiDelete } from "@mdi/js";
+
+const router = useRouter();
+const store = useStore();
+
+const isAdmin = true; // Assume admin status for demonstration
+const selectedCategory = ref("All");
+const categories = ref(["All", "Research", "Technology", "Education"]);
+const isLoading = ref(false);
+const hasReachedEnd = ref(false); // Track if all resources are loaded
+
+// Fetch resources
+const fetchResources = async (reset = false) => {
+    isLoading.value = true;
+    await store.dispatch("library/fetchResources", { reset });
+    isLoading.value = false;
+
+    // Determine if all resources are fetched
+    const resources = store.getters["library/resources"];
+    if (resources.length < 10 || resources.length % 10 !== 0) {
+        hasReachedEnd.value = true;
+    }
+};
+
+// Computed resources and filters
+const resources = computed(() => store.getters["library/resources"]);
+const filteredResources = computed(() =>
     selectedCategory.value === "All"
-      ? resources.value
-      : resources.value.filter((resource) => resource.category === selectedCategory.value)
-  );
-  
-  const toggleCategory = (category) => {
+        ? resources.value
+        : resources.value.filter((resource) => resource.category === selectedCategory.value)
+);
+
+// Select category and reset resources
+const selectCategory = (category) => {
     selectedCategory.value = category;
-  };
-  
-  const goToCreatePage = () => {
+    hasReachedEnd.value = false; // Reset the end flag
+    fetchResources(true); // Reset resources
+};
+
+// Load more resources
+const loadMoreResources = () => {
+    fetchResources();
+};
+
+// Delete resource
+const deleteResource = async (id) => {
+    if (confirm("Are you sure you want to delete this resource?")) {
+        debugger;
+        await store.dispatch("library/deleteResource", id);
+        fetchResources(true); // Refresh resources
+    }
+};
+
+// Navigate to create page
+const navigateToCreatePage = () => {
     router.push("/library-create-form");
-  };
-  </script>
-  
-  <style scoped>
-  .min-h-screen {
+};
+
+onMounted(() => {
+    fetchResources(true); // Fetch initial resources
+});
+</script>
+
+<style scoped>
+.min-h-screen {
     min-height: 100vh;
-  }
-  
-  .bg-green-500 {
+}
+
+.bg-green-500 {
     background-color: #10b981;
-  }
-  
-  .hover\:bg-green-600:hover {
+}
+
+.hover\:bg-green-600:hover {
     background-color: #059669;
-  }
-  
-  .bg-blue-500 {
+}
+
+.bg-blue-500 {
     background-color: #3b82f6;
-  }
-  
-  .hover\:bg-blue-600:hover {
+}
+
+.hover\:bg-blue-600:hover {
     background-color: #2563eb;
-  }
-  </style>
-  
+}
+
+.text-gray-500 {
+    color: #6b7280;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.text-gray-300 {
+    color: #d1d5db;
+}
+
+/* Ensure proper truncation with line clamps */
+p[style*="-webkit-line-clamp"] {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
