@@ -73,7 +73,7 @@ const passwordSchema = yup.object({
     .required('Confirm password is required')
 })
 
-const { handleSubmit, isSubmitting } = useForm({
+const {resetForm, handleSubmit, isSubmitting } = useForm({
   validationSchema: toTypedSchema(passwordSchema)
 })
 
@@ -172,6 +172,7 @@ const generalError = ref('')
               type="email"
               name="email"
               required
+              :is-read-only="true"
               autocomplete="email"
             />
           </FormField>
@@ -179,7 +180,7 @@ const generalError = ref('')
           <template #footer>
             <BaseButtons>
               <BaseButton color="info" type="submit" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
+              <BaseButton color="info" label="Cancel" outline  :onclick="resetForm"/>
             </BaseButtons>
           </template>
         </CardBox>
@@ -248,9 +249,10 @@ const generalError = ref('')
               />
               <BaseButton
                 color="info"
-                label="Options"
+                label="Cancel"
                 outline
                 :disabled="isSubmitting || isLoading"
+                :onclick="resetForm"
               />
             </BaseButtons>
           </template>
