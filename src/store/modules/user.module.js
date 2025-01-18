@@ -70,6 +70,37 @@ const actions = {
     return state.userFetchPromise
   },
 
+  // Get the User ACL to display some Admin privilege things or not.
+  async getUserAcl({ commit, state }, user) {
+    // flush if it was fetched previously because we would like to fetch it again
+    commit('setUserAclFetched', false)
+
+    if (state.isUserAclFetched) {
+      return true
+    }
+
+    if (!state.userAclFetchPromise) {
+      state.userAclFetchPromise = (async () => {
+        try {
+          const docRef = doc(db, 'acl', user.uid)
+          const docSnap = await getDoc(docRef)
+          if (docSnap.exists()) {
+            commit('setUserAclFetched', true)
+          } else {
+            // set a regular acl for this user since it is logging in using a pop-model with a provider
+            await store.dispatch('user/addAcl', { uid: user.uid, email: user.email }) // set the correct the ACL
+          }
+          return docSnap?.data()?.role || roles.REGULAR; // defaults to regular if there is no ACL for the user
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+          throw error
+        }
+      })()
+    }
+
+    return state.userAclFetchPromise
+  },
+
   // Check the ACL for pop-users
   async checkUserAcl({ commit, state }, user) {
     if (state.isUserAclFetched) {
@@ -86,7 +117,7 @@ const actions = {
           if (!userCheck) {
             const userData = {
               email: user.email,
-              fullName: user?.displayName  || '',
+              fullName: user?.displayName || '',
               phoneNumber: user?.phoneNumber || '',
               uid: user.uid,
               bio: '',
@@ -154,7 +185,8 @@ const mutations = {
 }
 
 const getters = {
-  getField
+  getField,
+  userData: (state) => state.userData
 }
 
 export default {
