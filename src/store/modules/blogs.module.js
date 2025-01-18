@@ -1,8 +1,7 @@
 import { db } from '@/firebase/firebaseInit'
-import { collection, getDocs, limit, query, where, doc, setDoc, orderBy } from 'firebase/firestore'
+import { collection, getDocs, limit, query, where, doc, setDoc, updateDoc, orderBy } from 'firebase/firestore'
 
 import { getField, updateField } from 'vuex-map-fields'
-import localforage from 'localforage'
 
 const state = {
   blogs: [],
@@ -22,17 +21,24 @@ const actions = {
     }
   },
 
-  async getBlogs({ commit }, { pageSize = 10, lastDoc = null }) {
+  async getBlogs({ commit }, { pageSize = 10, lastDoc = null, isAdmin = false }) {
     try {
-      const q = query(
+      let queryBuilder = query(
         collection(db, 'blogs'),
         where('isPublished', '==', true),
-        // orderBy('publishedAt', 'desc'),
+        orderBy('publishedAt', 'desc'),
         limit(pageSize)
         // lastDoc ? startAfter(lastDoc) : null
       )
+      if (isAdmin)
+        queryBuilder = query(
+          collection(db, 'blogs'),
+          orderBy('publishedAt', 'desc'),
+          limit(pageSize)
+          // lastDoc ? startAfter(lastDoc) : null
+        )
 
-      const querySnapshot = await getDocs(q)
+      const querySnapshot = await getDocs(queryBuilder)
       const blogs = []
 
       querySnapshot.forEach((doc) => {
@@ -81,7 +87,7 @@ const actions = {
         const blogData = querySnapshot.docs[0] // Get the first document
         // To update store you always need the updateField helper function (vuex-map-fields)
         // Commit the single blog data
-        const singleBlogValue = { id: blogData.id, ...blogData.data() }; 
+        const singleBlogValue = { id: blogData.id, ...blogData.data() }
 
         commit('updateField', {
           path: 'singleBlog',
@@ -93,6 +99,21 @@ const actions = {
       }
     } catch (error) {
       console.error('Error fetching single blog by slug:', error)
+    }
+  },
+  async publishBlog({ commit }, blog) {
+    try {
+      const docRef = doc(db, 'blogs', blog.id)
+      const publisher = { isPublished: true, publishedAt: Date.now(), updatedAt: Date.now() }
+      const publishedBlog = { ...blog, ...publisher }
+      await updateDoc(docRef, publishedBlog)
+
+      commit('updateField', {
+        path: 'blogData',
+        value: publishedBlog
+      })
+    } catch (error) {
+      console.error('Error updating certification:', error)
     }
   }
 }
