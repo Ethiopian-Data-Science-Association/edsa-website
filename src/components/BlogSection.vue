@@ -13,6 +13,9 @@
         buttonColor="text-blue-500 dark:text-blue-400"
         buttonFontWeight="font-medium"
         buttonText="Read More"
+        :is-admin="isAdmin"
+        :blog-data="blog"
+        :is-published="blog.isPublished"
       />
       <div
         v-if="!blogs"
@@ -30,22 +33,21 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { store } from '../store/index';
+import { computed } from 'vue';
+import { useStore } from "vuex";
 import CardBoxWidget from './CardBoxWidget.vue';
-import {sanitizeUrl} from "../utils/sanitizeUrl.utils.js"
+import {sanitizeUrl} from "../utils/sanitizeUrl.utils.js";
 
-const pageSize = 10
+const store = useStore();
+
+const props = defineProps({
+  isAdmin: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+});
 
 const blogs = computed(() => store.state.blogs.blogs)
 
-const fetchBlogs = async (lastDoc = null) => {
-  await store.dispatch('blogs/getBlogs', { pageSize, lastDoc })
-}
-
-onMounted(fetchBlogs)
-</script>
-
-<style scoped>
-/* Additional styles if necessary */
-</style>
+</script> 
