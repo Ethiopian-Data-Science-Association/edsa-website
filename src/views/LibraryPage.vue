@@ -5,14 +5,14 @@
             <SectionMain class="flex-grow">
                 <!-- Header with Title and Button -->
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-3xl font-bold">Library / Resources</h2>
+                    <h1 class="text-3xl font-bold">Library</h1>
                     <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
                         class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12"
                         @click="navigateToCreatePage" />
                 </div>
 
                 <!-- Category Filter Pills -->
-                <div class="flex justify-center mb-6 space-x-4">
+                <div class="flex justify-center mb-6 space-x-4 cursor-pointer">
                     <PillTag v-for="category in categories" :key="category" :label="category"
                         :color="selectedCategory === category ? 'info' : 'lightDark'"
                         :outline="selectedCategory !== category" @click="selectCategory(category)" />
@@ -37,13 +37,13 @@
                         <div class="flex justify-between items-center">
                             <!-- Open Resource Link -->
                             <a :href="resource.resourceLink" target="_blank" rel="noopener noreferrer"
-                                class="text-blue-500 hover:underline text-sm">
+                                class="text-blue-500 hover:underline text-md">
                                 Open Resource
                             </a>
 
                             <!-- Delete Button -->
-                            <BaseButton :icon="mdiDelete" color="danger" small rounded-full
-                                @click="deleteResource(resource.id)" />
+                            <BaseButton v-if="userId === resource.resourceUploadedBy" :icon="mdiDelete" color="danger" small rounded-full
+                                @click="deleteResource(resource.id, resource.resourceUploadedBy)" />
                         </div>
                     </CardBox>
                 </div>
@@ -73,14 +73,13 @@
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-
+import localforage from 'localforage';
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import SectionMain from "@/components/SectionMain.vue";
 import CardBox from "@/components/CardBox.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import PillTag from "@/components/PillTag.vue";
-
 import { mdiPlus, mdiDelete } from "@mdi/js";
 
 const router = useRouter();
@@ -88,7 +87,8 @@ const store = useStore();
 
 const isAdmin = true; // Assume admin status for demonstration
 const selectedCategory = ref("All");
-const categories = ref(["All", "Research", "Technology", "Education"]);
+const userId = ref('');
+const categories = ref(['All','Academic Paper', 'External Course', 'Podcast', 'Slides', 'Video', 'White Paper']);
 const isLoading = ref(false);
 const hasReachedEnd = ref(false); // Track if all resources are loaded
 
@@ -110,7 +110,7 @@ const resources = computed(() => store.getters["library/resources"]);
 const filteredResources = computed(() =>
     selectedCategory.value === "All"
         ? resources.value
-        : resources.value.filter((resource) => resource.category === selectedCategory.value)
+        : resources.value.filter((resource) => resource.resourceType === selectedCategory.value)
 );
 
 // Select category and reset resources
@@ -126,9 +126,8 @@ const loadMoreResources = () => {
 };
 
 // Delete resource
-const deleteResource = async (id) => {
-    if (confirm("Are you sure you want to delete this resource?")) {
-        debugger;
+const deleteResource = async (id, resourceUploadedBy) => {
+    if (confirm("Are you sure you want to delete this resource?") && (userId.value === resourceUploadedBy)) { // additional safety
         await store.dispatch("library/deleteResource", id);
         fetchResources(true); // Refresh resources
     }
@@ -141,7 +140,22 @@ const navigateToCreatePage = () => {
 
 onMounted(() => {
     fetchResources(true); // Fetch initial resources
+    fetchUser();
 });
+
+const fetchUser = async () => {
+    try {
+        const userData = await localforage.getItem('user')
+        if (userData && userData.uid) {
+            const userFound = await store.dispatch('user/getUser', userData.uid) // if returned true then pick it from the localForage
+            if (userFound) userId.value = userData.uid;
+        } else {
+            console.error('User data not found in local storage.')
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error)
+    }
+}
 </script>
 
 <style scoped>

@@ -34,8 +34,6 @@ const actions = {
   // Fetch paginated resources
   async fetchResources({ commit }, { reset = false }) {
     try {
-      debugger
-
       if (reset) {
         commit('resetResources')
       }
@@ -65,7 +63,6 @@ const actions = {
   },
   async deleteResource({ commit }, id) {
     try {
-        debugger;
       // Reference the specific document in the 'resources' collection
       const resourceRef = doc(db, "resources", id);
   

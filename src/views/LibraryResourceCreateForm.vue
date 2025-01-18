@@ -105,7 +105,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
-import localforage from 'localforage'
+import localforage from 'localforage';
 import { paths } from '@/shared/constants/paths';
 
 onMounted(() => {
