@@ -23,7 +23,8 @@ export default [
       },
       {
         icon: mdiEmail,
-        label: 'Announcements'
+        label: 'Announcements',
+        to: '/announcement'
       },
       {
         isDivider: true
