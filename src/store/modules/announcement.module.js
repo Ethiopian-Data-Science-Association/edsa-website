@@ -1,4 +1,3 @@
-/* COPIED FROM LIBRARY FOR BOOTSTRAPPING */
 import { getField, updateField } from 'vuex-map-fields'
 import { db } from '@/firebase/firebaseInit'
 import {
@@ -14,94 +13,97 @@ import {
 } from 'firebase/firestore'
 
 const state = {
-  resources: [],
-  ResourceData: {},
+  announcements: [],
+  announcementData: {},
   lastVisible: null // Track the last fetched document
 }
 
 const actions = {
-  async addResource({ commit }, resource) {
+  async addAnnouncement({ commit }, announcement) {
     try {
-      await setDoc(doc(db, 'resources', resource.id), resource)
+      await setDoc(doc(db, 'announcements', announcement.id), announcement)
       commit('updateField', {
-        path: 'ResourceData',
-        value: resource
+        path: 'announcementData',
+        value: announcement
       })
     } catch (error) {
-      console.error('Error adding resource:', error)
+      console.error('Error adding announcement:', error)
     }
   },
- 
-  // Fetch paginated resources
-  async fetchResources({ commit }, { reset = false }) {
+
+  // Fetch paginated announcements
+  async fetchAnnouncements({ commit }, { reset = false, category = 'All' }) {
     try {
       if (reset) {
-        commit('resetResources')
+        commit('resetAnnouncements')
       }
 
-      const resourcesQuery = state.lastVisible
-        ? query(
-            collection(db, 'resources'),
-            orderBy('title'), // Replace 'title' with the appropriate field in your database
-            startAfter(state.lastVisible),
-            limit(10)
-          )
-        : query(collection(db, 'resources'), orderBy('title'), limit(10))
+      const pageSize = category === 'recent' ? 5 : 10
 
-      const querySnapshot = await getDocs(resourcesQuery)
+      const announcementsQuery = state.lastVisible
+        ? query(
+            collection(db, 'announcements'),
+            orderBy('createdAt', 'desc'), // Ensure announcements are sorted by creation date
+            startAfter(state.lastVisible),
+            limit(pageSize)
+          )
+        : query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(pageSize))
+
+      const querySnapshot = await getDocs(announcementsQuery)
 
       state.lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] // Update last visible document
 
-      const resources = querySnapshot.docs.map((doc) => ({
+      const announcements = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
       }))
 
-      commit('appendResources', resources)
+      commit('appendAnnouncements', announcements)
     } catch (error) {
-      console.error('Error fetching resources with pagination:', error)
+      console.error('Error fetching announcements with pagination:', error)
     }
   },
-  async deleteResource({ commit }, id) {
+
+  async deleteAnnouncement({ commit }, id) {
     try {
-      // Reference the specific document in the 'resources' collection
-      const resourceRef = doc(db, "resources", id);
-  
+      // Reference the specific document in the 'announcements' collection
+      const announcementRef = doc(db, 'announcements', id)
+
       // Delete the document
-      await deleteDoc(resourceRef);
-  
-      // Fetch the updated list of resources
-      const querySnapshot = await getDocs(collection(db, "resources"));
-      const updatedResources = querySnapshot.docs.map((doc) => ({
+      await deleteDoc(announcementRef)
+
+      // Fetch the updated list of announcements
+      const querySnapshot = await getDocs(collection(db, 'announcements'))
+      const updatedAnnouncements = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
-      }));
-  
-      // Update the resources in the state
-      commit("updateField", {
-        path: "resources",
-        value: updatedResources,
-      });
+        ...doc.data()
+      }))
+
+      // Update the announcements in the state
+      commit('updateField', {
+        path: 'announcements',
+        value: updatedAnnouncements
+      })
     } catch (error) {
-      console.error("Error deleting resource:", error);
+      console.error('Error deleting announcement:', error)
     }
-  }  
+  }
 }
 
 const mutations = {
   updateField,
-  appendResources(state, newResources) {
-    state.resources = [...state.resources, ...newResources]
+  appendAnnouncements(state, newAnnouncements) {
+    state.announcements = [...state.announcements, ...newAnnouncements]
   },
-  resetResources(state) {
-    state.resources = []
+  resetAnnouncements(state) {
+    state.announcements = []
     state.lastVisible = null // Reset pagination
   }
 }
 
 const getters = {
   getField,
-  resources: (state) => state.resources
+  announcements: (state) => state.announcements
 }
 
 export default {

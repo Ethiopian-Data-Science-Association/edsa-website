@@ -5,8 +5,8 @@
             <SectionMain class="flex-grow">
                 <!-- Header with Title and Button -->
                 <div class="flex items-center justify-between mb-8">
-                    <h1 class="text-3xl font-bold">Library</h1>
-                    <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
+                    <h1 class="text-3xl font-bold">Announcements</h1>
+                    <BaseButton v-if="isAdmin" label="Add Announcement" :icon="mdiPlus" color="success"
                         class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12"
                         @click="navigateToCreatePage" />
                 </div>
@@ -18,49 +18,43 @@
                         :outline="selectedCategory !== category" @click="selectCategory(category)" />
                 </div>
 
-                <!-- Resources Grid -->
-                <div v-if="filteredResources.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <CardBox v-for="resource in filteredResources" :key="resource.id"
+                <!-- Announcements Grid -->
+                <div v-if="filteredAnnouncements.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <CardBox v-for="announcement in filteredAnnouncements" :key="announcement.id"
                         class="shadow-md hover:shadow-lg transition-shadow">
                         <!-- Title with dynamic padding -->
-                        <CardBoxComponentTitle :title="resource.title" :style="{
-                            paddingBottom: resource.title.length > 50 ? '1.5rem' : '5.5rem',
+                        <CardBoxComponentTitle :title="announcement.title" :style="{
+                            paddingBottom: announcement.title.length > 50 ? '1.5rem' : '5.5rem',
                         }"></CardBoxComponentTitle>
 
                         <!-- Description with more lines -->
                         <p class="text-gray-500 mb-4 overflow-hidden"
                             style="display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; min-height: 150px;">
-                            {{ resource.description }}
+                            {{ announcement.description }}
                         </p>
 
                         <!-- Clickable Link and Delete Button -->
-                        <div class="flex justify-between items-center">
-                            <!-- Open Resource Link -->
-                            <a :href="resource.resourceLink" target="_blank" rel="noopener noreferrer"
-                                class="text-blue-500 hover:underline text-md">
-                                Open Resource
-                            </a>
-
+                        <div class="flex justify-self-center items-center">
                             <!-- Delete Button -->
-                            <BaseButton v-if="userId === resource.resourceUploadedBy" :icon="mdiDelete" color="danger" small rounded-full
-                                @click="deleteResource(resource.id, resource.resourceUploadedBy)" />
+                            <BaseButton v-if="userId === announcement.createdBy" :icon="mdiDelete" color="danger" small
+                                rounded-full @click="deleteAnnouncement(announcement.id, announcement.createdBy)" />
                         </div>
                     </CardBox>
                 </div>
 
                 <!-- Load More Button -->
-                <div v-if="filteredResources.length && !hasReachedEnd" class="mt-6 flex justify-center">
+                <div v-if="filteredAnnouncements.length && !hasReachedEnd" class="mt-6 flex justify-center">
                     <BaseButton v-if="!isLoading" label="Load More" color="primary"
-                        class="bg-blue-500 text-white hover:bg-blue-600" @click="loadMoreResources" />
+                        class="bg-blue-500 text-white hover:bg-blue-600" @click="loadMoreAnnouncements" />
                     <p v-else class="text-gray-500">Loading...</p>
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="filteredResources.length === 0" class="flex flex-col items-center text-center py-16">
-                    <img src="/public/favicon.png" alt="No resources available" class="w-24 h-24 mb-4" />
-                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No resources available</p>
-                    <p class="text-gray-500 dark:text-gray-400">Check back later or add a new resource.</p>
-                    <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
+                <div v-if="filteredAnnouncements.length === 0" class="flex flex-col items-center text-center py-16">
+                    <img src="/public/favicon.png" alt="No announcements available" class="w-24 h-24 mb-4" />
+                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No announcements available</p>
+                    <p class="text-gray-500 dark:text-gray-400">Check back later or add a new announcement.</p>
+                    <BaseButton v-if="isAdmin" label="Add Announcement" :icon="mdiPlus" color="success"
                         class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600"
                         @click="navigateToCreatePage" />
                 </div>
@@ -86,60 +80,58 @@ const router = useRouter();
 const store = useStore();
 
 const isAdmin = true; // Assume admin status for demonstration
-const selectedCategory = ref("All");
+const selectedCategory = ref("recent");
 const userId = ref('');
-const categories = ref(['All','Academic Paper', 'External Course', 'Podcast', 'Slides', 'Video', 'White Paper']);
+const categories = ref(['recent', 'All']);
 const isLoading = ref(false);
-const hasReachedEnd = ref(false); // Track if all resources are loaded
+const hasReachedEnd = ref(false); // Track if all announcements are loaded
 
-// Fetch resources
-const fetchResources = async (reset = false) => {
+// Fetch announcements
+const fetchAnnouncements = async (reset = false) => {
     isLoading.value = true;
-    await store.dispatch("library/fetchResources", { reset });
+    await store.dispatch("announcement/fetchAnnouncements", { reset, category: selectedCategory.value });
     isLoading.value = false;
 
-    // Determine if all resources are fetched
-    const resources = store.getters["library/resources"];
-    if (resources.length < 10 || resources.length % 10 !== 0) {
+    // Determine if all announcements are fetched
+    const announcements = store.getters["announcement/announcements"];
+    if (announcements.length < (selectedCategory.value === "recent" ? 5 : 10)) {
         hasReachedEnd.value = true;
     }
 };
 
-// Computed resources and filters
-const resources = computed(() => store.getters["library/resources"]);
-const filteredResources = computed(() =>
-    selectedCategory.value === "All"
-        ? resources.value
-        : resources.value.filter((resource) => resource.resourceType === selectedCategory.value)
+// Computed announcements and filters
+const announcements = computed(() => store.getters["announcement/announcements"]);
+const filteredAnnouncements = computed(() =>
+    announcements.value
 );
 
-// Select category and reset resources
+// Select category and reset announcements
 const selectCategory = (category) => {
     selectedCategory.value = category;
     hasReachedEnd.value = false; // Reset the end flag
-    fetchResources(true); // Reset resources
+    fetchAnnouncements(true); // Reset announcements
 };
 
-// Load more resources
-const loadMoreResources = () => {
-    fetchResources();
+// Load more announcements
+const loadMoreAnnouncements = () => {
+    fetchAnnouncements();
 };
 
-// Delete resource
-const deleteResource = async (id, resourceUploadedBy) => {
-    if (confirm("Are you sure you want to delete this resource?") && (userId.value === resourceUploadedBy)) { // additional safety
-        await store.dispatch("library/deleteResource", id);
-        fetchResources(true); // Refresh resources
+// Delete announcement
+const deleteAnnouncement = async (id, createdBy) => {
+    if (confirm("Are you sure you want to delete this announcement?") && (userId.value === createdBy)) { // additional safety
+        await store.dispatch("announcement/deleteAnnouncement", id);
+        fetchAnnouncements(true); // Refresh announcements
     }
 };
 
 // Navigate to create page
 const navigateToCreatePage = () => {
-    router.push("/library-create-form");
+    router.push("/announcement-create-form");
 };
 
 onMounted(() => {
-    fetchResources(true); // Fetch initial resources
+    fetchAnnouncements(true); // Fetch initial announcements
     fetchUser();
 });
 
@@ -147,7 +139,7 @@ const fetchUser = async () => {
     try {
         const userData = await localforage.getItem('user')
         if (userData && userData.uid) {
-            const userFound = await store.dispatch('user/getUser', userData.uid) // if returned true then pick it from the localForage
+            const userFound = await store.dispatch('user/getUser', userData.uid);
             if (userFound) userId.value = userData.uid;
         } else {
             console.error('User data not found in local storage.')
