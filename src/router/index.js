@@ -106,6 +106,22 @@ const routes = [
   },
   {
     meta: {
+      title: 'Announcements'
+    },
+    path: '/announcements',
+    name: 'announcements',
+    component: () => import('@/views/AnnouncementPage.vue')
+  },
+  {
+    meta: {
+      title: 'Announcement Create Form'
+    },
+    path: '/announcement-create-form',
+    name: 'announcement-create-form',
+    component: () => import('@/views/AnnouncementCreateForm.vue')
+  },
+  {
+    meta: {
       title: 'Blogs'
     },
     path: '/blogs',
