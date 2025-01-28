@@ -106,10 +106,10 @@ const routes = [
   },
   {
     meta: {
-      title: 'Announcement'
+      title: 'Announcements'
     },
-    path: '/announcement',
-    name: 'announcement',
+    path: '/announcements',
+    name: 'announcements',
     component: () => import('@/views/AnnouncementPage.vue')
   },
   {

@@ -143,7 +143,7 @@ if (props.ctrlKFocus) {
       </option>
     </select>
     <textarea v-else-if="computedType === 'textarea'" :id="id" v-model="computedValue" :class="inputElClass"
-      :name="name" :maxlength="maxlength" :placeholder="placeholder" :required="required" />
+      :name="name" :maxlength="maxlength" :placeholder="placeholder" :required="required" style="min-height: 200px;"/>
     <input v-else-if="computedType === 'file'" :id="id" ref="fileEl" :name="name" :type="computedType"
       :required="required" :placeholder="placeholder" :class="inputElClass" @change="onFilePicked" />
     <input v-else :id="id" ref="inputEl" v-model="computedValue" :name="name" :maxlength="maxlength"
