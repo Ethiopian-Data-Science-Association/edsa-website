@@ -12,8 +12,8 @@
                     color="contrast" rounded-full small />
                 <BaseButton href="https://instagram.com/your-profile" target="_blank" :icon="mdiInstagram"
                     color="contrast" rounded-full small />
-                <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast"
-                    rounded-full small />
+                <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast" rounded-full
+                    small />
             </div>
 
         </SectionTitleLineWithButton>
@@ -28,13 +28,14 @@
             </FormField>
 
             <FormField label="Help Type">
-                <FormControl v-model="form.department" :options="selectOptions" />
+                <FormControl v-model="form.QuestionType" :options="selectOptions" />
             </FormField>
 
             <BaseDivider />
 
-            <FormField label="Question" help="Your question. Max 400 characters">
-                <FormControl type="textarea" placeholder="Explain how we can help you" maxlength="400" />
+            <FormField label="Question" help="Your question. Max 1000 characters">
+                <FormControl v-model="form.question" type="textarea" placeholder="Explain how we can help you"
+                    maxlength="1000" />
             </FormField>
             <BaseButtons>
                 <BaseButton type="submit" color="info" label="Submit" />
@@ -45,21 +46,16 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook, mdiTwitter, mdiInstagram, mdiYoutube } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
-import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 
 const selectOptions = [
     { id: 1, label: 'Technical Support' },
@@ -78,31 +74,12 @@ const form = reactive({
     name: '',
     email: '',
     phone: '',
-    department: selectOptions[0],
-    subject: '',
+    QuestionType: selectOptions[0],
     question: ''
 })
 
-const customElementsForm = reactive({
-    checkbox: ['lorem'],
-    radio: 'one',
-    switch: ['one'],
-    file: null
-})
 
 const submit = () => {
     //
-}
-
-const formStatusWithHeader = ref(true)
-
-const formStatusCurrent = ref(0)
-
-const formStatusOptions = ['info', 'success', 'danger', 'warning']
-
-const formStatusSubmit = () => {
-    formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
-        ? formStatusCurrent.value + 1
-        : 0
 }
 </script>
