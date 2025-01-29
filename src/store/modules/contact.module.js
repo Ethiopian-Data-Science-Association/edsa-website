@@ -2,49 +2,50 @@ import { db } from '@/firebase/firebaseInit'
 import { collection, addDoc, getDocs, orderBy, query } from 'firebase/firestore'
 
 const state = {
-  contacts: []
+  contactSubmissions: []
 }
 
 const actions = {
-  // **Add Contact Submission**
-  async addContactSubmission({ commit }, contactData) {
-    debugger;
+  // Add Contact Submission to Firestore
+  async addContactSubmission(_, contactData) {
     try {
       await addDoc(collection(db, 'contacts'), {
         ...contactData,
-        createdAt: Date.now()
+        createdAt: Date.now() // Timestamp for sorting
       })
     } catch (error) {
-      console.error('Error submitting contact request:', error)
+      console.error('Error adding contact submission:', error)
     }
   },
 
-  // **Fetch Contact Submissions in Descending Order**
-  async fetchContacts({ commit }) {
+  // Fetch Contact Submissions from Firestore (Descending Order)
+  async fetchContactSubmissions({ commit }) {
     try {
-      const contactsQuery = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'))
-      const querySnapshot = await getDocs(contactsQuery)
+      const q = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'))
+      const querySnapshot = await getDocs(q)
 
-      const contacts = querySnapshot.docs.map((doc) => ({
+      const submissions = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
       }))
 
-      commit('setContacts', contacts)
+      commit('setContactSubmissions', submissions)
+      return submissions
     } catch (error) {
-      console.error('Error fetching contacts:', error)
+      console.error('Error fetching contact submissions:', error)
+      return []
     }
   }
 }
 
 const mutations = {
-  setContacts(state, contacts) {
-    state.contacts = contacts
+  setContactSubmissions(state, submissions) {
+    state.contactSubmissions = submissions
   }
 }
 
 const getters = {
-  contacts: (state) => state.contacts
+  contactSubmissions: (state) => state.contactSubmissions
 }
 
 export default {

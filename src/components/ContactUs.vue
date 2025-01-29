@@ -17,6 +17,17 @@
             </div>
         </SectionTitleLineWithButton>
 
+        <!-- Notification Bar -->
+        <div v-if="notificationMessage !== ''" class="mb-4">
+            <NotificationBar :color="notificationColor" :icon="notificationIcon" :outline="notificationsOutline">
+                <b>{{ notificationTitle }}</b>. {{ notificationMessage }}
+                <template #right>
+                    <BaseButton label="Dismiss" :color="notificationsOutline ? notificationColor : 'white'"
+                        :outline="notificationsOutline" rounded-full small @click="clearNotification" />
+                </template>
+            </NotificationBar>
+        </div>
+
         <CardBox is-form @submit.prevent="submit">
             <FormField label="Name and Email">
                 <FormControl v-model="form.name" :icon="mdiAccount" placeholder="Full name" />
@@ -39,8 +50,8 @@
             </FormField>
 
             <BaseButtons>
-                <BaseButton type="submit" color="info" label="Submit" />
-                <BaseButton type="reset" color="info" outline label="Reset" />
+                <BaseButton type="submit" color="info" label="Submit" :disabled="isSubmitting" />
+                <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
             </BaseButtons>
         </CardBox>
     </SectionMain>
@@ -52,7 +63,7 @@ import { useStore } from 'vuex';
 import localforage from 'localforage';
 import {
     mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook,
-    mdiTwitter, mdiInstagram, mdiYoutube
+    mdiTwitter, mdiInstagram, mdiYoutube, mdiCheckCircle, mdiAlertCircle
 } from '@mdi/js';
 import SectionMain from '@/components/SectionMain.vue';
 import CardBox from '@/components/CardBox.vue';
@@ -61,10 +72,17 @@ import FormControl from '@/components/FormControl.vue';
 import BaseDivider from '@/components/BaseDivider.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import BaseButtons from '@/components/BaseButtons.vue';
+import NotificationBar from '@/components/NotificationBar.vue';
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue';
 
 const store = useStore();
-const userId = ref('Anonymous');
+const isSubmitting = ref(false);
+const userId = ref('');
+const notificationMessage = ref('');
+const notificationTitle = ref('');
+const notificationColor = ref('');
+const notificationIcon = ref('');
+const notificationsOutline = ref(true);
 
 const selectOptions = [
     { id: 1, label: 'Technical Support' },
@@ -93,13 +111,11 @@ const fetchUser = async () => {
         const userData = await localforage.getItem('user');
         if (userData && userData.uid) {
             await store.dispatch('user/getUser', userData.uid);
-            userId.value = userData.uid; // Store user ID for submission
-            form.name = userData.name || 'Anonymous';
-            form.email = userData.email || 'Anonymous';
+            userId.value = userData.uid;
+            form.name = userData.name || '';
+            form.email = userData.email || '';
         } else {
             console.error('User data not found in local storage.');
-            form.name = 'Anonymous';
-            form.email = 'Anonymous';
         }
     } catch (error) {
         console.error('Error fetching user:', error);
@@ -108,22 +124,71 @@ const fetchUser = async () => {
 
 onMounted(fetchUser);
 
+// Show notification
+const showNotification = (title, message, color, icon) => {
+    notificationTitle.value = title;
+    notificationMessage.value = message;
+    notificationColor.value = color;
+    notificationIcon.value = icon;
+};
+
+// Clear notification
+const clearNotification = () => {
+    notificationMessage.value = '';
+    notificationTitle.value = '';
+    notificationColor.value = '';
+    notificationIcon.value = '';
+};
+
+// Reset form after submission
+const resetForm = () => {
+    form.name = userId.value ? form.name : '';
+    form.email = userId.value ? form.email : '';
+    form.phone = '';
+    form.questionType = selectOptions[0];
+    form.question = '';
+};
+
+// Submit form
 const submit = async () => {
-    debugger;
     try {
+        isSubmitting.value = true;
         const contactData = {
-            name: form.name || 'Anonymous',
-            email: form.email || 'Anonymous',
+            name: form.name || '',
+            email: form.email || '',
             phone: form.phone || '',
             questionType: form.questionType.label,
             question: form.question,
-            userId: userId.value
+            userId: userId.value || 'Anonymous',
+            createdAt: new Date().toISOString()
         };
 
         await store.dispatch('contact/addContactSubmission', contactData);
-        alert('Your question has been submitted successfully.');
+        showNotification('Success', 'Your question has been submitted successfully.', 'success', mdiCheckCircle);
+        resetForm();
     } catch (error) {
         console.error('Error submitting question:', error);
+        showNotification('Error', 'Failed to submit your question. Please try again.', 'danger', mdiAlertCircle);
+    } finally {
+        isSubmitting.value = false;
     }
 };
 </script>
+
+<style scoped>
+.text-gray-500 {
+    color: #6b7280;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+
+.bg-gray-700 {
+    background-color: #374151;
+}
+</style>
