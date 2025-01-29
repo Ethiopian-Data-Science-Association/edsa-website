@@ -15,9 +15,9 @@
                 <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast" rounded-full
                     small />
             </div>
-
         </SectionTitleLineWithButton>
-        <CardBox form @submit.prevent="submit">
+
+        <CardBox is-form @submit.prevent="submit">
             <FormField label="Name and Email">
                 <FormControl v-model="form.name" :icon="mdiAccount" placeholder="Full name" />
                 <FormControl v-model="form.email" type="email" :icon="mdiMail" placeholder="john.doe@example.com" />
@@ -28,7 +28,7 @@
             </FormField>
 
             <FormField label="Help Type">
-                <FormControl v-model="form.QuestionType" :options="selectOptions" />
+                <FormControl v-model="form.questionType" :options="selectOptions" />
             </FormField>
 
             <BaseDivider />
@@ -37,6 +37,7 @@
                 <FormControl v-model="form.question" type="textarea" placeholder="Explain how we can help you"
                     maxlength="1000" />
             </FormField>
+
             <BaseButtons>
                 <BaseButton type="submit" color="info" label="Submit" />
                 <BaseButton type="reset" color="info" outline label="Reset" />
@@ -46,16 +47,24 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook, mdiTwitter, mdiInstagram, mdiYoutube } from '@mdi/js'
-import SectionMain from '@/components/SectionMain.vue'
-import CardBox from '@/components/CardBox.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import { reactive, ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import localforage from 'localforage';
+import {
+    mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook,
+    mdiTwitter, mdiInstagram, mdiYoutube
+} from '@mdi/js';
+import SectionMain from '@/components/SectionMain.vue';
+import CardBox from '@/components/CardBox.vue';
+import FormField from '@/components/FormField.vue';
+import FormControl from '@/components/FormControl.vue';
+import BaseDivider from '@/components/BaseDivider.vue';
+import BaseButton from '@/components/BaseButton.vue';
+import BaseButtons from '@/components/BaseButtons.vue';
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue';
+
+const store = useStore();
+const userId = ref('Anonymous');
 
 const selectOptions = [
     { id: 1, label: 'Technical Support' },
@@ -68,18 +77,53 @@ const selectOptions = [
     { id: 8, label: 'Project Partnerships' },
     { id: 9, label: 'Volunteering Opportunities' },
     { id: 10, label: 'Other' }
-]
+];
 
 const form = reactive({
     name: '',
     email: '',
     phone: '',
-    QuestionType: selectOptions[0],
+    questionType: selectOptions[0],
     question: ''
-})
+});
 
+// Fetch user data
+const fetchUser = async () => {
+    try {
+        const userData = await localforage.getItem('user');
+        if (userData && userData.uid) {
+            await store.dispatch('user/getUser', userData.uid);
+            userId.value = userData.uid; // Store user ID for submission
+            form.name = userData.name || 'Anonymous';
+            form.email = userData.email || 'Anonymous';
+        } else {
+            console.error('User data not found in local storage.');
+            form.name = 'Anonymous';
+            form.email = 'Anonymous';
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+    }
+};
 
-const submit = () => {
-    //
-}
+onMounted(fetchUser);
+
+const submit = async () => {
+    debugger;
+    try {
+        const contactData = {
+            name: form.name || 'Anonymous',
+            email: form.email || 'Anonymous',
+            phone: form.phone || '',
+            questionType: form.questionType.label,
+            question: form.question,
+            userId: userId.value
+        };
+
+        await store.dispatch('contact/addContactSubmission', contactData);
+        alert('Your question has been submitted successfully.');
+    } catch (error) {
+        console.error('Error submitting question:', error);
+    }
+};
 </script>
