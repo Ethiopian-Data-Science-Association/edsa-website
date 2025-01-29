@@ -11,37 +11,41 @@
                         @click="navigateToCreatePage" />
                 </div>
 
-                <!-- Jobs Grid -->
-                <div v-if="filteredJobs.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Jobs Grid (Fixed alignment) -->
+                <div v-if="filteredJobs.length"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-auto max-w-7xl">
                     <CardBox v-for="job in filteredJobs" :key="job.id"
-                        class="cursor-pointer shadow-md hover:shadow-lg transition-shadow" @click="openModal(job)">
-                        <!-- Job Title -->
-                        <CardBoxComponentTitle :title="job.title" :style="{
-                            paddingBottom: job.title.length > 50 ? '1.5rem' : '5.5rem',
-                        }"></CardBoxComponentTitle>
+                        class="cursor-pointer shadow-md hover:shadow-lg transition-shadow p-6 flex flex-col justify-between rounded-lg bg-white dark:bg-slate-900 w-full h-full min-h-[380px]"
+                        @click="openModal(job)">
 
-                        <!-- Job Description -->
-                        <p class="text-gray-500 mb-4 overflow-hidden"
-                            style="display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; min-height: 100px;">
+                        <!-- Job Title (Fixed height) -->
+                        <CardBoxComponentTitle :title="job.title"
+                            class="text-xl font-semibold text-gray-800 mb-2 min-h-[50px] text-center" />
+
+                        <!-- Job Description (Fixed height for alignment) -->
+                        <p class="text-gray-500 overflow-hidden line-clamp-4 min-h-[80px] mb-4 text-justify">
                             {{ job.description }}
                         </p>
 
-                        <!-- Job Link and Admin Actions -->
-                        <div class="flex justify-between items-center">
-                            <a :href="job.link" target="_blank" rel="noopener noreferrer"
-                                class="text-blue-500 hover:underline text-md">
+                        <!-- Apply Now Link (Centered across all cards) -->
+                        <div class="flex justify-center mb-4">
+                            <a v-if="!job.isClosed" :href="job.link" target="_blank" rel="noopener noreferrer"
+                                class="text-blue-500 hover:underline text-md font-semibold block text-center">
                                 Apply Now
                             </a>
+                            <PillTag v-if="job.isClosed" :color="'warning'" :label="'Closed'" :icon="mdiBookCancel" />
+                        </div>
 
-                            <!-- Admin Controls -->
-                            <div v-if="isAdmin" class="flex space-x-2">
-                                <BaseButton v-if="!job.isApproved" label="Approve" color="success" small rounded-full
-                                    @click.stop="approveJob(job.id)" />
-                                <BaseButton v-if="!job.isApproved" label="Decline" color="danger" small rounded-full
-                                    @click.stop="declineJob(job.id)" />
-                                <BaseButton v-if="job.isApproved && !job.isClosed" label="Close" color="warning" small
-                                    rounded-full @click.stop="closeJob(job.id)" />
-                            </div>
+                        <!-- Admin Controls (Side-by-Side Buttons) -->
+                        <div v-if="isAdmin" class="flex justify-center gap-3 mt-auto">
+                            <BaseButton v-if="!job.isApproved" label="Approve" color="success" small rounded-full
+                                @click.stop="approveJob(job.id)" />
+                            <BaseButton v-if="!job.isApproved && !job.isDeclined" label="Decline" color="danger" small
+                                rounded-full @click.stop="declineJob(job.id)" />
+                            <BaseButton v-if="job.isApproved && !job.isClosed" label="Close" color="warning" small
+                                rounded-full @click.stop="closeJob(job.id)" />
+                            <PillTag v-if="job.isDeclined" :color="'warning'" :label="'Declined'"
+                                :icon="mdiBookCancel" />
                         </div>
                     </CardBox>
                 </div>
@@ -72,6 +76,7 @@
     </LayoutAuthenticated>
 </template>
 
+
 <script setup>
 import { roles } from "@/shared/constants/roles";
 import { ref, computed, onMounted } from "vue";
@@ -84,7 +89,8 @@ import CardBox from "@/components/CardBox.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import CardBoxModal from "@/components/CardBoxModal.vue";
 import BaseButton from "@/components/BaseButton.vue";
-import { mdiPlus } from "@mdi/js";
+import { mdiPlus, mdiBookCancel } from "@mdi/js";
+import PillTag from '@/components/PillTag.vue'
 
 const router = useRouter();
 const store = useStore();

@@ -28,6 +28,7 @@ const actions = {
       await setDoc(doc(db, 'jobs', job.id), {
         ...job,
         isApproved: false, // Default: Pending approval
+        isDeclined: false, // not declined 
         isClosed: false, // Default: Open
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -83,6 +84,7 @@ const actions = {
       const jobRef = doc(db, 'jobs', jobId)
       await updateDoc(jobRef, {
         isApproved: true,
+        isDeclined: false,
         updatedAt: Date.now()
       })
 
@@ -98,6 +100,7 @@ const actions = {
       const jobRef = doc(db, 'jobs', jobId)
       await updateDoc(jobRef, {
         isApproved: false,
+        isDeclined: true,
         updatedAt: Date.now()
       })
 
