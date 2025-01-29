@@ -47,7 +47,7 @@ export default [
     icon: mdiTelevisionGuide
   },
   {
-    to: '/responsive',
+    to: '/jobs',
     label: 'Jobs',
     icon: mdiResponsive
   },

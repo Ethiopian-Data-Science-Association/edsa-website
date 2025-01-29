@@ -154,6 +154,22 @@ const routes = [
   },
   {
     meta: {
+      title: 'Jobs'
+    },
+    path: '/jobs',
+    name: 'jobs',
+    component: () => import('@/views/JobsPage.vue')
+  },
+  {
+    meta: {
+      title: 'Job Create Form'
+    },
+    path: '/job-create-form',
+    name: 'job-create-form',
+    component: () => import('@/views/JobCreateForm.vue')
+  },
+  {
+    meta: {
       title: 'Forms'
     },
     path: '/forms',
