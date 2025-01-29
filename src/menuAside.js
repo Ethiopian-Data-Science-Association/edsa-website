@@ -7,7 +7,8 @@ import {
   mdiTelevisionGuide,
   mdiResponsive,
   mdiAccountMultiplePlus,
-  mdiPost
+  mdiPost,
+  mdiBallotOutline
 } from '@mdi/js'
 
 export default [
@@ -60,5 +61,10 @@ export default [
     to: '/login',
     label: 'Login',
     icon: mdiLock
+  },
+  {
+    to: '/contacts',
+    label: 'Contacts',
+    icon: mdiBallotOutline
   }
 ]
