@@ -52,28 +52,20 @@ window.addEventListener('keydown', (e) => {
 
 <template>
   <OverlayLayer v-show="value" @overlay-click="cancel">
-    <CardBox
-      v-show="value"
-      class="shadow-lg max-h-modal w-11/12 md:w-3/5 lg:w-2/5 xl:w-4/12 z-50"
-      is-modal
-    >
+    <CardBox v-show="value" class="shadow-lg max-h-[80vh] w-11/12 md:w-3/5 lg:w-2/5 xl:w-4/12 z-50 flex flex-col"
+      is-modal>
       <CardBoxComponentTitle :title="title">
-        <BaseButton
-          v-if="hasCancel"
-          :icon="mdiClose"
-          color="whiteDark"
-          small
-          rounded-full
-          @click.prevent="cancel"
-        />
+        <BaseButton v-if="hasCancel" :icon="mdiClose" color="whiteDark" small rounded-full @click.prevent="cancel" />
       </CardBoxComponentTitle>
 
-      <div class="space-y-3">
+      <!-- Scrollable Content Section -->
+      <div class="overflow-y-auto max-h-[60vh] px-4 pb-4">
         <slot />
       </div>
 
+      <!-- Footer Section -->
       <template #footer>
-        <BaseButtons>
+        <BaseButtons class="p-4 bg-white border-t border-gray-200">
           <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
           <BaseButton v-if="hasCancel" label="Cancel" :color="button" outline @click="cancel" />
         </BaseButtons>
@@ -81,3 +73,10 @@ window.addEventListener('keydown', (e) => {
     </CardBox>
   </OverlayLayer>
 </template>
+
+<style scoped>
+/* Ensuring the modal doesn't exceed viewport height */
+.max-h-modal {
+  max-height: 80vh;
+}
+</style>
