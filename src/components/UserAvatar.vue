@@ -20,7 +20,7 @@ const props = defineProps({
 const avatar = computed(() =>
   props.avatar && props.avatar !== ''  // short circuit for the null
     ? props.avatar
-    : `https://api.dicebear.com/7.x/${props.api}/svg?seed=${props.avatar.replace(
+    : `https://api.dicebear.com/7.x/${props.api}/svg?seed=${props.avatar?.replace(
       /[^a-z0-9]+/gi,
       '-'
     )}.svg`

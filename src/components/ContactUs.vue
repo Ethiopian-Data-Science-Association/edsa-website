@@ -12,12 +12,23 @@
                     color="contrast" rounded-full small />
                 <BaseButton href="https://instagram.com/your-profile" target="_blank" :icon="mdiInstagram"
                     color="contrast" rounded-full small />
-                <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast"
-                    rounded-full small />
+                <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast" rounded-full
+                    small />
             </div>
-
         </SectionTitleLineWithButton>
-        <CardBox form @submit.prevent="submit">
+
+        <!-- Notification Bar -->
+        <div v-if="notificationMessage !== ''" class="mb-4">
+            <NotificationBar :color="notificationColor" :icon="notificationIcon" :outline="notificationsOutline">
+                <b>{{ notificationTitle }}</b>. {{ notificationMessage }}
+                <template #right>
+                    <BaseButton label="Dismiss" :color="notificationsOutline ? notificationColor : 'white'"
+                        :outline="notificationsOutline" rounded-full small @click="clearNotification" />
+                </template>
+            </NotificationBar>
+        </div>
+
+        <CardBox is-form @submit.prevent="submit">
             <FormField label="Name and Email">
                 <FormControl v-model="form.name" :icon="mdiAccount" placeholder="Full name" />
                 <FormControl v-model="form.email" type="email" :icon="mdiMail" placeholder="john.doe@example.com" />
@@ -28,38 +39,50 @@
             </FormField>
 
             <FormField label="Help Type">
-                <FormControl v-model="form.department" :options="selectOptions" />
+                <FormControl v-model="form.questionType" :options="selectOptions" />
             </FormField>
 
             <BaseDivider />
 
-            <FormField label="Question" help="Your question. Max 400 characters">
-                <FormControl type="textarea" placeholder="Explain how we can help you" maxlength="400" />
+            <FormField label="Question" help="Your question. Max 1000 characters">
+                <FormControl v-model="form.question" type="textarea" placeholder="Explain how we can help you"
+                    maxlength="1000" />
             </FormField>
+
             <BaseButtons>
-                <BaseButton type="submit" color="info" label="Submit" />
-                <BaseButton type="reset" color="info" outline label="Reset" />
+                <BaseButton type="submit" color="info" label="Submit" :disabled="isSubmitting" />
+                <BaseButton type="reset" color="info" outline label="Reset" @click="resetForm" />
             </BaseButtons>
         </CardBox>
     </SectionMain>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook, mdiTwitter, mdiInstagram, mdiYoutube } from '@mdi/js'
-import SectionMain from '@/components/SectionMain.vue'
-import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
-import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
+import { reactive, ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import localforage from 'localforage';
+import {
+    mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook,
+    mdiTwitter, mdiInstagram, mdiYoutube, mdiCheckCircle, mdiAlertCircle
+} from '@mdi/js';
+import SectionMain from '@/components/SectionMain.vue';
+import CardBox from '@/components/CardBox.vue';
+import FormField from '@/components/FormField.vue';
+import FormControl from '@/components/FormControl.vue';
+import BaseDivider from '@/components/BaseDivider.vue';
+import BaseButton from '@/components/BaseButton.vue';
+import BaseButtons from '@/components/BaseButtons.vue';
+import NotificationBar from '@/components/NotificationBar.vue';
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue';
+
+const store = useStore();
+const isSubmitting = ref(false);
+const userId = ref('');
+const notificationMessage = ref('');
+const notificationTitle = ref('');
+const notificationColor = ref('');
+const notificationIcon = ref('');
+const notificationsOutline = ref(true);
 
 const selectOptions = [
     { id: 1, label: 'Technical Support' },
@@ -72,37 +95,100 @@ const selectOptions = [
     { id: 8, label: 'Project Partnerships' },
     { id: 9, label: 'Volunteering Opportunities' },
     { id: 10, label: 'Other' }
-]
+];
 
 const form = reactive({
     name: '',
     email: '',
     phone: '',
-    department: selectOptions[0],
-    subject: '',
+    questionType: selectOptions[0],
     question: ''
-})
+});
 
-const customElementsForm = reactive({
-    checkbox: ['lorem'],
-    radio: 'one',
-    switch: ['one'],
-    file: null
-})
+// Fetch user data
+const fetchUser = async () => {
+    try {
+        const userData = await localforage.getItem('user');
+        if (userData && userData.uid) {
+            await store.dispatch('user/getUser', userData.uid);
+            userId.value = userData.uid;
+            form.name = userData.name || '';
+            form.email = userData.email || '';
+        } else {
+            console.error('User data not found in local storage.');
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+    }
+};
 
-const submit = () => {
-    //
-}
+onMounted(fetchUser);
 
-const formStatusWithHeader = ref(true)
+// Show notification
+const showNotification = (title, message, color, icon) => {
+    notificationTitle.value = title;
+    notificationMessage.value = message;
+    notificationColor.value = color;
+    notificationIcon.value = icon;
+};
 
-const formStatusCurrent = ref(0)
+// Clear notification
+const clearNotification = () => {
+    notificationMessage.value = '';
+    notificationTitle.value = '';
+    notificationColor.value = '';
+    notificationIcon.value = '';
+};
 
-const formStatusOptions = ['info', 'success', 'danger', 'warning']
+// Reset form after submission
+const resetForm = () => {
+    form.name = userId.value ? form.name : '';
+    form.email = userId.value ? form.email : '';
+    form.phone = '';
+    form.questionType = selectOptions[0];
+    form.question = '';
+};
 
-const formStatusSubmit = () => {
-    formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
-        ? formStatusCurrent.value + 1
-        : 0
-}
+// Submit form
+const submit = async () => {
+    try {
+        isSubmitting.value = true;
+        const contactData = {
+            name: form.name || '',
+            email: form.email || '',
+            phone: form.phone || '',
+            questionType: form.questionType.label,
+            question: form.question,
+            userId: userId.value || 'Anonymous',
+            createdAt: new Date().toISOString()
+        };
+
+        await store.dispatch('contact/addContactSubmission', contactData);
+        showNotification('Success', 'Your question has been submitted successfully.', 'success', mdiCheckCircle);
+        resetForm();
+    } catch (error) {
+        console.error('Error submitting question:', error);
+        showNotification('Error', 'Failed to submit your question. Please try again.', 'danger', mdiAlertCircle);
+    } finally {
+        isSubmitting.value = false;
+    }
+};
 </script>
+
+<style scoped>
+.text-gray-500 {
+    color: #6b7280;
+}
+
+.text-gray-700 {
+    color: #374151;
+}
+
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+
+.bg-gray-700 {
+    background-color: #374151;
+}
+</style>
