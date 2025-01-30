@@ -1,9 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { paths } from '@/shared/constants/paths';
+import { useStore } from 'vuex'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { toTypedSchema } from '@vee-validate/yup'
-import { mdiFlag, mdiPhone, mdiFax, mdiAccountCircle, mdiFilePdfBox, mdiEmail, mdiHome } from '@mdi/js'
+import localforage from 'localforage'
+import {
+  mdiFlag, mdiPhone, mdiFax, mdiAccountCircle, mdiFilePdfBox, mdiEmail, mdiHome,
+  mdiCheckCircle, mdiAlertCircle
+} from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
@@ -13,18 +19,21 @@ import FormControl from '@/components/FormControl.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
+import NotificationBar from '@/components/NotificationBar.vue';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
+import { roles } from '@/shared/constants/roles';
 
 // **Yup Validation Schema**
 const formSchema = yup.object({
   firstName: yup.string().required('First name is required'),
   middleName: yup.string().required('Middle name is required'),
   lastName: yup.string().required('Last name is required'),
-  gender: yup.string().nullable().required('Gender is required'),
+  gender: yup.string().required('Gender is required'),
+  membershipType: yup.string().required('Membership Type is required. The default one is Regular Membership.'),
   birthDate: yup.date().required('Birth date is required').max(new Date(), 'Birth date cannot be in the future'),
   nationality: yup.string().required('Nationality is required'),
-  maritalStatus: yup.string().nullable().required('Marital status is required'),
-  educationLevel: yup.string().nullable().required('Education level is required'),
+  maritalStatus: yup.string().required('Marital status is required'),
+  educationLevel: yup.string().required('Education level is required'),
   addressRegion: yup.string().required('Region is required'),
   addressZone: yup.string().required('Zone is required'),
   addressWoreda: yup.string().required('Woreda is required'),
@@ -41,7 +50,7 @@ const formSchema = yup.object({
   workPlaceWoreda: yup.string(),
   workPlaceKebele: yup.string(),
   workPlacePhoneNumber: yup.string(),
-  passportPhoto: yup.mixed().nullable().required('Passport photo is required'),
+  passportPhoto: yup.mixed().nullable(), //.required('Passport photo is required'),
   fullName: yup.string().required('Full name is required'),
   signature: yup.string().required('Signature is required'),
   signDate: yup.date().required('Signature date is required').max(new Date(), 'Date cannot be in the future'),
@@ -57,6 +66,7 @@ const { value: firstName, errorMessage: firstNameError } = useField('firstName')
 const { value: middleName, errorMessage: middleNameError } = useField('middleName')
 const { value: lastName, errorMessage: lastNameError } = useField('lastName')
 const { value: gender, errorMessage: genderError } = useField('gender')
+const { value: membershipType, errorMessage: membershipTypeError } = useField('membershipType')
 const { value: birthDate, errorMessage: birthDateError } = useField('birthDate')
 const { value: nationality, errorMessage: nationalityError } = useField('nationality')
 const { value: maritalStatus, errorMessage: maritalStatusError } = useField('maritalStatus')
@@ -77,7 +87,8 @@ const { value: workPlaceZone } = useField('workPlaceZone')
 const { value: workPlaceWoreda } = useField('workPlaceWoreda')
 const { value: workPlaceKebele } = useField('workPlaceKebele')
 const { value: workPlacePhoneNumber } = useField('workPlacePhoneNumber')
-const { value: passportPhoto, errorMessage: passportPhotoError } = useField('passportPhoto')
+const { value: passportPhoto } = useField('passportPhoto')
+//TODO:: const { value: passportPhoto, errorMessage: passportPhotoError } = useField('passportPhoto')
 const { value: fullName, errorMessage: fullNameError } = useField('fullName')
 const { value: signature, errorMessage: signatureError } = useField('signature')
 const { value: signDate, errorMessage: signDateError } = useField('signDate')
@@ -86,6 +97,12 @@ const genderOptions = {
   female: 'ሴት',
   male: 'ወንድ'
 };
+
+const membershipOptions = {
+  regular: roles.REGULAR + ' (መደበኛ)',
+  honorary: roles.HONORARY + ' (ክብር)',
+  student: roles.STUDENT + ' (ተማሪ)'
+}
 
 const maritalStatusOptions = {
   married: 'ያገባ/ች',
@@ -101,36 +118,113 @@ const educationLevelOptions = {
 
 const isLoading = ref(false);
 
+// **Firestore Integration**
+const store = useStore()
+const userId = ref('')
 
-// const resetForm = () => {
-//   Object.keys(form).forEach(key => {
-//     if (typeof form[key] === 'string') {
-//       form[key] = '';
-//     } else if (typeof form[key] === 'boolean') {
-//       form[key] = false;
-//     } else if (Array.isArray(form[key])) {
-//       form[key] = [];
-//     } else if (typeof form[key] === 'object' && form[key] !== null) {
-//       form[key] = null
-//     }
-//   });
-// };
+// **Fetch User Function**
+const fetchUser = async () => {
+  try {
+    const userData = await localforage.getItem('user')
+    if (userData && userData.uid) {
+      const userFound = await store.dispatch('user/getUser', userData.uid)
+      if (userFound) userId.value = userData.uid
+    } else {
+      console.error('User data not found in local storage.')
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error)
+  }
+}
+
+
+// **Notifications**
+const notificationMessage = ref('')
+const notificationTitle = ref('')
+const notificationColor = ref('')
+const notificationIcon = ref('')
+const notificationsOutline = ref(true)
+
+const showNotification = (title, message, color, icon) => {
+  notificationTitle.value = title
+  notificationMessage.value = message
+  notificationColor.value = color
+  notificationIcon.value = icon
+}
+
+const clearNotification = () => {
+  notificationMessage.value = ''
+  notificationTitle.value = ''
+  notificationColor.value = ''
+  notificationIcon.value = ''
+}
+
+// **Photo Upload Handling**
+const onPhotoUploadCompleted = async () => {
+  passportPhoto.value = store.getters['shared/documentPath']
+  showNotification('Success', 'Photo uploaded successfully.', 'success', mdiCheckCircle)
+}
+
+const onPhotoUploadFailed = async () => {
+  showNotification('Error', 'Failed to upload photo. Please try again.', 'danger', mdiAlertCircle)
+}
 
 const generatePDF = () => {
   console.log("Generating PDF...");
 };
 
+// **Submit Form**
 const submit = handleSubmit(async (values) => {
-  console.log(values);
+  try {
+    isLoading.value = true;
+    if (!userId.value) {
+      showNotification('Error', 'User authentication is required. Please go to Login page and Sign In or Sign Up.', 'danger', mdiAlertCircle)
+      return
+    }
 
-}); 
+    // Check if membership already exists
+    const existingMember = await store.dispatch('member/checkMembership', userId.value)
+    if (existingMember) {
+      showNotification('Error', 'You have already registered for membership.', 'danger', mdiAlertCircle)
+      return
+    }
+
+    // Store data
+    const memberData = {
+      uid: userId.value,
+      membershipType: values.membershipType?.split(' ')[0].toUpperCase(), // split only the necessary role type like REGULAR
+      ...values,
+      createdAt: new Date().toISOString()
+    }
+
+    await store.dispatch('member/addMember', memberData)
+    showNotification('Success', 'Membership registered successfully.', 'success', mdiCheckCircle)
+    resetForm()
+  } catch (error) {
+    console.error('Error submitting membership:', error)
+    showNotification('Error', 'Failed to register membership. Please try again.', 'danger', mdiAlertCircle)
+  } finally {
+    isLoading.value = false;
+  }
+})
+
+// **Fetch user data on mount**
+onMounted(fetchUser)
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitle title="የሲቪል ማኅበረሰብ ድርጅቶች ባለስልጣን ምዝገባ ፎርም" />
-
+      <div v-if="notificationMessage !== ''" class="mb-4">
+        <NotificationBar :color="notificationColor" :icon="notificationIcon" :outline="notificationsOutline">
+          <b>{{ notificationTitle }}</b>. {{ notificationMessage }}
+          <template #right>
+            <BaseButton label="Dismiss" :color="notificationsOutline ? notificationColor : 'white'"
+              :outline="notificationsOutline" rounded-full small @click="clearNotification" />
+          </template>
+        </NotificationBar>
+      </div>
       <CardBox is-form @submit.prevent="submit">
         <div class="flex justify-center">
           <div class="text-2xl font-bold">ክፍል ሁለት</div>
@@ -138,8 +232,10 @@ const submit = handleSubmit(async (values) => {
         <div class="text-center text-lg mb-4">በድርጅቱ መስራቾች እና አመራር አባላት የሚሞላ</div>
         <BaseDivider />
         <FormField label="ፎቶ ግራፍ (የድርጅቱ፣ የፓስፖርት መጠን ያለው)">
-          <FormFilePicker v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true" />
-          <p v-if="passportPhotoError" class="text-red-500">{{ passportPhotoError }}</p>
+          <FormFilePicker v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true"
+            :disabled="isSubmitting || isLoading" :documentStoragePath="paths.REGULAR_MEMBER_UPLOAD_PATH"
+            @file-upload-success="onPhotoUploadCompleted" @file-upload-error="onPhotoUploadFailed" />
+          <!-- <p v-if="passportPhotoError" class="text-red-500">{{ passportPhotoError }}</p> -->
         </FormField>
 
         <!-- Name -->
@@ -154,37 +250,44 @@ const submit = handleSubmit(async (values) => {
           <p v-if="lastNameError" class="text-red-500">{{ lastNameError }}</p>
         </FormField>
 
+        <!-- membershipType -->
+        <FormField label="2. የአባልነት አይነት">
+          <FormCheckRadioGroup v-model="membershipType" name="membershipType" type="radio"
+            :options="membershipOptions" />
+          <p v-if="membershipTypeError" class="text-red-500">{{ membershipTypeError }}</p>
+        </FormField>
+
         <!-- Gender -->
-        <FormField label="2. ጾታ">
+        <FormField label="3. ጾታ">
           <FormCheckRadioGroup v-model="gender" name="gender" type="radio" :options="genderOptions" />
           <p v-if="genderError" class="text-red-500">{{ genderError }}</p>
         </FormField>
 
         <!-- Birth Date -->
-        <FormField label="3. የትውልድ ጊዜ">
+        <FormField label="4. የትውልድ ጊዜ">
           <FormControl v-model="birthDate" type="date" />
           <p v-if="birthDateError" class="text-red-500">{{ birthDateError }}</p>
         </FormField>
 
         <!-- Nationality -->
-        <FormField label="4. ዜግነት">
+        <FormField label="5. ዜግነት">
           <FormControl v-model="nationality" placeholder="ዜግነት" :icon="mdiFlag" />
           <p v-if="nationalityError" class="text-red-500">{{ nationalityError }}</p>
         </FormField>
 
-        <FormField label="5. የትዳር ሁኔታ">
+        <FormField label="6. የትዳር ሁኔታ">
           <FormCheckRadioGroup v-model="maritalStatus" name="maritalStatus" type="radio"
             :options="maritalStatusOptions" />
           <p v-if="maritalStatusError" class="text-red-500">{{ maritalStatusError }}</p>
         </FormField>
 
-        <FormField label="6. የትምህርት ደረጃ">
+        <FormField label="7. የትምህርት ደረጃ">
           <FormCheckRadioGroup v-model="educationLevel" name="educationLevel" type="radio"
             :options="educationLevelOptions" />
           <p v-if="educationLevelError" class="text-red-500">{{ educationLevelError }}</p>
         </FormField>
 
-        <FormField label="7. ቋሚ የመኖሪያ አድራሻ">
+        <FormField label="8. ቋሚ የመኖሪያ አድራሻ">
           <div class="grid grid-cols-4 gap-4">
             <FormControl v-model="addressRegion" placeholder="ክልል/ከተማ አስተዳድር" />
             <p v-if="addressRegionError" class="text-red-500">{{ addressRegionError }}</p>
@@ -215,7 +318,7 @@ const submit = handleSubmit(async (values) => {
           </div>
         </FormField>
 
-        <FormField label="8. የሥራ አድራሻ (ካለ)">
+        <FormField label="9. የሥራ አድራሻ (ካለ)">
           <FormControl v-model="workPlaceName" placeholder="የመስሪያ ቤቱ ስም" />
           <div class="grid grid-cols-4 gap-4 mt-4">
             <FormControl v-model="workPlaceRegion" placeholder="ክልል/ከተማ አስተዳድር" />
