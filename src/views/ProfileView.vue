@@ -151,8 +151,8 @@ const generalError = ref('')
         </NotificationBar>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CardBox is-form @submit.prevent="submitProfile">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <CardBox is-form @submit.prevent="submitProfile" :rounded="''">
           <FormField label="Avatar" help="Max 500kb">
             <FormFilePicker label="Upload" />
           </FormField>
@@ -185,7 +185,7 @@ const generalError = ref('')
           </template>
         </CardBox>
 
-        <CardBox is-form @submit.prevent="submitPass">
+        <CardBox is-form @submit.prevent="submitPass" :rounded="''">
           <div
             v-if="generalError"
             class="mb-4 p-4 text-rose-500 bg-rose-300 border border-red-400 rounded"
