@@ -52,7 +52,6 @@ const formSchema = yup.object({
   workPlacePhoneNumber: yup.string(),
   passportPhoto: yup.mixed().nullable(), //.required('Passport photo is required'),
   fullName: yup.string().required('Full name is required'),
-  signature: yup.string().required('Signature is required'),
   signDate: yup.date().required('Signature date is required').max(new Date(), 'Date cannot be in the future'),
 })
 
@@ -90,7 +89,6 @@ const { value: workPlacePhoneNumber } = useField('workPlacePhoneNumber')
 const { value: passportPhoto } = useField('passportPhoto')
 //TODO:: const { value: passportPhoto, errorMessage: passportPhotoError } = useField('passportPhoto')
 const { value: fullName, errorMessage: fullNameError } = useField('fullName')
-const { value: signature, errorMessage: signatureError } = useField('signature')
 const { value: signDate, errorMessage: signDateError } = useField('signDate')
 
 const genderOptions = {
@@ -227,11 +225,11 @@ onMounted(fetchUser)
       </div>
       <CardBox is-form @submit.prevent="submit">
         <div class="flex justify-center">
-          <div class="text-2xl font-bold">ክፍል ሁለት</div>
+          <div class="text-2xl font-bold">ክፍል አንድ</div>
         </div>
-        <div class="text-center text-lg mb-4">በድርጅቱ መስራቾች እና አመራር አባላት የሚሞላ</div>
+        <div class="text-center text-lg mb-4">የኢትዮጵያ ዳታ ሳይንስ ማህበር የመደበኛ አባልነት ቅጽ</div>
         <BaseDivider />
-        <FormField label="ፎቶ ግራፍ (የድርጅቱ፣ የፓስፖርት መጠን ያለው)">
+        <FormField label="ፎቶ ግራፍ (የፓስፖርት መጠን ያለው)">
           <FormFilePicker v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true"
             :disabled="isSubmitting || isLoading" :documentStoragePath="paths.REGULAR_MEMBER_UPLOAD_PATH"
             @file-upload-success="onPhotoUploadCompleted" @file-upload-error="onPhotoUploadFailed" />
@@ -331,19 +329,14 @@ onMounted(fetchUser)
           </div>
         </FormField>
 
-        <div class="mt-8">
+        <div class="mt-8 mb-4">
           <p class="text-sm">እኔ ከዚህ በላይ ስሜ እና አዳራሻዬ የተገለፀው የሰጠሁት መረጃ በሙሉ ትክክለኛና እውነተኛ
-            ስለመሆኑ አረጋግጣለሁ፡፡</p>
+            ስለመሆኑ አረጋግጣለሁ፡፡ ይህ ክፍል እንደ ፊርማ ያገለግላል።</p>
         </div>
 
         <FormField label="ሙሉ ስም">
           <FormControl v-model="fullName" type="text" placeholder="ሙሉ ስም" />
           <p v-if="fullNameError" class="text-red-500">{{ fullNameError }}</p>
-        </FormField>
-
-        <FormField label="ፊርማ">
-          <FormControl v-model="signature" type="text" placeholder="እዚህ ላይ ይፈርሙ" />
-          <p v-if="signatureError" class="text-red-500">{{ signatureError }}</p>
         </FormField>
 
         <FormField label="ቀን">

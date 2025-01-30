@@ -32,7 +32,6 @@ const formSchema = yup.object({
   workPlacePhoneNumber: yup.string().matches(/^\d{9,15}$/, 'Phone or Mobile number is required. Example: 0116261087 , 0927716801'),
   workPlaceMobileNumber: yup.string(),
   fullName: yup.string().required('Full name is required'),
-  signature: yup.string().required('Signature is required'),
   signDate: yup.date().required('Signature date is required').max(new Date(), 'Date cannot be in the future'),
 })
 
@@ -53,7 +52,6 @@ const { value: workPlaceKebele, errorMessage: workPlaceKebeleError } = useField(
 const { value: workPlacePhoneNumber, errorMessage: workPlacePhoneNumberError } = useField('workPlacePhoneNumber')
 const { value: workPlaceMobileNumber } = useField('workPlaceMobileNumber')
 const { value: fullName, errorMessage: fullNameError } = useField('fullName')
-const { value: signature, errorMessage: signatureError } = useField('signature')
 const { value: signDate, errorMessage: signDateError } = useField('signDate')
 
 
@@ -158,9 +156,9 @@ onMounted(fetchUser)
       </div>
       <CardBox is-form @submit.prevent="submit">
         <div class="flex justify-center">
-          <div class="text-2xl font-bold">ክፍል ሁለት</div>
+          <div class="text-2xl font-bold">ክፍል አንድ</div>
         </div>
-        <div class="text-center text-lg mb-4">በድርጅቱ መስራቾች እና አመራር አባላት የሚሞላ</div>
+        <div class="text-center text-lg mb-4">የኢትዮጵያ ዳታ ሳይንስ ማህበር የተቋም አባልነት ቅጽ</div>
         <BaseDivider />
 
         <!-- Name -->
@@ -207,19 +205,14 @@ onMounted(fetchUser)
           </div>
         </FormField>
 
-        <div class="mt-8">
+        <div class="mt-8 mb-4">
           <p class="text-sm">እኔ ከዚህ በላይ ስሜ እና አዳራሻዬ የተገለፀው የሰጠሁት መረጃ በሙሉ ትክክለኛና እውነተኛ
-            ስለመሆኑ አረጋግጣለሁ፡፡</p>
+            ስለመሆኑ አረጋግጣለሁ፡፡ ይህ ክፍል እንደ ፊርማ ያገለግላል።</p>
         </div>
 
-        <FormField label="ሙሉ ስም">
+        <FormField label="የተቋሙ ወኪል ሙሉ ስም">
           <FormControl v-model="fullName" type="text" placeholder="ሙሉ ስም" />
           <p v-if="fullNameError" class="text-red-500">{{ fullNameError }}</p>
-        </FormField>
-
-        <FormField label="ፊርማ">
-          <FormControl v-model="signature" type="text" placeholder="እዚህ ላይ ይፈርሙ" />
-          <p v-if="signatureError" class="text-red-500">{{ signatureError }}</p>
         </FormField>
 
         <FormField label="ቀን">
