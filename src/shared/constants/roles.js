@@ -4,7 +4,7 @@ const roles = {
   REGULAR: 'REGULAR',
   INSTITUTION: 'INSTITUTION',
   STUDENT: 'STUDENT',
-  SPECIAL: 'SPECIAL'
+  HONORARY: 'HONORARY'
 }
 
 Object.freeze(roles)
