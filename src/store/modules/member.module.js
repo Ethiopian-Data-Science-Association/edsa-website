@@ -4,7 +4,8 @@ import { doc, setDoc, getDoc } from 'firebase/firestore'
 
 const state = {
   memberData: {},
-  isMemberFetched: false
+  isMemberFetched: false,
+  membershipData: {}
 }
 
 const actions = {
@@ -47,6 +48,24 @@ const actions = {
       console.error('Error adding member:', error)
       throw error
     }
+  },
+  /** Get Membership Details */
+  async getUserMembership({ commit }, uid) {
+    try {
+      const docRef = doc(db, 'members', uid)
+      const docSnap = await getDoc(docRef)
+
+      if (!docSnap.exists()) {
+        throw new Error('Membership not found')
+      }
+
+      const membership = docSnap.data()
+      commit('setMembershipData', membership)
+      return membership
+    } catch (error) {
+      console.error('Error fetching membership details:', error)
+      throw error
+    }
   }
 }
 
@@ -54,6 +73,9 @@ const mutations = {
   updateField,
   setMemberFetched(state, value) {
     state.isMemberFetched = value
+  },
+  setMembershipData(state, data) {
+    state.membershipData = data
   }
 }
 

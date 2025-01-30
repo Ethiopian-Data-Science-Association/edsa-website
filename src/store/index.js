@@ -38,7 +38,7 @@ export const store = createStore({
     persistUser: (state) => {
       const serializedUser = {
         email: state.user.userData.email,
-        fullName: state.user.userData.fullName,
+        fullName: state.user.userData.fullName || state.user.userData.displayName,
         phoneNumber: state.user.userData.phoneNumber || '', // Default to empty string if undefined
         uid: state.user.userData.uid,
         bio: state.user.userData.bio || '', // Default to empty string if undefined

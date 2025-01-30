@@ -21,6 +21,11 @@ const props = defineProps({
     default: 'Done'
   },
   hasCancel: Boolean,
+  footerDisplayed: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
   modelValue: {
     type: [String, Number, Boolean],
     default: null
@@ -64,7 +69,7 @@ window.addEventListener('keydown', (e) => {
       </div>
 
       <!-- Footer Section -->
-      <template #footer>
+      <template #footer v-if="footerDisplayed">
         <BaseButtons class="p-4 bg-white border-t border-gray-200">
           <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
           <BaseButton v-if="hasCancel" label="Cancel" :color="button" outline @click="cancel" />

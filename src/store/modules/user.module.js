@@ -53,7 +53,6 @@ const actions = {
               path: 'userData',
               value: docSnap.data()
             })
-
             commit('setUserFetched', true)
           } else {
             console.error('No such user!')
@@ -90,7 +89,7 @@ const actions = {
             // set a regular acl for this user since it is logging in using a pop-model with a provider
             await store.dispatch('user/addAcl', { uid: user.uid, email: user.email }) // set the correct the ACL
           }
-          return docSnap?.data()?.role || roles.REGULAR; // defaults to regular if there is no ACL for the user
+          return docSnap?.data()?.role || roles.REGULAR // defaults to regular if there is no ACL for the user
         } catch (error) {
           console.error('Error fetching user data:', error)
           throw error
@@ -170,6 +169,24 @@ const actions = {
       })
     } catch (error) {
       console.error('Error registering certification to user:', error)
+    }
+  },
+
+  async updateUserProfile({ commit }, profileForm) {
+    try {
+      // Check logged in user is the one making the edits
+      const userFound = await store.dispatch('user/getUser', profileForm.uid, { root: true }) // returns true or null
+      if (!userFound) {
+        console.error('User ID is missing.')
+        return
+      }
+
+      const userRef = doc(db, 'users', profileForm.uid)
+
+      // Update only the fullName field
+      await updateDoc(userRef, { fullName: profileForm.name })
+    } catch (error) {
+      console.error('Error updating user profile:', error)
     }
   }
 }
