@@ -1,5 +1,8 @@
 <script setup>
-import { reactive } from 'vue'
+import { ref } from 'vue'
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
+import { toTypedSchema } from '@vee-validate/yup'
 import { mdiFlag, mdiPhone, mdiFax, mdiAccountCircle, mdiFilePdfBox, mdiEmail, mdiHome } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -12,36 +15,72 @@ import BaseButton from '@/components/BaseButton.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 
-const form = reactive({
-  firstName: '',
-  middleName: '',
-  lastName: '',
-  gender: null,
-  birthDate: '',
-  nationality: '',
-  maritalStatus: null,
-  educationLevel: null,
-  addressRegion: '',
-  addressZone: '',
-  addressWoreda: '',
-  addressKebele: '',
-  addressHouseNumber: '',
-  addressPhoneNumber: '',
-  addressMobileNumber: '',
-  addressFaxNumber: '',
-  addressPostalCode: '',
-  addressEmail: '',
-  workPlaceName: '',
-  workPlaceRegion: '',
-  workPlaceZone: '',
-  workPlaceWoreda: '',
-  workPlaceKebele: '',
-  workPlacePhoneNumber: '',
-  passportPhoto: null,
-  fullName: '',
-  signature: '',
-  signDate: ''
-});
+// **Yup Validation Schema**
+const formSchema = yup.object({
+  firstName: yup.string().required('First name is required'),
+  middleName: yup.string().required('Middle name is required'),
+  lastName: yup.string().required('Last name is required'),
+  gender: yup.string().nullable().required('Gender is required'),
+  birthDate: yup.date().required('Birth date is required').max(new Date(), 'Birth date cannot be in the future'),
+  nationality: yup.string().required('Nationality is required'),
+  maritalStatus: yup.string().nullable().required('Marital status is required'),
+  educationLevel: yup.string().nullable().required('Education level is required'),
+  addressRegion: yup.string().required('Region is required'),
+  addressZone: yup.string().required('Zone is required'),
+  addressWoreda: yup.string().required('Woreda is required'),
+  addressKebele: yup.string(),
+  addressHouseNumber: yup.string(),
+  addressPhoneNumber: yup.string(),
+  addressMobileNumber: yup.string().matches(/^\d{9,15}$/, 'Enter a valid mobile number').required('Mobile number is required. Example: 0927716801'),
+  addressFaxNumber: yup.string(),
+  addressPostalCode: yup.string(),
+  addressEmail: yup.string().email('Enter a valid email address').required('Email is required'),
+  workPlaceName: yup.string(),
+  workPlaceRegion: yup.string(),
+  workPlaceZone: yup.string(),
+  workPlaceWoreda: yup.string(),
+  workPlaceKebele: yup.string(),
+  workPlacePhoneNumber: yup.string(),
+  passportPhoto: yup.mixed().nullable().required('Passport photo is required'),
+  fullName: yup.string().required('Full name is required'),
+  signature: yup.string().required('Signature is required'),
+  signDate: yup.date().required('Signature date is required').max(new Date(), 'Date cannot be in the future'),
+})
+
+//   **Initialize Form Validation**
+const { handleSubmit, isSubmitting, resetForm } = useForm({
+  validationSchema: toTypedSchema(formSchema),
+})
+
+// ✅ **Fields with Validation**
+const { value: firstName, errorMessage: firstNameError } = useField('firstName')
+const { value: middleName, errorMessage: middleNameError } = useField('middleName')
+const { value: lastName, errorMessage: lastNameError } = useField('lastName')
+const { value: gender, errorMessage: genderError } = useField('gender')
+const { value: birthDate, errorMessage: birthDateError } = useField('birthDate')
+const { value: nationality, errorMessage: nationalityError } = useField('nationality')
+const { value: maritalStatus, errorMessage: maritalStatusError } = useField('maritalStatus')
+const { value: educationLevel, errorMessage: educationLevelError } = useField('educationLevel')
+const { value: addressRegion, errorMessage: addressRegionError } = useField('addressRegion')
+const { value: addressZone, errorMessage: addressZoneError } = useField('addressZone')
+const { value: addressWoreda, errorMessage: addressWoredaError } = useField('addressWoreda')
+const { value: addressKebele } = useField('addressKebele')
+const { value: addressHouseNumber } = useField('addressHouseNumber')
+const { value: addressPhoneNumber } = useField('addressPhoneNumber')
+const { value: addressMobileNumber, errorMessage: addressMobileNumberError } = useField('addressMobileNumber')
+const { value: addressFaxNumber } = useField('addressFaxNumber')
+const { value: addressPostalCode } = useField('addressPostalCode')
+const { value: addressEmail, errorMessage: addressEmailError } = useField('addressEmail')
+const { value: workPlaceName } = useField('workPlaceName')
+const { value: workPlaceRegion } = useField('workPlaceRegion')
+const { value: workPlaceZone } = useField('workPlaceZone')
+const { value: workPlaceWoreda } = useField('workPlaceWoreda')
+const { value: workPlaceKebele } = useField('workPlaceKebele')
+const { value: workPlacePhoneNumber } = useField('workPlacePhoneNumber')
+const { value: passportPhoto, errorMessage: passportPhotoError } = useField('passportPhoto')
+const { value: fullName, errorMessage: fullNameError } = useField('fullName')
+const { value: signature, errorMessage: signatureError } = useField('signature')
+const { value: signDate, errorMessage: signDateError } = useField('signDate')
 
 const genderOptions = {
   female: 'ሴት',
@@ -60,27 +99,31 @@ const educationLevelOptions = {
   "doctorate": 'ከማስተርስ ዲግሪ በላይ',
 };
 
-const resetForm = () => {
-  Object.keys(form).forEach(key => {
-    if (typeof form[key] === 'string') {
-      form[key] = '';
-    } else if (typeof form[key] === 'boolean') {
-      form[key] = false;
-    } else if (Array.isArray(form[key])) {
-      form[key] = [];
-    } else if (typeof form[key] === 'object' && form[key] !== null) {
-      form[key] = null
-    }
-  });
-};
+const isLoading = ref(false);
+
+
+// const resetForm = () => {
+//   Object.keys(form).forEach(key => {
+//     if (typeof form[key] === 'string') {
+//       form[key] = '';
+//     } else if (typeof form[key] === 'boolean') {
+//       form[key] = false;
+//     } else if (Array.isArray(form[key])) {
+//       form[key] = [];
+//     } else if (typeof form[key] === 'object' && form[key] !== null) {
+//       form[key] = null
+//     }
+//   });
+// };
 
 const generatePDF = () => {
   console.log("Generating PDF...");
 };
 
-const submit = () => {
-  console.log(form);
-};
+const submit = handleSubmit(async (values) => {
+  console.log(values);
+
+}); 
 </script>
 
 <template>
@@ -95,72 +138,93 @@ const submit = () => {
         <div class="text-center text-lg mb-4">በድርጅቱ መስራቾች እና አመራር አባላት የሚሞላ</div>
         <BaseDivider />
         <FormField label="ፎቶ ግራፍ (የድርጅቱ፣ የፓስፖርት መጠን ያለው)">
-          <FormFilePicker v-model="form.passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true" />
+          <FormFilePicker v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true" />
+          <p v-if="passportPhotoError" class="text-red-500">{{ passportPhotoError }}</p>
         </FormField>
 
+        <!-- Name -->
         <FormField label="1. ስም">
-          <div class="grid grid-cols-3 gap-4">
-            <FormControl v-model="form.firstName" placeholder="የመጀመሪያ ስም" />
-            <FormControl v-model="form.middleName" placeholder="የአባት ስም" />
-            <FormControl v-model="form.lastName" placeholder="የአያት ስም" />
-          </div>
+          <FormControl v-model="firstName" placeholder="የመጀመሪያ ስም" />
+          <p v-if="firstNameError" class="text-red-500">{{ firstNameError }}</p>
+
+          <FormControl v-model="middleName" placeholder="የአባት ስም" />
+          <p v-if="middleNameError" class="text-red-500">{{ middleNameError }}</p>
+
+          <FormControl v-model="lastName" placeholder="የአያት ስም" />
+          <p v-if="lastNameError" class="text-red-500">{{ lastNameError }}</p>
         </FormField>
 
+        <!-- Gender -->
         <FormField label="2. ጾታ">
-          <FormCheckRadioGroup v-model="form.gender" name="gender" type="radio" :options="genderOptions" />
+          <FormCheckRadioGroup v-model="gender" name="gender" type="radio" :options="genderOptions" />
+          <p v-if="genderError" class="text-red-500">{{ genderError }}</p>
         </FormField>
 
+        <!-- Birth Date -->
         <FormField label="3. የትውልድ ጊዜ">
-          <FormControl v-model="form.birthDate" type="date" placeholder="ቀን/ወር/ዓ.ም" />
+          <FormControl v-model="birthDate" type="date" />
+          <p v-if="birthDateError" class="text-red-500">{{ birthDateError }}</p>
         </FormField>
 
+        <!-- Nationality -->
         <FormField label="4. ዜግነት">
-          <FormControl v-model="form.nationality" placeholder="ዜግነት" :icon="mdiFlag" />
+          <FormControl v-model="nationality" placeholder="ዜግነት" :icon="mdiFlag" />
+          <p v-if="nationalityError" class="text-red-500">{{ nationalityError }}</p>
         </FormField>
 
         <FormField label="5. የትዳር ሁኔታ">
-          <FormCheckRadioGroup v-model="form.maritalStatus" name="maritalStatus" type="radio"
+          <FormCheckRadioGroup v-model="maritalStatus" name="maritalStatus" type="radio"
             :options="maritalStatusOptions" />
+          <p v-if="maritalStatusError" class="text-red-500">{{ maritalStatusError }}</p>
         </FormField>
 
         <FormField label="6. የትምህርት ደረጃ">
-          <FormCheckRadioGroup v-model="form.educationLevel" name="educationLevel" type="radio"
+          <FormCheckRadioGroup v-model="educationLevel" name="educationLevel" type="radio"
             :options="educationLevelOptions" />
+          <p v-if="educationLevelError" class="text-red-500">{{ educationLevelError }}</p>
         </FormField>
 
         <FormField label="7. ቋሚ የመኖሪያ አድራሻ">
           <div class="grid grid-cols-4 gap-4">
-            <FormControl v-model="form.addressRegion" placeholder="ክልል/ከተማ አስተዳድር" />
-            <FormControl v-model="form.addressZone" placeholder="ዞን/ክ/ከተማ" />
-            <FormControl v-model="form.addressWoreda" placeholder="ወረዳ" />
-            <FormControl v-model="form.addressKebele" placeholder="ቀበሌ" />
+            <FormControl v-model="addressRegion" placeholder="ክልል/ከተማ አስተዳድር" />
+            <p v-if="addressRegionError" class="text-red-500">{{ addressRegionError }}</p>
+
+            <FormControl v-model="addressZone" placeholder="ዞን/ክ/ከተማ" />
+            <p v-if="addressZoneError" class="text-red-500">{{ addressZoneError }}</p>
+
+            <FormControl v-model="addressWoreda" placeholder="ወረዳ" />
+            <p v-if="addressWoredaError" class="text-red-500">{{ addressWoredaError }}</p>
+
+            <FormControl v-model="addressKebele" placeholder="ቀበሌ" />
           </div>
           <div class="grid grid-cols-2 gap-4 mt-4">
-            <FormControl v-model="form.addressHouseNumber" placeholder="የቤት ቁጥር" :icon="mdiHome" />
-            <FormControl v-model="form.addressPhoneNumber" type="tel" placeholder="ስልክ ቁጥር (ቤት)" :icon="mdiPhone" />
+            <FormControl v-model="addressHouseNumber" placeholder="የቤት ቁጥር" :icon="mdiHome" />
+            <FormControl v-model="addressPhoneNumber" type="tel" placeholder="ስልክ ቁጥር (ቤት)" :icon="mdiPhone" />
           </div>
           <div class="grid grid-cols-1 gap-4 mt-4">
-            <FormControl v-model="form.addressMobileNumber" type="tel" placeholder="ስልክ ቁጥር (ሞባይል)" :icon="mdiPhone" />
+            <FormControl v-model="addressMobileNumber" type="tel" placeholder="ስልክ ቁጥር (ሞባይል)" :icon="mdiPhone" />
+            <p v-if="addressMobileNumberError" class="text-red-500">{{ addressMobileNumberError }}</p>
           </div>
           <div class="grid grid-cols-2 gap-4 mt-4">
-            <FormControl v-model="form.addressFaxNumber" placeholder="ፋክስ ቁጥር" :icon="mdiFax" />
-            <FormControl v-model="form.addressPostalCode" placeholder="ፖ.ሣ.ቁጥር" />
+            <FormControl v-model="addressFaxNumber" placeholder="ፋክስ ቁጥር" :icon="mdiFax" />
+            <FormControl v-model="addressPostalCode" placeholder="ፖ.ሣ.ቁጥር" />
           </div>
           <div class="grid grid-cols-1 gap-4 mt-4">
-            <FormControl v-model="form.addressEmail" type="email" placeholder="ኢ-ሜይል" :icon="mdiEmail" />
+            <FormControl v-model="addressEmail" type="email" placeholder="ኢ-ሜይል" :icon="mdiEmail" />
+            <p v-if="addressEmailError" class="text-red-500">{{ addressEmailError }}</p>
           </div>
         </FormField>
 
         <FormField label="8. የሥራ አድራሻ (ካለ)">
-          <FormControl v-model="form.workPlaceName" placeholder="የመስሪያ ቤቱ ስም" />
+          <FormControl v-model="workPlaceName" placeholder="የመስሪያ ቤቱ ስም" />
           <div class="grid grid-cols-4 gap-4 mt-4">
-            <FormControl v-model="form.workPlaceRegion" placeholder="ክልል/ከተማ አስተዳድር" />
-            <FormControl v-model="form.workPlaceZone" placeholder="ዞን/ክ/ከተማ" />
-            <FormControl v-model="form.workPlaceWoreda" placeholder="ወረዳ" />
-            <FormControl v-model="form.workPlaceKebele" placeholder="ቀበሌ" />
+            <FormControl v-model="workPlaceRegion" placeholder="ክልል/ከተማ አስተዳድር" />
+            <FormControl v-model="workPlaceZone" placeholder="ዞን/ክ/ከተማ" />
+            <FormControl v-model="workPlaceWoreda" placeholder="ወረዳ" />
+            <FormControl v-model="workPlaceKebele" placeholder="ቀበሌ" />
           </div>
           <div class="grid grid-cols-1 gap-4 mt-4">
-            <FormControl v-model="form.workPlacePhoneNumber" type="tel" placeholder="ስልክ ቁጥር" />
+            <FormControl v-model="workPlacePhoneNumber" type="tel" placeholder="ስልክ ቁጥር" />
           </div>
         </FormField>
 
@@ -169,16 +233,19 @@ const submit = () => {
             ስለመሆኑ አረጋግጣለሁ፡፡</p>
         </div>
 
-        <FormField label="ስም">
-          <FormControl v-model="form.fullName" type="text" placeholder="ስም" />
+        <FormField label="ሙሉ ስም">
+          <FormControl v-model="fullName" type="text" placeholder="ሙሉ ስም" />
+          <p v-if="fullNameError" class="text-red-500">{{ fullNameError }}</p>
         </FormField>
 
         <FormField label="ፊርማ">
-          <FormControl v-model="form.signature" type="text" placeholder="እዚህ ላይ ይፈርሙ" />
+          <FormControl v-model="signature" type="text" placeholder="እዚህ ላይ ይፈርሙ" />
+          <p v-if="signatureError" class="text-red-500">{{ signatureError }}</p>
         </FormField>
 
         <FormField label="ቀን">
-          <FormControl v-model="form.signDate" type="date" hint="ቀን/ወር/ዓ.ም" />
+          <FormControl v-model="signDate" type="date" hint="ቀን/ወር/ዓ.ም" />
+          <p v-if="signDateError" class="text-red-500">{{ signDateError }}</p>
         </FormField>
 
         <ol class="list-decimal pl-6 mt-4 text-sm">
@@ -192,9 +259,11 @@ const submit = () => {
         <!-- Submit , Generate and Reset Buttons -->
         <template #footer>
           <BaseDivider />
-          <BaseButton class="mr-6" type="submit" color="info" outline label="Submit" :disabled="isSubmitting || isLoading" />
+          <BaseButton class="mr-6" type="submit" color="info" outline label="Submit"
+            :disabled="isSubmitting || isLoading" />
           <BaseButton class="mr-6" type="reset" color="info" outline label="Reset" @click="resetForm" />
-          <BaseButton type="button" color="info" outline label="Generate PDF" :icon="mdiFilePdfBox" @click="generatePDF" />
+          <BaseButton type="button" color="info" outline label="Generate PDF" :icon="mdiFilePdfBox"
+            @click="generatePDF" />
         </template>
 
       </CardBox>
