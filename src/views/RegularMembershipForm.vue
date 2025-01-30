@@ -157,15 +157,6 @@ const clearNotification = () => {
   notificationIcon.value = ''
 }
 
-// **Photo Upload Handling**
-const onPhotoUploadCompleted = async () => {
-  passportPhoto.value = store.getters['shared/documentPath']
-  showNotification('Success', 'Photo uploaded successfully.', 'success', mdiCheckCircle)
-}
-
-const onPhotoUploadFailed = async () => {
-  showNotification('Error', 'Failed to upload photo. Please try again.', 'danger', mdiAlertCircle)
-}
 
 const generatePDF = () => {
   console.log("Generating PDF...");
@@ -206,6 +197,35 @@ const submit = handleSubmit(async (values) => {
   }
 })
 
+// **Photo Upload Handling**
+const avatarSizeLimit = 500 * 1024 // 500KB
+const avatarError = ref('')
+
+const onAvatarUpload = async (file) => {
+  if (file.size > avatarSizeLimit) {
+    avatarError.value = 'File size exceeds 500KB limit.'
+    showNotification('Error', avatarError.value, 'danger', mdiAlertCircle)
+    return
+  }
+  avatarError.value = ''
+  profileForm.avatar = file
+  // Upload file via shared module
+  try {
+    const metadata = { contentType: file.type.toString() };
+    const uploadPath = `${paths.REGULAR_MEMBER_UPLOAD_PATH}${Date.now()}_${file.name}`; // Unique upload path
+    await store.dispatch('shared/uploadDocument', {
+      payload: {
+        document: file,
+        documentStoragePath: uploadPath,
+        metadata,
+      },
+    });
+    showNotification('Success', 'Photo uploaded successfully.', 'success', mdiCheckCircle);
+  } catch (error) { // emit failed to upload event
+    showNotification('Error', 'Failed to upload photo.', 'danger', mdiAlertCircle);
+  }
+}
+
 // **Fetch user data on mount**
 onMounted(fetchUser)
 </script>
@@ -229,10 +249,11 @@ onMounted(fetchUser)
         </div>
         <div class="text-center text-lg mb-4">የኢትዮጵያ ዳታ ሳይንስ ማህበር የመደበኛ አባልነት ቅጽ</div>
         <BaseDivider />
-        <FormField label="ፎቶ ግራፍ (የፓስፖርት መጠን ያለው)">
-          <FormFilePicker v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true"
+        <FormField label="ፎቶ ግራፍ (የፓስፖርት መጠን ያለው)" help="Max 500KB">
+          <!-- **Avatar Upload** -->
+          <FormFilePicker label="Upload" v-model="passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true"
             :disabled="isSubmitting || isLoading" :documentStoragePath="paths.REGULAR_MEMBER_UPLOAD_PATH"
-            @file-upload-success="onPhotoUploadCompleted" @file-upload-error="onPhotoUploadFailed" />
+            @update:modelValue="onAvatarUpload" />
           <!-- <p v-if="passportPhotoError" class="text-red-500">{{ passportPhotoError }}</p> -->
         </FormField>
 
