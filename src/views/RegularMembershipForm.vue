@@ -1,6 +1,6 @@
 <script setup>
-import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
+import { reactive } from 'vue'
+import { mdiFlag, mdiPhone, mdiFax, mdiAccountCircle, mdiFilePdfBox, mdiEmail, mdiHome } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
@@ -9,162 +9,197 @@ import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
-
-const selectOptions = [
-  { id: 1, label: 'Business development' },
-  { id: 2, label: 'Marketing' },
-  { id: 3, label: 'Sales' }
-]
 
 const form = reactive({
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '',
-  department: selectOptions[0],
-  subject: '',
-  question: ''
-})
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  gender: null,
+  birthDate: '',
+  nationality: '',
+  maritalStatus: null,
+  educationLevel: null,
+  addressRegion: '',
+  addressZone: '',
+  addressWoreda: '',
+  addressKebele: '',
+  addressHouseNumber: '',
+  addressPhoneNumber: '',
+  addressMobileNumber: '',
+  addressFaxNumber: '',
+  addressPostalCode: '',
+  addressEmail: '',
+  workPlaceName: '',
+  workPlaceRegion: '',
+  workPlaceZone: '',
+  workPlaceWoreda: '',
+  workPlaceKebele: '',
+  workPlacePhoneNumber: '',
+  passportPhoto: null,
+  fullName: '',
+  signature: '',
+  signDate: ''
+});
 
-const customElementsForm = reactive({
-  checkbox: ['lorem'],
-  radio: 'one',
-  switch: ['one'],
-  file: null
-})
+const genderOptions = {
+  female: 'ሴት',
+  male: 'ወንድ'
+};
+
+const maritalStatusOptions = {
+  married: 'ያገባ/ች',
+  single: 'ያላገባ/ች'
+};
+
+const educationLevelOptions = {
+  "below-degree": 'ከመጀመሪያ ዲግሪ በታች',
+  "bachelor": 'መጀመሪያ ዲግሪ',
+  "master": 'ማስተርስ ዲግሪ',
+  "doctorate": 'ከማስተርስ ዲግሪ በላይ',
+};
+
+const resetForm = () => {
+  Object.keys(form).forEach(key => {
+    if (typeof form[key] === 'string') {
+      form[key] = '';
+    } else if (typeof form[key] === 'boolean') {
+      form[key] = false;
+    } else if (Array.isArray(form[key])) {
+      form[key] = [];
+    } else if (typeof form[key] === 'object' && form[key] !== null) {
+      form[key] = null
+    }
+  });
+};
+
+const generatePDF = () => {
+  console.log("Generating PDF...");
+};
 
 const submit = () => {
-  //
-}
-
-const formStatusWithHeader = ref(true)
-
-const formStatusCurrent = ref(0)
-
-const formStatusOptions = ['info', 'success', 'danger', 'warning']
-
-const formStatusSubmit = () => {
-  formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
-    ? formStatusCurrent.value + 1
-    : 0
-}
+  console.log(form);
+};
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Forms example" main>
-        <BaseButton
-          href="https://github.com/Ethiopian-Data-Science-Association/edsa-website"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
-      </SectionTitleLineWithButton>
-      <CardBox form @submit.prevent="submit">
-        <FormField label="Grouped with icons">
-          <FormControl v-model="form.name" :icon="mdiAccount" />
-          <FormControl v-model="form.email" type="email" :icon="mdiMail" />
-        </FormField>
+      <SectionTitle title="የሲቪል ማኅበረሰብ ድርጅቶች ባለስልጣን ምዝገባ ፎርም" />
 
-        <FormField label="With help line" help="Do not enter the leading zero">
-          <FormControl v-model="form.phone" type="tel" placeholder="Your phone number" />
-        </FormField>
-
-        <FormField label="Dropdown">
-          <FormControl v-model="form.department" :options="selectOptions" />
-        </FormField>
-
+      <CardBox is-form @submit.prevent="submit">
+        <div class="flex justify-center">
+          <div class="text-2xl font-bold">ክፍል ሁለት</div>
+        </div>
+        <div class="text-center text-lg mb-4">በድርጅቱ መስራቾች እና አመራር አባላት የሚሞላ</div>
         <BaseDivider />
-
-        <FormField label="Question" help="Your question. Max 255 characters">
-          <FormControl type="textarea" placeholder="Explain how we can help you" />
+        <FormField label="ፎቶ ግራፍ (የድርጅቱ፣ የፓስፖርት መጠን ያለው)">
+          <FormFilePicker v-model="form.passportPhoto" :icon="mdiAccountCircle" :is-round-icon="true" />
         </FormField>
 
+        <FormField label="1. ስም">
+          <div class="grid grid-cols-3 gap-4">
+            <FormControl v-model="form.firstName" placeholder="የመጀመሪያ ስም" />
+            <FormControl v-model="form.middleName" placeholder="የአባት ስም" />
+            <FormControl v-model="form.lastName" placeholder="የአያት ስም" />
+          </div>
+        </FormField>
+
+        <FormField label="2. ጾታ">
+          <FormCheckRadioGroup v-model="form.gender" name="gender" type="radio" :options="genderOptions" />
+        </FormField>
+
+        <FormField label="3. የትውልድ ጊዜ">
+          <FormControl v-model="form.birthDate" type="date" placeholder="ቀን/ወር/ዓ.ም" />
+        </FormField>
+
+        <FormField label="4. ዜግነት">
+          <FormControl v-model="form.nationality" placeholder="ዜግነት" :icon="mdiFlag" />
+        </FormField>
+
+        <FormField label="5. የትዳር ሁኔታ">
+          <FormCheckRadioGroup v-model="form.maritalStatus" name="maritalStatus" type="radio"
+            :options="maritalStatusOptions" />
+        </FormField>
+
+        <FormField label="6. የትምህርት ደረጃ">
+          <FormCheckRadioGroup v-model="form.educationLevel" name="educationLevel" type="radio"
+            :options="educationLevelOptions" />
+        </FormField>
+
+        <FormField label="7. ቋሚ የመኖሪያ አድራሻ">
+          <div class="grid grid-cols-4 gap-4">
+            <FormControl v-model="form.addressRegion" placeholder="ክልል/ከተማ አስተዳድር" />
+            <FormControl v-model="form.addressZone" placeholder="ዞን/ክ/ከተማ" />
+            <FormControl v-model="form.addressWoreda" placeholder="ወረዳ" />
+            <FormControl v-model="form.addressKebele" placeholder="ቀበሌ" />
+          </div>
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <FormControl v-model="form.addressHouseNumber" placeholder="የቤት ቁጥር" :icon="mdiHome" />
+            <FormControl v-model="form.addressPhoneNumber" type="tel" placeholder="ስልክ ቁጥር (ቤት)" :icon="mdiPhone" />
+          </div>
+          <div class="grid grid-cols-1 gap-4 mt-4">
+            <FormControl v-model="form.addressMobileNumber" type="tel" placeholder="ስልክ ቁጥር (ሞባይል)" :icon="mdiPhone" />
+          </div>
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <FormControl v-model="form.addressFaxNumber" placeholder="ፋክስ ቁጥር" :icon="mdiFax" />
+            <FormControl v-model="form.addressPostalCode" placeholder="ፖ.ሣ.ቁጥር" />
+          </div>
+          <div class="grid grid-cols-1 gap-4 mt-4">
+            <FormControl v-model="form.addressEmail" type="email" placeholder="ኢ-ሜይል" :icon="mdiEmail" />
+          </div>
+        </FormField>
+
+        <FormField label="8. የሥራ አድራሻ (ካለ)">
+          <FormControl v-model="form.workPlaceName" placeholder="የመስሪያ ቤቱ ስም" />
+          <div class="grid grid-cols-4 gap-4 mt-4">
+            <FormControl v-model="form.workPlaceRegion" placeholder="ክልል/ከተማ አስተዳድር" />
+            <FormControl v-model="form.workPlaceZone" placeholder="ዞን/ክ/ከተማ" />
+            <FormControl v-model="form.workPlaceWoreda" placeholder="ወረዳ" />
+            <FormControl v-model="form.workPlaceKebele" placeholder="ቀበሌ" />
+          </div>
+          <div class="grid grid-cols-1 gap-4 mt-4">
+            <FormControl v-model="form.workPlacePhoneNumber" type="tel" placeholder="ስልክ ቁጥር" />
+          </div>
+        </FormField>
+
+        <div class="mt-8">
+          <p class="text-sm">እኔ ከዚህ በላይ ስሜ እና አዳራሻዬ የተገለፀው የሰጠሁት መረጃ በሙሉ ትክክለኛና እውነተኛ
+            ስለመሆኑ አረጋግጣለሁ፡፡</p>
+        </div>
+
+        <FormField label="ስም">
+          <FormControl v-model="form.fullName" type="text" placeholder="ስም" />
+        </FormField>
+
+        <FormField label="ፊርማ">
+          <FormControl v-model="form.signature" type="text" placeholder="እዚህ ላይ ይፈርሙ" />
+        </FormField>
+
+        <FormField label="ቀን">
+          <FormControl v-model="form.signDate" type="date" hint="ቀን/ወር/ዓ.ም" />
+        </FormField>
+
+        <ol class="list-decimal pl-6 mt-4 text-sm">
+          <li>ሁሉም የድርጅቱን ስራ አመራር ቦርድ አባላት፣ ስራ አስፈፃሚ ኮሚቴ አባላት እና ስራ አስኪያጅ (ተመርጦ ከቀረበ ብቻ) ያጠቃልላል፤</li>
+          <li>ሙሉ ስም ከነማዕረጉ መፃፍ ይኖርበታል፤</li>
+          <li>የድርጅቱ መስራች፣ ስራ አመራር ቦርድ አባል ወይም ስራ አስፈፃሚ ኮሚቴ አባል ወይም ስራ አስኪያጅ ተብሎ ይሞላል፤</li>
+          <li>በሲቪል ማህበረሰብ ድርጅቶች አዋጅ ቁጥር 1113/2011 እንቀፅ 59(1)(መ) እና 59(7) መሰረት በሀሰት የተዘጋጀ ወይም የተጭበረበረ ሰነድ
+            ማቅረብ የምዝገባ ጥያቄን ውድቅ የሚያደርግ ሲሆን በማታለል ወይም በማጭበርበር መመዝገብ ድርጅቱ እንዲፈርስ ምክንያት ይሆናል፤ የህግ
+            ተጠያቂነትም ይኖረዋል፤</li>
+        </ol>
+        <!-- Submit , Generate and Reset Buttons -->
         <template #footer>
-          <BaseButtons>
-            <BaseButton type="submit" color="info" label="Submit" />
-            <BaseButton type="reset" color="info" outline label="Reset" />
-          </BaseButtons>
+          <BaseDivider />
+          <BaseButton class="mr-6" type="submit" color="info" outline label="Submit" :disabled="isSubmitting || isLoading" />
+          <BaseButton class="mr-6" type="reset" color="info" outline label="Reset" @click="resetForm" />
+          <BaseButton type="button" color="info" outline label="Generate PDF" :icon="mdiFilePdfBox" @click="generatePDF" />
         </template>
-      </CardBox>
-    </SectionMain>
 
-    <SectionTitle>Custom elements</SectionTitle>
-
-    <SectionMain>
-      <CardBox>
-        <FormField label="Checkbox">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.checkbox"
-            name="sample-checkbox"
-            :options="{ lorem: 'Lorem', ipsum: 'Ipsum', dolore: 'Dolore' }"
-          />
-        </FormField>
-
-        <BaseDivider />
-
-        <FormField label="Radio">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.radio"
-            name="sample-radio"
-            type="radio"
-            :options="{ one: 'One', two: 'Two' }"
-          />
-        </FormField>
-
-        <BaseDivider />
-
-        <FormField label="Switch">
-          <FormCheckRadioGroup
-            v-model="customElementsForm.switch"
-            name="sample-switch"
-            type="switch"
-            :options="{ one: 'One', two: 'Two' }"
-          />
-        </FormField>
-
-        <BaseDivider />
-
-        <FormFilePicker v-model="customElementsForm.file" label="Upload" />
       </CardBox>
 
-      <SectionTitle>Form with status example</SectionTitle>
 
-      <CardBox
-        class="md:w-7/12 lg:w-5/12 xl:w-4/12 shadow-2xl md:mx-auto"
-        is-form
-        is-hoverable
-        @submit.prevent="formStatusSubmit"
-      >
-        <NotificationBarInCard
-          :color="formStatusOptions[formStatusCurrent]"
-          :is-placed-with-header="formStatusWithHeader"
-        >
-          <span
-            ><b class="capitalize">{{ formStatusOptions[formStatusCurrent] }}</b> state</span
-          >
-        </NotificationBarInCard>
-        <FormField label="Fields">
-          <FormControl
-            v-model="form.name"
-            :icon-left="mdiAccount"
-            help="Your full name"
-            placeholder="Name"
-          />
-        </FormField>
-
-        <template #footer>
-          <BaseButton label="Trigger" type="submit" color="info" />
-        </template>
-      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>
