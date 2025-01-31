@@ -20,7 +20,7 @@ const props = defineProps({
 // Compute color class
 const colorClass = computed(() => {
   return useDarkModeStore().isEnabled
-    ? 'bg-gray-100 text-black dark:bg-slate-800 dark:text-white'
+    ? 'text-black dark:bg-slate-800 dark:text-white'
     : ''
 })
 

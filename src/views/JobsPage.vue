@@ -69,7 +69,7 @@
             </SectionMain>
 
             <!-- Modal for Viewing Full Job Description -->
-            <CardBoxModal v-model="modalActive" :title="selectedJob?.title || 'Job Details'">
+            <CardBoxModal v-model="modalActive" :title="selectedJob?.title || 'Job Details'" :footerDisplayed="false">
                 <p class="text-gray-700 dark:text-gray-300">{{ selectedJob?.description }}</p>
             </CardBoxModal>
         </div>

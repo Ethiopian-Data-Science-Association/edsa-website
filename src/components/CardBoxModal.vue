@@ -70,7 +70,7 @@ window.addEventListener('keydown', (e) => {
 
       <!-- Footer Section -->
       <template #footer v-if="footerDisplayed">
-        <BaseButtons class="p-4 bg-white border-t border-gray-200">
+        <BaseButtons class="p-4 bg-white  dark:bg-slate-900">
           <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
           <BaseButton v-if="hasCancel" label="Cancel" :color="button" outline @click="cancel" />
         </BaseButtons>

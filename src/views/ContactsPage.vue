@@ -10,14 +10,14 @@
                 <!-- Contact Submissions Table -->
                 <div v-if="contactSubmissions.length">
                     <table class="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-                        <thead class="bg-gray-100 dark:bg-gray-700">
+                        <thead class="bg-gray-100">
                             <tr>
-                                <th class="p-4 text-left">Name</th>
-                                <th class="p-4 text-left">Email</th>
-                                <th class="p-4 text-left">Phone</th>
-                                <th class="p-4 text-left">Type</th>
-                                <th class="p-4 text-left">Submitted At</th>
-                                <th class="p-4 text-left">Actions</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Name</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Email</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Phone</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Type</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Submitted At</th>
+                                <th class="p-4 text-left dark:bg-gray-700">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Modal for Viewing Full Contact Submission -->
-        <CardBoxModal v-model="isModalActive" :title="selectedContact?.name || 'Contact Details'">
+        <CardBoxModal v-model="isModalActive" :title="selectedContact?.name || 'Contact Details'" :footerDisplayed="false">
             <p><strong>Email:</strong> {{ selectedContact?.email || 'Anonymous' }}</p>
             <p><strong>Phone:</strong> {{ selectedContact?.phone || 'N/A' }}</p>
             <p><strong>Type:</strong> {{ selectedContact?.questionType }}</p>
