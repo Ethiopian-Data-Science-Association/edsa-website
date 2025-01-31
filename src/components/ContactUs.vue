@@ -14,6 +14,8 @@
                     color="contrast" rounded-full small />
                 <BaseButton href="https://youtube.com/" target="_blank" :icon="mdiYoutube" color="contrast" rounded-full
                     small />
+                <BaseButton v-if="isAdmin" :icon="mdiBallotOutline" color="contrast" rounded-full small
+                   :disabled="false" @click="navigateToContactsPage" />
             </div>
         </SectionTitleLineWithButton>
 
@@ -58,8 +60,10 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from "vue-router";
+import { roles } from '@/shared/constants/roles';
 import localforage from 'localforage';
 import {
     mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiLinkedin, mdiFacebook,
@@ -75,9 +79,11 @@ import BaseButtons from '@/components/BaseButtons.vue';
 import NotificationBar from '@/components/NotificationBar.vue';
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue';
 
+const router = useRouter();
 const store = useStore();
 const isSubmitting = ref(false);
 const userId = ref('');
+const isAdmin = ref(false);
 const notificationMessage = ref('');
 const notificationTitle = ref('');
 const notificationColor = ref('');
@@ -122,7 +128,23 @@ const fetchUser = async () => {
     }
 };
 
-onMounted(fetchUser);
+
+
+// Fetch the User ACL
+const fetchUserAcl = async () => {
+    await fetchUser().then(async () => {
+        const user = computed(() => store.getters['user/userData']);
+        if (user) {
+            const userAcl = await store.dispatch('user/getUserAcl', user.value)
+            isAdmin.value = (userAcl === roles.ADMIN ? true : false);
+        }
+    })
+};
+
+// Fetch user data
+onMounted(async () => {
+    await fetchUserAcl(); // we ought to know if the user is an ADMIN 
+});
 
 // Show notification
 const showNotification = (title, message, color, icon) => {
@@ -172,6 +194,11 @@ const submit = async () => {
     } finally {
         isSubmitting.value = false;
     }
+};
+
+// Navigate to create page
+const navigateToContactsPage = () => {
+    router.push("/contacts");
 };
 </script>
 
