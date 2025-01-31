@@ -42,11 +42,12 @@ export default [
     label: 'My Blogs',
     icon: mdiPost
   },
-  {
-    to: '/ui',
-    label: 'UI',
-    icon: mdiTelevisionGuide
-  },
+  /* Uncomment this section whenever you would like to see the reusable components.*/
+  // {
+  //   to: '/ui',
+  //   label: 'UI',
+  //   icon: mdiTelevisionGuide
+  // },
   {
     to: '/jobs',
     label: 'Jobs',
