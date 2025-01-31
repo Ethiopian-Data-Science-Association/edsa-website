@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
       'bg-gray-100 dark:bg-slate-800 lg:bg-transparent lg:dark:bg-transparent p-3 lg:p-0':
         item.menu
     }">
-      <UserAvatarCurrentUser v-if="item.isCurrentUser" class="w-6 h-6 mr-3 inline-flex" :username="user?.fullName"
+      <UserAvatarCurrentUser v-if="item.isCurrentUser" class="w-6 h-6 mr-1 inline-flex" :username="user?.fullName"
         :avatarUrl="user?.profilePicture" />
       <BaseIcon v-if="item.icon" :path="item.icon" class="transition-colors" />
       <span class="px-2 transition-colors" :class="{ 'lg:hidden': item.isDesktopNoLabel && item.icon }">{{ itemLabel
