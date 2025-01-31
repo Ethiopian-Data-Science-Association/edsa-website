@@ -1,8 +1,8 @@
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { ref, onMounted } from 'vue'
 import {
-  mdiChartTimelineVariant,
-  mdiGithub,
+  mdiChartTimelineVariant
 } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -72,17 +72,17 @@ onMounted(() => {
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
         <CardBoxWidget title="Fostering Collaboration"
           description="Share expertise, address industry challenges collectively, and foster meaningful partnerships by networking and exchanging contacts."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
-          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
+          :imageUrl="favicon" linkText="Learn more" linkUrl="/" linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium" />
         <CardBoxWidget title="Research and Development"
           description="We aim to offer crucial professional support and essential resources to students pursuing data science."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
-          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
+          :imageUrl="favicon" linkText="Learn more" linkUrl="/" linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium" />
 
         <CardBoxWidget title="Education and Training"
           description="We offer variety of certifications, workshops, webinars, and training programs. Check out our Certifications page."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
-          linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
+          :imageUrl="favicon" linkText="Learn more" linkUrl="/" linkColor="text-purple-600 dark:text-purple-400"
+          linkFontWeight="font-medium" />
       </div>
 
       <!-- Objectives Section here -->

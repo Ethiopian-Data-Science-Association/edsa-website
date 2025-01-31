@@ -5,7 +5,7 @@
     <!-- Blog Grid -->
     <div v-if="blogs.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <CardBoxWidget v-for="(blog, index) in blogs" :key="blog.slug" :title="blog.title" :description="blog.content"
-        :imageUrl="blog.coverImage || `/public/favicon.png`"
+        :imageUrl="blog.coverImage || favicon"
         :buttonUrl="`/edsa-website/blogs/${sanitizeUrl(blog.slug)}`" buttonColor="text-blue-500 dark:text-blue-400"
         buttonFontWeight="font-medium" buttonText="Read More" :is-admin="isAdmin" :blog-data="blog"
         :is-published="blog.isPublished" />
@@ -23,7 +23,7 @@
 
     <!-- Empty State -->
     <div v-if="!isLoading && blogs.length === 0" class="flex flex-col items-center text-center py-16">
-      <img src="/public/favicon.png" alt="No blogs available" class="w-24 h-24 mb-4" />
+      <img :src="favicon" alt="No blogs available" class="w-24 h-24 mb-4" />
       <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No blogs available</p>
       <p class="text-gray-500 dark:text-gray-400">Check back later or create a new blog post.</p>
       <BaseButton v-if="isAdmin" label="Add Blog" :icon="mdiPlus" color="success"
@@ -42,6 +42,7 @@ import { sanitizeUrl } from "../utils/sanitizeUrl.utils.js";
 import BaseButton from '@/components/BaseButton.vue';
 import { mdiPlus } from "@mdi/js";
 import localforage from "localforage";
+import favicon from '@/assets/favicon.png';
 
 
 const router = useRouter()

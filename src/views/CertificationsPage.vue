@@ -17,13 +17,13 @@
         <div v-if="displayedCertifications.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <CardBoxWidget v-for="(certification, index) in displayedCertifications" :key="certification.id"
             :title="certification.title" :description="certification.description"
-            :imageUrl="certification.image || 'favicon.png'" buttonColor="text-blue-500 dark:text-blue-400"
+            :imageUrl="certification.image || favicon" buttonColor="text-blue-500 dark:text-blue-400"
             buttonFontWeight="font-medium" buttonText="View Details" @click="viewCertificationDetail(certification)" />
         </div>
 
         <!-- Empty State -->
         <div v-else class="flex flex-col items-center text-center py-16">
-          <img src="/public/favicon.png" alt="No certifications available" class="w-24 h-24 mb-4" />
+          <img :src="favicon" alt="No certifications available" class="w-24 h-24 mb-4" />
           <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No certifications available</p>
           <p class="text-gray-500 dark:text-gray-400">Check back later or enroll in a certification program.</p>
           <BaseButton v-if="isAdmin" label="Create Certification" :icon="mdiPlus" color="success"
@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { ref, computed, onMounted } from 'vue';
 import { roles } from "@/shared/constants/roles";
 import { useStore } from 'vuex';

@@ -5,7 +5,7 @@ import { computed } from 'vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
 import AsideMenuItem from '@/components/AsideMenuItem.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
-import logo from "../../public/favicon.png";
+import logo from '@/assets/favicon.png';
 
 const router = useRouter();
 

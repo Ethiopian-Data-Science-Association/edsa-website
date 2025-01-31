@@ -18,7 +18,7 @@
         </div>
 
         <!-- Image -->
-        <img :src="certification.imageUrl || '/public/favicon.png'" alt="Certification Image"
+        <img :src="certification.imageUrl || favicon" alt="Certification Image"
           class="w-full h-64 object-cover mb-6 rounded-lg" />
 
         <!-- Description -->
@@ -89,6 +89,7 @@
 </template>
 
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { roles } from "@/shared/constants/roles";
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
