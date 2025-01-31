@@ -1,6 +1,6 @@
 # [EDSA Website](https://google.com/)
 
-   [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+   [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Netlify Status](https://api.netlify.com/api/v1/badges/51e41a4f-5d65-4b5f-9735-7084753f2173/deploy-status)](https://app.netlify.com/sites/ethiodsa/deploys)
 
 ### Tailwind 3.x Vue 3.x with Vite
 
