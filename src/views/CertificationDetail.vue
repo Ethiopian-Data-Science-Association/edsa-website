@@ -5,7 +5,7 @@
         <!-- Title and Action Icons -->
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-4xl font-bold">{{ certification.title }}</h2>
-          <div class="flex space-x-2 ml-4">
+          <div v-if="isAdmin" class="flex space-x-2 ml-4">
             <button @click="navigateToEdit"
               class="flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
               <BaseIcon :path="mdiPencil" />
@@ -89,9 +89,11 @@
 </template>
 
 <script setup>
+import { roles } from "@/shared/constants/roles";
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import localforage from "localforage";
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
 import BaseButton from '@/components/BaseButton.vue';
@@ -103,6 +105,7 @@ import { certification as certificationConstants } from '@/shared/constants/cert
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+const isAdmin = ref(false);
 const certificationId = route.params.id;
 const isLoading = ref(false);
 const certification = ref({
@@ -180,7 +183,33 @@ const navigateToRegistration = () => {
   router.push({ name: 'certification-register-form', params: { id: certificationId } });
 };
 
+// Fetch user 
+const fetchUser = async () => {
+    try {
+        const userData = await localforage.getItem('user')
+        if (userData && userData.uid) {
+            await store.dispatch('user/getUser', userData.uid)
+        } else {
+            console.error('User data not found in local storage.')
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error)
+    }
+}
+
+// Fetch the User ACL
+const fetchUserAcl = async () => {
+    await fetchUser().then(async () => {
+        const user = computed(() => store.getters['user/userData']);
+        if (user) {
+            const userAcl = await store.dispatch('user/getUserAcl', user.value)
+            isAdmin.value = (userAcl === roles.ADMIN ? true : false);
+        }
+    })
+}
+
 onMounted(async () => {
+  await fetchUserAcl(); // we ought to know if the user is an ADMIN 
   // Fetch the certification details based on certificationId
   await store.dispatch('certification/fetchCertification', certificationId);
   const { certificationData } = store.state.certification;// certificationData;

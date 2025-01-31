@@ -7,8 +7,7 @@ import {
   mdiTelevisionGuide,
   mdiResponsive,
   mdiAccountMultiplePlus,
-  mdiPost,
-  mdiBallotOutline
+  mdiPost
 } from '@mdi/js'
 
 export default [
@@ -42,11 +41,12 @@ export default [
     label: 'My Blogs',
     icon: mdiPost
   },
-  {
-    to: '/ui',
-    label: 'UI',
-    icon: mdiTelevisionGuide
-  },
+  /* Uncomment this section whenever you would like to see the reusable components.*/
+  // {
+  //   to: '/ui',
+  //   label: 'UI',
+  //   icon: mdiTelevisionGuide
+  // },
   {
     to: '/jobs',
     label: 'Jobs',
@@ -61,10 +61,5 @@ export default [
     to: '/login',
     label: 'Login',
     icon: mdiLock
-  },
-  {
-    to: '/contacts',
-    label: 'Contacts',
-    icon: mdiBallotOutline
   }
 ]

@@ -52,11 +52,11 @@ onMounted(() => {
 
         <!-- Responsive Buttons -->
         <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-          <a href="/membership"
+          <a href="/edsa-website/memberships"
             class="px-6 py-3 border-2 border-green-500 text-green-500 font-bold rounded-full hover:bg-green-500 hover:text-white transition text-center">
             BECOME A MEMBER
           </a>
-          <a href="/courses"
+          <a href="/edsa-website/certifications"
             class="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition text-center">
             START LEARNING AI
           </a>
@@ -66,24 +66,22 @@ onMounted(() => {
 
     <!-- Ensure SectionMain Starts Below the Video Section -->
     <SectionMain class="mt-[150px] xs:mt-80 sm:mt-80 md:mt-80 lg:mt-40">
-      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
-        <BaseButton href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank"
-          :icon="mdiGithub" label="Star on GitHub" color="contrast" rounded-full small />
+      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Objectives" main>
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-        <CardBoxWidget title="Chartered Data Scientist Exam"
-          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+        <CardBoxWidget title="Fostering Collaboration"
+          description="Share expertise, address industry challenges collectively, and foster meaningful partnerships by networking and exchanging contacts."
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
           linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
-        <CardBoxWidget title="Chartered Data Scientist Exam"
-          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+        <CardBoxWidget title="Research and Development"
+          description="We aim to offer crucial professional support and essential resources to students pursuing data science."
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
           linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
 
-        <CardBoxWidget title="Chartered Data Scientist Exam"
-          description="The highest distinction in the data science profession. Not just earn a charter, but use it as a designation."
-          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/chartered-data-scientist"
+        <CardBoxWidget title="Education and Training"
+          description="We offer variety of certifications, workshops, webinars, and training programs. Check out our Certifications page."
+          imageUrl="/public/favicon.png" linkText="Learn more" linkUrl="/"
           linkColor="text-purple-600 dark:text-purple-400" linkFontWeight="font-medium" />
       </div>
 

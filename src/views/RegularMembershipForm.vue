@@ -158,10 +158,6 @@ const clearNotification = () => {
 }
 
 
-const generatePDF = () => {
-  console.log("Generating PDF...");
-};
-
 // **Submit Form**
 const submit = handleSubmit(async (values) => {
   try {
@@ -379,8 +375,6 @@ onMounted(fetchUser)
           <BaseButton class="mr-6" type="submit" color="info" outline label="Submit"
             :disabled="isSubmitting || isLoading" />
           <BaseButton class="mr-6" type="reset" color="info" outline label="Reset" @click="resetForm" />
-          <BaseButton type="button" color="info" outline label="Generate PDF" :icon="mdiFilePdfBox"
-            @click="generatePDF" />
         </template>
 
       </CardBox>

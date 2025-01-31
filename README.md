@@ -10,7 +10,20 @@
 
 ### Tailwind 3.x Vue 3.x with Vite
 
-**Admin One** is simple, beautiful and free Vue.js 3.x Tailwind CSS 3.x admin dashboard. Nuxt 3.x or Laravel 9.x integrations available
+**EDSA Website** is simple, beautiful Vue.js 3.x Tailwind CSS 3.x web application dashboard created to serve as a gateway for many features provided by the Ethiopian Data Science Association (EDSA).
+
+#### The Features include: 
+
+- **Memberships**
+- **Certifications**
+- **Library**
+- **Blogs**
+- **Jobs**
+- **Profile**
+- **Login**
+- **SignUp**
+- **Contacts**
+- **Announcements and many more.**
 
 * Built with **Vue.js 3**, **Tailwind CSS 3** framework & **Composition API**
 * **Vite** under the hood &mdash; [Info](https://vitejs.dev)  
@@ -27,13 +40,14 @@
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vue.js 3](https://v3.vuejs.org/)
 - [Vite](https://vitejs.dev)
+
 ### Get code & install
 
-#### Get the repo
+#### Clone the repo
 
-* [Create new repo](https://github.com/Ethiopian-Data-Science-Association/edsa-website/generate) with this template
-* &hellip; or clone this repo on GitHub
-* &hellip; or [download .zip](https://github.com/Ethiopian-Data-Science-Association/edsa-website/archive/master.zip) from GitHub
+```
+git clone https://github.com/Ethiopian-Data-Science-Association/edsa-website
+```
 
 #### Install
 
@@ -83,6 +97,6 @@ We try to make sure Dashboard works well in the latest versions of all major bro
 
 ## Licensing
 
-Copyright &copy; 2024 Licensed under MIT.
+Copyright &copy; 2025 Licensed under MIT.
 
 
