@@ -6,7 +6,7 @@
                 <!-- Header with Title and Button -->
                 <div class="flex items-center justify-between mb-8">
                     <h1 class="text-3xl font-bold">Jobs</h1>
-                    <BaseButton v-if="isAdmin" label="Post a Job" :icon="mdiPlus" color="success"
+                    <BaseButton label="Post a Job" :icon="mdiPlus" color="success"
                         class="rounded-full bg-green-500 text-white hover:bg-green-600 ml-12"
                         @click="navigateToCreatePage" />
                 </div>
@@ -62,7 +62,7 @@
                     <img src="/public/favicon.png" alt="No jobs available" class="w-24 h-24 mb-4" />
                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No jobs available</p>
                     <p class="text-gray-500 dark:text-gray-400">Check back later or post a new job.</p>
-                    <BaseButton v-if="isAdmin" label="Post a Job" :icon="mdiPlus" color="success"
+                    <BaseButton label="Post a Job" :icon="mdiPlus" color="success"
                         class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600"
                         @click="navigateToCreatePage" />
                 </div>
@@ -94,7 +94,6 @@ import PillTag from '@/components/PillTag.vue'
 
 const router = useRouter();
 const store = useStore();
-
 const isAdmin = ref(false);
 const isLoading = ref(false);
 const hasReachedEnd = ref(false);

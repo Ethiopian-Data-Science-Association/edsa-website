@@ -152,8 +152,11 @@ const submit = handleSubmit(async (values) => {
         };
 
         await store.dispatch('job/addJob', jobData);
-        showNotification('Success', 'Job posted successfully.', 'success', mdiBook);
-        router.push('/jobs');
+        showNotification('Success', 'Job posted successfully. Jobs will be displayed once approved by Admins.', 'success', mdiBook);
+        resetForm();
+        setTimeout(() => {
+            router.push('/jobs');
+        }, 10000); // 10-second delay before navigating for the user to read the message
     } catch (error) {
         generalError.value = error.message;
         showNotification('Error', 'Failed to post job. Please try again.', 'danger', mdiAlertCircle);
