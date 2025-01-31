@@ -10,7 +10,7 @@
         :title="blog.title"
         :isPublished="blog.isPublished"
         :description="blog.content"
-        :imageUrl="blog.coverImage || `/public/favicon.png`"
+        :imageUrl="blog.coverImage || favicon"
         :buttonUrl="`/edsa-website/blogs/${sanitizeUrl(blog.slug)}`"
         buttonColor="text-blue-500 dark:text-blue-400"
         buttonFontWeight="font-medium"
@@ -33,7 +33,7 @@
 
     <!-- Empty State -->
     <div v-if="!isLoading && blogs.length === 0" class="flex flex-col items-center text-center py-16">
-      <img src="/public/favicon.png" alt="No blogs available" class="w-24 h-24 mb-4" />
+      <img :src="favicon" alt="No blogs available" class="w-24 h-24 mb-4" />
       <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">You haven't created any blogs yet</p>
       <p class="text-gray-500 dark:text-gray-400">Start writing and share your knowledge with the community.</p>
       <BaseButton
@@ -52,6 +52,7 @@
 ### **🔹 Script Section**
 ```vue
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { store } from '../store/index';

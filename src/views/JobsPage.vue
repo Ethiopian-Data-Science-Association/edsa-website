@@ -59,7 +59,7 @@
 
                 <!-- Empty State -->
                 <div v-if="filteredJobs.length === 0" class="flex flex-col items-center text-center py-16">
-                    <img src="/public/favicon.png" alt="No jobs available" class="w-24 h-24 mb-4" />
+                    <img :src="favicon" alt="No jobs available" class="w-24 h-24 mb-4" />
                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No jobs available</p>
                     <p class="text-gray-500 dark:text-gray-400">Check back later or post a new job.</p>
                     <BaseButton label="Post a Job" :icon="mdiPlus" color="success"
@@ -78,6 +78,7 @@
 
 
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { roles } from "@/shared/constants/roles";
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";

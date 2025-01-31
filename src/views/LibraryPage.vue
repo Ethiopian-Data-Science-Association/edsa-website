@@ -57,7 +57,7 @@
 
                 <!-- Empty State -->
                 <div v-if="filteredResources.length === 0" class="flex flex-col items-center text-center py-16">
-                    <img src="/public/favicon.png" alt="No resources available" class="w-24 h-24 mb-4" />
+                    <img :src="favicon" alt="No resources available" class="w-24 h-24 mb-4" />
                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No resources available</p>
                     <p class="text-gray-500 dark:text-gray-400">Check back later or add a new resource.</p>
                     <BaseButton v-if="isAdmin" label="Add Resource" :icon="mdiPlus" color="success"
@@ -70,6 +70,7 @@
 </template>
 
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";

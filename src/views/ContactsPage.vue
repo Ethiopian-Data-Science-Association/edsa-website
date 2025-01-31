@@ -51,7 +51,7 @@
 
                 <!-- Empty State -->
                 <div v-if="contactSubmissions.length === 0" class="flex flex-col items-center text-center py-16">
-                    <img src="/public/favicon.png" alt="No contacts available" class="w-24 h-24 mb-4" />
+                    <img :src="favicon" alt="No contacts available" class="w-24 h-24 mb-4" />
                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No contact submissions yet</p>
                     <p class="text-gray-500 dark:text-gray-400">Check back later for new submissions.</p>
                 </div>
@@ -70,6 +70,7 @@
 </template>
 
 <script setup>
+import favicon from '@/assets/favicon.png';
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
