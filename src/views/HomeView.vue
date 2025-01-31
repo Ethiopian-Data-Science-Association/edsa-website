@@ -44,10 +44,10 @@ onMounted(() => {
         <h2 class="text-3xl font-semibold mb-4">Enhance Your AI Skills with our Hands-on training</h2>
 
         <h2 class="text-xl font-normal mb-4 lg:pt-64">
-          Stand out from the crowd by mastering AI today—your future success depends on staying ahead in the game.
+          Stand out from the crowd by mastering AI today. Your future success depends on staying ahead in the game.
         </h2>
         <h2 class="text-xl font-bold text-green-500 mb-6">
-          Start transforming your skills with our Generative AI courses—enroll now and future-proof your career!
+          Start transforming your skills with our Generative AI certifications. Enroll now and future-proof your career!
         </h2>
 
         <!-- Responsive Buttons -->
