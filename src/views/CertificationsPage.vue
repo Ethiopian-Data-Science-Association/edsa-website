@@ -25,7 +25,7 @@
         <div v-else class="flex flex-col items-center text-center py-16">
           <img src="/public/favicon.png" alt="No certifications available" class="w-24 h-24 mb-4" />
           <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">No certifications available</p>
-          <p class="text-gray-500 dark:text-gray-400">Check back later or add a new certification.</p>
+          <p class="text-gray-500 dark:text-gray-400">Check back later or enroll in a certification program.</p>
           <BaseButton v-if="isAdmin" label="Create Certification" :icon="mdiPlus" color="success"
             class="mt-4 rounded-full bg-green-500 text-white hover:bg-green-600" @click="goToCreatePage" />
         </div>
@@ -35,7 +35,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { roles } from "@/shared/constants/roles";
 import { useStore } from 'vuex';
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue';
 import SectionMain from '@/components/SectionMain.vue';
@@ -45,7 +46,7 @@ import { mdiPlus, mdiCertificate } from '@mdi/js';
 import { useRouter } from 'vue-router';
 import localforage from 'localforage';
 
-const isAdmin = true; // Assume admin status for demonstration
+const isAdmin = ref(false); // Assume admin status for demonstration
 const router = useRouter();
 const store = useStore();
 
@@ -75,7 +76,33 @@ const fetchUserCertifications = async () => {
   }
 };
 
+// Fetch user 
+const fetchUser = async () => {
+  try {
+    const userData = await localforage.getItem('user')
+    if (userData && userData.uid) {
+      await store.dispatch('user/getUser', userData.uid)
+    } else {
+      console.error('User data not found in local storage.')
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error)
+  }
+};
+
+// Fetch the User ACL
+const fetchUserAcl = async () => {
+  await fetchUser().then(async () => {
+    const user = computed(() => store.getters['user/userData']);
+    if (user) {
+      const userAcl = await store.dispatch('user/getUserAcl', user.value)
+      isAdmin.value = (userAcl === roles.ADMIN ? true : false);
+    }
+  })
+};
+
 onMounted(async () => {
+  await fetchUserAcl(); // we ought to know if the user is an ADMIN 
   await store.dispatch('certification/fetchCertifications');
   certifications.value = store.state.certification.certifications || [];
   displayedCertifications.value = certifications.value; // Show all certifications by default

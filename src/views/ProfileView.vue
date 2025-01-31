@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, onMounted , computed } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useMainStore } from '@/pinia/main'
 import localforage from 'localforage'
 import {
@@ -134,7 +134,7 @@ const fetchUser = async () => {
       if (userFound) {
         const user = computed(() => store.getters['user/userData']);
         profileForm.uid = user.value.uid;
-        profileForm.name = user.value.fullName;
+        profileForm.name = user.value.fullName || '';
         profileForm.email = user.value.email;
       }
     } else {
@@ -179,8 +179,6 @@ const onAvatarUpload = async (file) => {
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main>
-        <BaseButton href="https://github.com/Ethiopian-Data-Science-Association/edsa-website" target="_blank"
-          :icon="mdiGithub" label="Star on GitHub" color="contrast" rounded-full small />
       </SectionTitleLineWithButton>
 
       <UserCard class="mb-6" />
@@ -205,11 +203,11 @@ const onAvatarUpload = async (file) => {
               @update:modelValue="onAvatarUpload" />
             <p v-if="avatarError" class="text-red-500 text-sm">{{ avatarError }}</p>
           </FormField>
-          <FormField label="Name" help="Required. Your name">
+          <FormField label="Name" help="Required. Your Full Name." placeholder="Name">
             <FormControl v-model="profileForm.name" :icon="mdiAccount" name="username" required
               autocomplete="username" />
           </FormField>
-          <FormField label="E-mail" help="Required. Your e-mail">
+          <FormField label="E-mail" help="Required. Your e-mail address can not be edited.">
             <FormControl v-model="profileForm.email" :icon="mdiMail" type="email" name="email" required
               :is-read-only="true" autocomplete="email" />
           </FormField>

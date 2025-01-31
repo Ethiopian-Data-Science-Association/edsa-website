@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import { roles } from "@/shared/constants/roles";
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
@@ -40,6 +41,7 @@ import CardBoxWidget from './CardBoxWidget.vue';
 import { sanitizeUrl } from "../utils/sanitizeUrl.utils.js";
 import BaseButton from '@/components/BaseButton.vue';
 import { mdiPlus } from "@mdi/js";
+import localforage from "localforage";
 
 
 const router = useRouter()
@@ -54,23 +56,46 @@ const props = defineProps({
   },
 });
 
+const isAdmin = ref(false);
 const blogs = computed(() => store.state.blogs.blogs);
 const isLoading = ref(true);
 
-// Fetch Blogs
-const fetchBlogs = async () => {
-  isLoading.value = true;
-  await store.dispatch("blogs/fetchBlogs");
-  isLoading.value = false;
-};
 
 // Navigate to Blog Creation
 const handleWriteBlogBtn = () => {
   router.push("/blogs/write")
 }
 
+// Fetch user 
+const fetchUser = async () => {
+  try {
+    const userData = await localforage.getItem('user')
+    if (userData && userData.uid) {
+      await store.dispatch('user/getUser', userData.uid)
+    } else {
+      console.error('User data not found in local storage.')
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error)
+  }
+}
+
+const fetchUserAcl = async () => {
+  await fetchUser().then(async () => {
+    const user = computed(() => store.getters['user/userData']);
+    if (user) {
+      const userAcl = await store.dispatch('user/getUserAcl', user.value)
+      isAdmin.value = (userAcl === roles.ADMIN ? true : false);
+    }
+  }).then(async () => {
+    isLoading.value = true;
+    await store.dispatch('blogs/getBlogs', { pageSize: 10, lastDoc: null, isAdmin: isAdmin.value })
+    isLoading.value = false;
+  })
+}
+
 // Fetch blogs on mount
-onMounted(() => {
-  fetchBlogs();
+onMounted(async () => {
+  await fetchUserAcl(); // we ought to know if the user is an ADMIN 
 });
 </script>
