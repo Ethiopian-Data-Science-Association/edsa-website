@@ -267,7 +267,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/edsa-website'), // The web Base URL attaches on each route
+  history: createWebHistory(import.meta.env.VITE_BASE_URL), // The web Base URL attaches on each route
   routes,
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { top: 0 }
